@@ -1,4 +1,4 @@
-import { ArrowRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import BannerImg from "@/assets/images/backgroudHD.jpg";
@@ -115,16 +115,16 @@ const HomePage = () => {
               >
                 {banners[0]?.title || "Bienvenido al Colegio de Topógrafos"}
               </motion.h1>
-              
+
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={!isLoading ? { opacity: 1 } : {}}
                 transition={{ delay: 0.7, duration: 0.8 }}
                 className="text-xl text-gray-200 mb-8 drop-shadow-md"
               >
-                {banners[0]?.subtitle || "Formación especializada para profesionales"}
+                {banners[0]?.subtitle || "Comprometidos con la excelencia profesional y el desarrollo del sector topográfico."}
               </motion.p>
-              
+
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={!isLoading ? { opacity: 1 } : {}}
@@ -157,6 +157,7 @@ const HomePage = () => {
 
       {!isLoading && (
         <>
+          {/* Noticias y Comunicados */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <motion.div
@@ -186,27 +187,22 @@ const HomePage = () => {
             </div>
           </section>
 
-          <TitleMain 
-            title="Por qué elegirnos"
-            subtitle="Una formación completa y especializada para quienes construyen el futuro de la topografía."
+          <TitleMain
+            title="¿Por qué elegirnos?"
+            subtitle="Acompañamos el crecimiento profesional con actividades, recursos y espacios de encuentro para nuestra comunidad."
           />
 
+          {/* Capacitaciones (texto general, sin enlace 'ver todos') */}
           <section className="py-16 bg-gray-50">
             <div className="container mx-auto px-6 md:px-12">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Cursos destacados</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Capacitaciones y formación</h2>
                   <p className="text-lg text-gray-600 max-w-2xl">
-                    Explora nuestra selección de cursos diseñados para mejorar tus habilidades en topografía.
+                    Compartimos actividades formativas orientadas a fortalecer habilidades y buenas prácticas en el ejercicio profesional.
                   </p>
                 </div>
-                <Link
-                  to="/cursos"
-                  className="mt-4 md:mt-0 text-cyan-600 hover:text-cyan-700 font-medium flex items-center"
-                >
-                  Ver todos los cursos
-                  <ArrowRight size={18} className="ml-1" />
-                </Link>
+                {/* 🔥 Eliminado el Link 'Ver todos los cursos' */}
               </div>
 
               <div className="grid grid-cols-1 text-black md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -223,22 +219,17 @@ const HomePage = () => {
             </div>
           </section>
 
+          {/* Eventos (texto general, sin enlace 'ver todos') */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Próximos eventos</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Actividades y novedades</h2>
                   <p className="text-lg text-gray-600 max-w-2xl">
-                    Participa y potencia tu conocimiento con las tendencias más actuales de la industria.
+                    Conectamos a nuestra comunidad a través de actividades informativas y de actualización profesional.
                   </p>
                 </div>
-                <Link
-                  to="/events"
-                  className="mt-4 md:mt-0 text-cyan-600 hover:text-cyan-700 font-medium flex items-center"
-                >
-                  Ver todos los eventos
-                  <ArrowRight size={18} className="ml-1" />
-                </Link>
+                {/* 🔥 Eliminado el Link 'Ver todos los eventos' */}
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
