@@ -11,8 +11,8 @@ const Footer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const SocialNetworkService = createApiService({basePath: 'social_networks'});
-  const ContactService = createApiService({basePath: 'contacts'});
+  const SocialNetworkService = createApiService({ basePath: 'social_networks' });
+  const ContactService = createApiService({ basePath: 'contacts' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,9 +20,9 @@ const Footer = () => {
         setIsLoading(true);
         const [socialResponse, contactResponse] = await Promise.all([
           SocialNetworkService.get('all'),
-          ContactService.get('all')
+          ContactService.get('all'),
         ]);
-        
+
         setSocialNetworks(socialResponse.data || []);
         setContacts(contactResponse.data || []);
       } catch (err) {
@@ -52,8 +52,8 @@ const Footer = () => {
     );
   }
 
-  const mainContact = contacts[0] || {};
-  const mainSocial = socialNetworks[0] || {};
+  const mainContact = contacts[0] || {} as IContact;
+  const mainSocial = socialNetworks[0] || {} as ISocialNetwork;
 
   const formatBusinessHours = (text: string) => {
     if (!text) return null;
@@ -76,7 +76,7 @@ const Footer = () => {
           <p className="text-gray-300 mb-4">
             Impulsando el futuro de la topografía boliviana.
           </p>
-          
+
           {(mainSocial.url_facebook || mainSocial.url_twitter || mainSocial.url_instagram || mainSocial.url_linkedin) && (
             <div className="flex space-x-4">
               {mainSocial.url_facebook && (
@@ -111,16 +111,8 @@ const Footer = () => {
                 Inicio
               </Link>
             </li>
-            <li>
-              <Link to="/cursos" className="text-gray-300 hover:text-white transition-colors">
-                Cursos
-              </Link>
-            </li>
-            <li>
-              <Link to="/eventos" className="text-gray-300 hover:text-white transition-colors">
-                Eventos
-              </Link>
-            </li>
+            {/* 🔥 Eliminado: /cursos */}
+            {/* 🔥 Eliminado: /eventos */}
             <li>
               <Link to="/contacto" className="text-gray-300 hover:text-white transition-colors">
                 Contacto
