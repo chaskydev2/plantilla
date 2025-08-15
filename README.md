@@ -1,6 +1,6 @@
 # CTB – Plantilla 1 (Landing + Admin)
 
-![Stack](https://img.shields.io/badge/stack-Laravel_12%20%2B%20React_19%20%2B%20Passport%20%2B%20Vite-informational?style=flat&logo=laravel&logoColor=white&color=FF2D20)
+![Stack](https://img.shields.io/badge/stack-Laravel_12%20%2B%20React_19%20%2B%20MySQL%20%2B%20Vite-informational?style=flat&logo=laravel&logoColor=white&color=FF2D20)
 
 Plantilla base para proyectos con **Landing pública** y **Panel administrativo**.  
 Monorepo con **Laravel** (server) + **React** (client). Pensada para reusar y clonar como boilerplate.
