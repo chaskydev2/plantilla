@@ -54,14 +54,14 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-# Configurar Passport (ejecutar estos comandos en orden)
+### Configurar Passport (ejecutar estos comandos en orden)
 ```bash
 php artisan key:generate
 php artisan migrate --seed
 php artisan passport:install
 ```
 
-# 3. Frontend
+### 3. Frontend
 ```bash
 cd ../client
 npm install
