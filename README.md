@@ -29,14 +29,16 @@ Monorepo con **Laravel** (server) + **React** (client). Pensada para reusar y cl
 ```bash
 git clone https://github.com/chaskydev2/plantilla.git
 cd ctb-main
+```
 
-# 2. Backend
+### 2. Backend
+```bash
 cd server
 composer install
 cp .env.example .env
-
+```
 Edita server/.env (ejemplo para XAMPP + MySQL):
-
+```bash
 APP_NAME=CTB
 APP_ENV=local
 APP_KEY=
@@ -50,16 +52,20 @@ DB_PORT=3306
 DB_DATABASE=ctb_db
 DB_USERNAME=root
 DB_PASSWORD=
-
-php artisan key:generate
+```
 
 # Configurar Passport (ejecutar estos comandos en orden)
+```bash
+php artisan key:generate
 php artisan migrate --seed
 php artisan passport:install
+```
 
 # 3. Frontend
+```bash
 cd ../client
 npm install
+```
 
 ## 🚀 Comandos para Levantar el Proyecto
 
@@ -69,8 +75,9 @@ npm install
 ```bash
 cd server
 php artisan serve
-
+```
 ### Terminal 2 - Frontend (React)
 ```bash
 cd client
 npm run dev
+```
