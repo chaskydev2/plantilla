@@ -4,9 +4,6 @@ import Logo from "@/assets/images/CTB-LOGO.png";
 import {
   LayoutDashboard,
   Users,
-  Mail,
-  Calendar,
-  BookOpen,
   Globe,
   History,
   Contact,
@@ -22,7 +19,6 @@ import {
   HelpCircle,
   Image,
   Share2,
-  BarChart2
 } from "lucide-react";
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
@@ -42,6 +38,9 @@ type OpenSubmenu = {
   index: number;
 } | null;
 
+/** =========================
+ *  MENÚ ADMIN (limpio)
+ *  ========================= */
 const navItems: MenuItem[] = [
   {
     icon: <LayoutDashboard className="w-5 h-5" />,
@@ -57,161 +56,111 @@ const navItems: MenuItem[] = [
         name: "Lista de Usuarios",
         path: "/admin/usuarios",
         icon: <List className="w-4 h-4" />,
-        permissions: ["usuario_listar"]
+        permissions: ["usuario_listar"],
       },
       {
         name: "Roles",
         path: "/admin/roles",
         icon: <Shield className="w-4 h-4" />,
-        permissions: ["rol_listar"]
+        permissions: ["rol_listar"],
       },
       {
         name: "Permisos",
         path: "/admin/permisos",
         icon: <Key className="w-4 h-4" />,
-        permissions: ["permiso_listar"]
-      }
-    ],
-  },
-  {
-    name: "Comunicados",
-    icon: <Mail className="w-5 h-5" />,
-    permissions: ["comunicado_listar"],
-    subItems: [
-      {
-        name: "Lista de Comunicados",
-        path: "/admin/comunicados",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["comunicado_listar"]
-      },
-    ],
-  },
-  {
-    name: "Eventos",
-    icon: <Calendar className="w-5 h-5" />,
-    permissions: ["tipo_evento_listar"],
-    subItems: [
-      {
-        name: "Tipos de Eventos",
-        path: "/admin/tipo_eventos",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["tipo_evento_listar"]
-      },
-      {
-        name: "Eventos",
-        path: "/admin/eventos",
-        icon: <Calendar className="w-4 h-4" />,
-        permissions: ["evento_listar"]
-      },
-    ],
-  },
-  {
-    name: "Cursos",
-    icon: <BookOpen className="w-5 h-5" />,
-    permissions: ["curso_listar"],
-    subItems: [
-      {
-        name: "Lista de Cursos",
-        path: "/admin/cursos",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["curso_listar"]
-      },
-    ],
-  },
-  {
-    name: "Pagos",
-    icon: <BookOpen className="w-5 h-5" />,
-    permissions: ["payment_listar"],
-    subItems: [
-      {
-        name: "Lista de pagos",
-        path: "/admin/montlypay",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["payment_listar"]
-      },
-      {
-        name: "Reporte de pagos",
-        path: "/admin/montlypayreport",
-        icon: <BarChart2 className="w-4 h-4" />,
-        permissions: ["payment_listar"]
+        permissions: ["permiso_listar"],
       },
     ],
   },
 ];
 
+/** =========================
+ *  MENÚ WEB (se mantiene)
+ *  ========================= */
 const webItems: MenuItem[] = [
   {
     name: "LANDING PAGE",
     icon: <Globe className="w-5 h-5" />,
-    permissions: ["historia_listar", "contacto_listar", "principio_listar", "valor_moral_listar", 
-      "directiva_listar", "requisito_listar", "acuerdo_listar", "consulta_listar", "pregunta_frecuente_listar", "red_social_listar", 
-      "banner_listar", "red_social_listar"],
+    permissions: [
+      "historia_listar",
+      "contacto_listar",
+      "principio_listar",
+      "valor_moral_listar",
+      "directiva_listar",
+      "requisito_listar",
+      "acuerdo_listar",
+      "consulta_listar",
+      "pregunta_frecuente_listar",
+      "red_social_listar",
+      "banner_listar",
+      "red_social_listar",
+    ],
     subItems: [
       {
         name: "Historia",
         path: "/admin/historias",
         icon: <History className="w-4 h-4" />,
-        permissions: ["historia_listar"]
+        permissions: ["historia_listar"],
       },
       {
         name: "Contacto",
         path: "/admin/contactos",
         icon: <Contact className="w-4 h-4" />,
-        permissions: ["contacto_listar"]
+        permissions: ["contacto_listar"],
       },
       {
         name: "Principios",
         path: "/admin/principios",
         icon: <Scale className="w-4 h-4" />,
-        permissions: ["principio_listar"]
+        permissions: ["principio_listar"],
       },
       {
         name: "Valores Morales",
         path: "/admin/valores_morales",
         icon: <Star className="w-4 h-4" />,
-        permissions: ["valor_moral_listar"]
+        permissions: ["valor_moral_listar"],
       },
-      { 
-        name: "Directiva", 
+      {
+        name: "Directiva",
         path: "/admin/directiva",
         icon: <Users className="w-4 h-4" />,
-        permissions: ["directiva_listar"]
+        permissions: ["directiva_listar"],
       },
-      { 
-        name: "Requisitos", 
+      {
+        name: "Requisitos",
         path: "/admin/requisitos",
         icon: <Clipboard className="w-4 h-4" />,
-        permissions: ["requisito_listar"]
+        permissions: ["requisito_listar"],
       },
-      { 
-        name: "Acuerdos", 
+      {
+        name: "Acuerdos",
         path: "/admin/acuerdos",
         icon: <FileSignature className="w-4 h-4" />,
-        permissions: ["acuerdo_listar"] 
+        permissions: ["acuerdo_listar"],
       },
-      { 
-        name: "Consultas", 
+      {
+        name: "Consultas",
         path: "/admin/consultas",
         icon: <MessageSquare className="w-4 h-4" />,
-        permissions: ["consulta_listar"] 
+        permissions: ["consulta_listar"],
       },
-      { 
-        name: "Preguntas Frecuentes", 
+      {
+        name: "Preguntas Frecuentes",
         path: "/admin/preguntas_frecuentes",
         icon: <HelpCircle className="w-4 h-4" />,
-        permissions: ["pregunta_frecuente_listar"] 
+        permissions: ["pregunta_frecuente_listar"],
       },
-      { 
-        name: "Banner", 
+      {
+        name: "Banner",
         path: "/admin/banners",
         icon: <Image className="w-4 h-4" />,
-        permissions: ["banner_listar"]
+        permissions: ["banner_listar"],
       },
-      { 
-        name: "Redes Sociales", 
+      {
+        name: "Redes Sociales",
         path: "/admin/redes_sociales",
         icon: <Share2 className="w-4 h-4" />,
-        permissions: ["red_social_listar"]
+        permissions: ["red_social_listar"],
       },
     ],
   },
@@ -254,7 +203,7 @@ const AppSidebar: React.FC = () => {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
       const ref = subMenuRefs.current[key];
       if (ref) {
-        setSubMenuHeight(prev => ({
+        setSubMenuHeight((prev) => ({
           ...prev,
           [key]: ref.scrollHeight,
         }));
@@ -264,19 +213,19 @@ const AppSidebar: React.FC = () => {
 
   const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
     return items
-      .filter(item => !item.permissions || hasAnyPermission(item.permissions))
-      .map(item => ({
+      .filter((item) => !item.permissions || hasAnyPermission(item.permissions))
+      .map((item) => ({
         ...item,
-        subItems: item.subItems ? filterMenuItems(item.subItems) : undefined
+        subItems: item.subItems ? filterMenuItems(item.subItems) : undefined,
       }))
-      .filter(item => item.path || (item.subItems && item.subItems.length > 0));
+      .filter((item) => item.path || (item.subItems && item.subItems.length > 0));
   };
 
   const filteredNavItems = filterMenuItems(navItems);
   const filteredWebItems = filterMenuItems(webItems);
 
   const handleSubmenuToggle = (index: number, menuType: "main" | "web") => {
-    setOpenSubmenu(prev =>
+    setOpenSubmenu((prev) =>
       prev?.type === menuType && prev.index === index ? null : { type: menuType, index }
     );
   };
@@ -297,29 +246,34 @@ const AppSidebar: React.FC = () => {
                     "menu-item-active": isSubmenuOpen,
                     "menu-item-inactive": !isSubmenuOpen,
                     "lg:justify-center": !isExpanded && !isHovered,
-                    "lg:justify-start": isExpanded || isHovered
+                    "lg:justify-start": isExpanded || isHovered,
                   })}
                 >
-                  <span className={classNames("menu-item-icon-size", {
-                    "menu-item-icon-active": isSubmenuOpen,
-                    "menu-item-icon-inactive": !isSubmenuOpen
-                  })}>
+                  <span
+                    className={classNames("menu-item-icon-size", {
+                      "menu-item-icon-active": isSubmenuOpen,
+                      "menu-item-icon-inactive": !isSubmenuOpen,
+                    })}
+                  >
                     {nav.icon}
                   </span>
                   {(isExpanded || isHovered || isMobileOpen) && (
                     <>
                       <span className="menu-item-text">{nav.name}</span>
-                      <ChevronDown className={classNames(
-                        "ml-auto w-5 h-5 transition-transform duration-200",
-                        { "rotate-180 text-gray-100": isSubmenuOpen }
-                      )} />
+                      <ChevronDown
+                        className={classNames("ml-auto w-5 h-5 transition-transform duration-200", {
+                          "rotate-180 text-gray-100": isSubmenuOpen,
+                        })}
+                      />
                     </>
                   )}
                 </button>
 
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <div
-                    ref={el => { subMenuRefs.current[menuKey] = el; }}
+                    ref={(el) => {
+                      subMenuRefs.current[menuKey] = el;
+                    }}
                     className="overflow-hidden transition-all duration-300"
                     style={{
                       height: isSubmenuOpen ? `${subMenuHeight[menuKey] || 0}px` : "0px",
@@ -332,7 +286,7 @@ const AppSidebar: React.FC = () => {
                             to={subItem.path || "#"}
                             className={classNames("flex items-center menu-dropdown-item", {
                               "menu-dropdown-item-active": subItem.path ? isActive(subItem.path) : false,
-                              "menu-dropdown-item-inactive": subItem.path ? !isActive(subItem.path) : true
+                              "menu-dropdown-item-inactive": subItem.path ? !isActive(subItem.path) : true,
                             })}
                           >
                             {subItem.icon}
@@ -350,13 +304,15 @@ const AppSidebar: React.FC = () => {
                   to={nav.path}
                   className={classNames("menu-item group", {
                     "menu-item-active": isActive(nav.path),
-                    "menu-item-inactive": !isActive(nav.path)
+                    "menu-item-inactive": !isActive(nav.path),
                   })}
                 >
-                  <span className={classNames("menu-item-icon-size", {
-                    "menu-item-icon-active": isActive(nav.path),
-                    "menu-item-icon-inactive": !isActive(nav.path)
-                  })}>
+                  <span
+                    className={classNames("menu-item-icon-size", {
+                      "menu-item-icon-active": isActive(nav.path),
+                      "menu-item-icon-inactive": !isActive(nav.path),
+                    })}
+                  >
                     {nav.icon}
                   </span>
                   {(isExpanded || isHovered || isMobileOpen) && (
@@ -380,16 +336,18 @@ const AppSidebar: React.FC = () => {
           "w-[90px]": !isExpanded && !isHovered,
           "translate-x-0": isMobileOpen,
           "-translate-x-full": !isMobileOpen,
-          "lg:translate-x-0": true
+          "lg:translate-x-0": true,
         }
       )}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={classNames("py-8 flex", {
-        "lg:justify-center": !isExpanded && !isHovered,
-        "justify-start": isExpanded || isHovered
-      })}>
+      <div
+        className={classNames("py-8 flex", {
+          "lg:justify-center": !isExpanded && !isHovered,
+          "justify-start": isExpanded || isHovered,
+        })}
+      >
         <Link to="/" className="flex items-center gap-2 text-gray-400">
           {isExpanded || isHovered || isMobileOpen ? (
             "Colegio Topografos Cochabamba"
@@ -403,13 +361,15 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             {filteredNavItems.length > 0 && (
               <div>
-                <h2 className={classNames(
-                  "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
-                  {
-                    "lg:justify-center": !isExpanded && !isHovered,
-                    "justify-start": isExpanded || isHovered
-                  }
-                )}>
+                <h2
+                  className={classNames(
+                    "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
+                    {
+                      "lg:justify-center": !isExpanded && !isHovered,
+                      "justify-start": isExpanded || isHovered,
+                    }
+                  )}
+                >
                   {isExpanded || isHovered || isMobileOpen ? "Menu" : <ChevronDown className="size-6" />}
                 </h2>
                 {renderMenuItems(filteredNavItems, "main")}
@@ -418,13 +378,15 @@ const AppSidebar: React.FC = () => {
 
             {filteredWebItems.length > 0 && (
               <div>
-                <h2 className={classNames(
-                  "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
-                  {
-                    "lg:justify-center": !isExpanded && !isHovered,
-                    "justify-start": isExpanded || isHovered
-                  }
-                )}>
+                <h2
+                  className={classNames(
+                    "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
+                    {
+                      "lg:justify-center": !isExpanded && !isHovered,
+                      "justify-start": isExpanded || isHovered,
+                    }
+                  )}
+                >
                   {isExpanded || isHovered || isMobileOpen ? "Web" : <ChevronDown className="size-6" />}
                 </h2>
                 {renderMenuItems(filteredWebItems, "web")}
