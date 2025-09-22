@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin, Loader2, Smartphone } from 'lucide-react';
+import { Phone, Mail, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 import type { ISocialNetwork } from '@/core/types/ISocialNetwork';
 import { useEffect, useState } from 'react';
 import { createApiService } from '@/core/services/api.service';
@@ -8,8 +8,8 @@ import type { IContact } from '@/core/types/IContact';
 const Footer = () => {
   const [socialNetworks, setSocialNetworks] = useState<ISocialNetwork[]>([]);
   const [contacts, setContacts] = useState<IContact[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // We render the footer regardless of loading to avoid layout jumps; data will hydrate when available.
+  // Optional: capture fetch errors in console only to avoid UI noise
 
   const SocialNetworkService = createApiService({basePath: 'social_networks'});
   const ContactService = createApiService({basePath: 'contacts'});
@@ -17,171 +17,128 @@ const Footer = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
         const [socialResponse, contactResponse] = await Promise.all([
           SocialNetworkService.get('all'),
           ContactService.get('all')
         ]);
-        
         setSocialNetworks(socialResponse.data || []);
         setContacts(contactResponse.data || []);
       } catch (err) {
-        setError('Error al cargar los datos del footer');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+        console.error('Error al cargar los datos del footer', err);
       }
     };
-
     fetchData();
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64 bg-gradient-to-r from-cyan-700 to-blue-900">
-        <Loader2 className="animate-spin text-white h-8 w-8" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center p-4 bg-gradient-to-r from-cyan-700 to-blue-900 text-white">
-        <p>{error}</p>
-      </div>
-    );
-  }
 
   const mainContact = contacts[0] || {};
   const mainSocial = socialNetworks[0] || {};
 
-  const formatBusinessHours = (text: string) => {
-    if (!text) return null;
-    return text.split('\n').map((line, i) => (
-      <span key={i}>
-        {line}
-        <br />
-      </span>
-    ));
-  };
+  // reserved for future use if we show business hours again
+  // const formatBusinessHours = (text: string) => {
+  //   if (!text) return null;
+  //   return text.split('\n').map((line, i) => (
+  //     <span key={i}>
+  //       {line}
+  //       <br />
+  //     </span>
+  //   ));
+  // };
 
   return (
-    <footer className="footer p-10 bg-gradient-to-r from-cyan-700 to-blue-900 text-white">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div className="animate__animated animate__fadeIn">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <MapPin size={20} className="mr-2" />
-            Colegio de Topógrafos Cochabamba
-          </h3>
-          <p className="text-gray-300 mb-4">
-            Impulsando el futuro de la topografía boliviana.
-          </p>
-          
-          {(mainSocial.url_facebook || mainSocial.url_twitter || mainSocial.url_instagram || mainSocial.url_linkedin) && (
-            <div className="flex space-x-4">
-              {mainSocial.url_facebook && (
-                <a href={mainSocial.url_facebook} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Facebook size={20} />
+    <section className="relative">
+      {/* Wave top separator */}
+      <div className="absolute -top-[60px] left-0 right-0 h-[60px] pointer-events-none" aria-hidden>
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-full">
+          <path
+            d="M0,32L60,26.7C120,21,240,11,360,10.7C480,11,600,21,720,26.7C840,32,960,32,1080,26.7C1200,21,1320,11,1380,5.3L1440,0L1440,60L1380,60C1320,60,1200,60,1080,60C960,60,840,60,720,60C600,60,480,60,360,60C240,60,120,60,60,60L0,60Z"
+            fill="#1A1B16"
+          />
+        </svg>
+      </div>
+
+      <footer className="bg-[#1A1B16] text-white pt-20 pb-12">
+        <div className="container mx-auto px-6 md:px-12">
+          {/* Brand */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2">
+              <span className="text-4xl md:text-5xl font-extrabold tracking-tight">Directorii</span>
+            </div>
+            <p className="mt-6 text-gray-300 text-lg">
+              {mainContact.address || '16650 Bass Lake Rd, Suite 102, Maple Grove, MN, 55311'}
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-6 text-gray-300">
+              {(mainContact.phone_number || mainContact.mobile_number) && (
+                <a href={`tel:${mainContact.phone_number || mainContact.mobile_number}`} className="inline-flex items-center gap-2 hover:text-white">
+                  <Phone className="size-5" />
+                  <span>{mainContact.phone_number || mainContact.mobile_number}</span>
                 </a>
               )}
-              {mainSocial.url_twitter && (
-                <a href={mainSocial.url_twitter} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Twitter size={20} />
+              {mainContact.email && (
+                <a href={`mailto:${mainContact.email}`} className="inline-flex items-center gap-2 hover:text-white">
+                  <Mail className="size-5" />
+                  <span>{mainContact.email}</span>
                 </a>
               )}
+            </div>
+
+            {/* Social icons */}
+            <div className="mt-8 flex items-center justify-center gap-6">
               {mainSocial.url_instagram && (
-                <a href={mainSocial.url_instagram} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Instagram size={20} />
+                <a href={mainSocial.url_instagram} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center size-14 rounded-full border border-white/30 hover:bg-white/10 transition">
+                  <Instagram className="size-6 text-white" />
+                </a>
+              )}
+              {mainSocial.url_facebook && (
+                <a href={mainSocial.url_facebook} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center size-14 rounded-full border border-white/30 hover:bg-white/10 transition">
+                  <Facebook className="size-6 text-white" />
                 </a>
               )}
               {mainSocial.url_linkedin && (
-                <a href={mainSocial.url_linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Linkedin size={20} />
+                <a href={mainSocial.url_linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center size-14 rounded-full border border-white/30 hover:bg-white/10 transition">
+                  <Linkedin className="size-6 text-white" />
+                </a>
+              )}
+              {/* Optional YouTube if available via a custom field */}
+              {(mainSocial as any).url_youtube && (
+                <a href={(mainSocial as any).url_youtube} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center size-14 rounded-full border border-white/30 hover:bg-white/10 transition">
+                  <Youtube className="size-6 text-white" />
                 </a>
               )}
             </div>
-          )}
-        </div>
 
-        <div className="animate__animated animate__fadeIn animate__delay-1s">
-          <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
-          <ul className="space-y-2">
-            <li>
-              <Link to="/" className="text-gray-300 hover:text-white transition-colors">
-                Inicio
-              </Link>
-            </li>
-            <li>
-              <Link to="/cursos" className="text-gray-300 hover:text-white transition-colors">
-                Cursos
-              </Link>
-            </li>
-            <li>
-              <Link to="/eventos" className="text-gray-300 hover:text-white transition-colors">
-                Eventos
-              </Link>
-            </li>
-            <li>
-              <Link to="/contacto" className="text-gray-300 hover:text-white transition-colors">
-                Contacto
-              </Link>
-            </li>
-            <li>
-              <Link to="/afiliados" className="text-gray-300 hover:text-white transition-colors">
-                Área de Miembros
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div className="animate__animated animate__fadeIn animate__delay-2s">
-          <h3 className="text-lg font-semibold mb-4">Contacto</h3>
-          <ul className="space-y-3">
-            {mainContact.address && (
-              <li className="flex items-start">
-                <MapPin size={20} className="mr-2 flex-shrink-0 mt-0.5" />
-                <span>{mainContact.address}</span>
-              </li>
-            )}
-            {mainContact.phone_number && (
-              <li className="flex items-center">
-                <Phone size={20} className="mr-2 flex-shrink-0" />
-                <span>{mainContact.phone_number}</span>
-              </li>
-            )}
-            {mainContact.mobile_number && (
-              <li className="flex items-center">
-                <Smartphone size={20} className="mr-2 flex-shrink-0" />
-                <span>{mainContact.mobile_number}</span>
-              </li>
-            )}
-            {mainContact.email && (
-              <li className="flex items-center">
-                <Mail size={20} className="mr-2 flex-shrink-0" />
-                <span>{mainContact.email}</span>
-              </li>
-            )}
-          </ul>
-        </div>
-
-        <div className="animate__animated animate__fadeIn animate__delay-3s">
-          <h3 className="text-lg font-semibold mb-4">Horario</h3>
-          {mainContact.business_hours ? (
-            <div className="text-gray-300 whitespace-pre-line">
-              {formatBusinessHours(mainContact.business_hours)}
+            {/* Store badges */}
+            <div className="mt-8 flex items-center justify-center gap-6">
+              <a href="#" className="block">
+                <img
+                  src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                  alt="Download on the App Store"
+                  className="h-12 w-auto"
+                  loading="lazy"
+                />
+              </a>
+              <a href="#" className="block">
+                <img
+                  src="https://play.google.com/intl/en/badges/static/images/badges/en_badge_web_generic.png"
+                  alt="Get it on Google Play"
+                  className="h-14 w-auto"
+                  loading="lazy"
+                />
+              </a>
             </div>
-          ) : (
-            <p className="text-gray-400">Horario no disponible</p>
-          )}
-        </div>
-      </div>
 
-      <div className="mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-        <p className="text-gray-300 text-sm">
-          © {new Date().getFullYear()} Colegio de Topógrafos Cochabamba. Todos los derechos reservados.
-        </p>
-      </div>
-    </footer>
+            {/* Legal */}
+            <div className="mt-10 flex items-center justify-center gap-8 text-gray-300">
+              <Link to="/terms" className="hover:text-white">Terms of Use</Link>
+              <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
+            </div>
+
+            <p className="mt-4 text-sm text-gray-400">
+              Copyright © {new Date().getFullYear()} Directorii LLC. All Rights Reserved
+            </p>
+          </div>
+        </div>
+      </footer>
+    </section>
   );
 };
 

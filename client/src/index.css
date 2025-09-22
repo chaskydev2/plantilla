@@ -5,6 +5,91 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Override DaisyUI theme to use brand colors */
+:root,
+[data-theme] {
+  /* DaisyUI expects raw HSL values (no hsl()) */
+  /* Primary (#F5D238) */
+  --p: 49 90% 59% !important;
+  --pc: 0 0% 100% !important; /* white text on primary */
+
+  /* Secondary (#1A1B16) */
+  --s: 72 10% 9% !important;
+  --sc: 0 0% 100% !important; /* white text on secondary */
+}
+
+/* Simple one-turn spin animation */
+@keyframes spin-once {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Coin-like spin (adds slight 3D tilt and wobble during the turn) */
+@keyframes coin-spin {
+  0% {
+    transform: perspective(800px) rotateZ(0deg) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+  20% {
+    transform: perspective(800px) rotateZ(90deg) rotateX(14deg) rotateY(8deg) scale(1.03);
+  }
+  50% {
+    transform: perspective(800px) rotateZ(180deg) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+  80% {
+    transform: perspective(800px) rotateZ(270deg) rotateX(-12deg) rotateY(-6deg) scale(1.03);
+  }
+  100% {
+    transform: perspective(800px) rotateZ(360deg) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+}
+
+/* Planet-style spin: rotate around vertical axis (Y) */
+@keyframes planet-spin {
+  0% {
+    transform: perspective(800px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(800px) rotateY(180deg);
+  }
+  100% {
+    transform: perspective(800px) rotateY(360deg);
+  }
+}
+
+/* Card tilt: preserves readability by oscillating around Y without flipping */
+@keyframes card-tilt {
+  0%, 100% {
+    transform: perspective(800px) rotateY(-8deg);
+  }
+  50% {
+    transform: perspective(800px) rotateY(8deg);
+  }
+}
+
+/* One-turn Y-axis spin for cards (hover) */
+@keyframes y-spin-once {
+  from {
+    transform: perspective(800px) rotateY(0deg);
+  }
+  to {
+    transform: perspective(800px) rotateY(360deg);
+  }
+}
+
+/* Border runner: animates stroke-dashoffset for SVG borders */
+@keyframes dash-move {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -320;
+  }
+}
+
 @theme {
   --font-*: initial;
   --font-outfit: Outfit, sans-serif;
@@ -40,6 +125,12 @@
   --color-transparent: transparent;
   --color-white: #ffffff;
   --color-black: #101828;
+
+  --color-primary: #F5D238;
+  --color-primary-500: #F5D238;
+
+  --color-secondary: #1A1B16;      
+  --color-secondary-500: #1A1B16;  
 
   --color-brand-25: #f2f7ff;
   --color-brand-50: #ecf3ff;
@@ -293,6 +384,16 @@
 
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
+}
+
+/* Continuous left scroll for marquee-like carousels */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 
