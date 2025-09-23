@@ -5,6 +5,7 @@ import BannerImg from "@/assets/images/backgroudHD.jpg";
 import { createApiService } from '@/core/services/api.service'
 import { useEffect, useState } from "react";
 import type { IBanner } from "@/core/types/IBanner";
+import React from "react";
 // removed: announcements
 
 const HomePage = () => {
@@ -37,100 +38,120 @@ const HomePage = () => {
     setBanners(response.data);
   }
 
+   const bannerContent = {
+    topText: "Protección de familias en los EE. UU. y Canadá",
+    title: "Solo profesionales examinados. Respaldado por nuestra garantía de $250,000",
+    subtitle: "Todos los contratistas son verificados en sus antecedentes y examinados financieramente, y si meten la pata, su proyecto está protegido.",
+  };
+
   // removed: getAnnouncements
 
   return (
     <div className="flex flex-col">
-      <section className="relative h-screen overflow-hidden">
-        <AnimatePresence mode="wait">
-          {isLoading ? (
+     <section className="relative min-h-screen overflow-hidden bg-[#1A1B16] text-white">
+      {/* Background image + overlay */}
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0 bg-center bg-cover"
+          style={{ backgroundImage: `url(${BannerImg})` }}
+        />
+        <div className="absolute inset-0 bg-[#1A1B16]/70" />
+      </div>
+
+      <div className="relative z-10 h-full flex items-center justify-center text-center py-16">
+        <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={!isLoading ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="flex flex-col items-center"
+          >
+            {/* Top orange pill */}
             <motion.div
-              key="loading-banner"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 w-full h-full bg-gradient-to-r from-cyan-700 via-blue-900 to-indigo-800"
+              initial={{ opacity: 0 }}
+              animate={!isLoading ? { opacity: 1 } : {}}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="px-4 py-1 mb-6 rounded-full text-[#1A1B16] bg-[#F5D238] text-sm font-semibold shadow ring-1 ring-inset ring-black/5"
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
-                  className="h-16 w-16 rounded-full border-4 border-white/30 border-t-white animate-spin"
-                />
+              {bannerContent.topText}
+            </motion.div>
+
+            {/* Main title */}
+            <motion.h1
+              initial={{ opacity: 0 }}
+              animate={!isLoading ? { opacity: 1 } : {}}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-3 text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.2)]"
+            >
+              {bannerContent.title.split('.').map((sentence, index, arr) => (
+                <React.Fragment key={index}>
+                  {index === 1 ? (
+                    <span className="text-[#F5D238]">{sentence.trim()}</span>
+                  ) : (
+                    <>{sentence.trim()}</>
+                  )}
+                  {index < arr.length - 1 && '. '}
+                </React.Fragment>
+              ))}
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={!isLoading ? { opacity: 1 } : {}}
+              transition={{ delay: 0.9, duration: 0.8 }}
+              className="text-lg md:text-xl text-white/90 mb-10 max-w-3xl"
+            >
+              {bannerContent.subtitle}
+            </motion.p>
+            
+            {/* Search bar and button */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={!isLoading ? { opacity: 1 } : {}}
+              transition={{ delay: 1.1, duration: 0.8 }}
+              className="flex flex-col items-center w-full justify-center"
+            >
+              <div className="flex w-full max-w-2xl items-center bg-white/10 border border-white/20 rounded-full shadow-xl p-1 backdrop-blur-md">
+                {/* Service select */}
+                <div className="relative flex-1">
+                  <svg aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 8v8"/><path d="M8 12h8"/>
+                  </svg>
+                  <select
+                    aria-label="Seleccione un servicio"
+                    className="w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-white bg-transparent appearance-none cursor-pointer border-r border-white/20"
+                  >
+                    <option className="text-[#1A1B16]">Seleccione un servicio</option>
+                    <option className="text-[#1A1B16]">Opción 1</option>
+                    <option className="text-[#1A1B16]">Opción 2</option>
+                  </select>
+                </div>
+
+                {/* Location input */}
+                <div className="relative flex-1">
+                  <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-white/70" />
+                  <input
+                    type="text"
+                    aria-label="Ingrese su código postal o ciudad"
+                    placeholder="Ingrese su código postal o ciudad"
+                    className="w-full py-3 pl-10 pr-3 focus:outline-none text-white placeholder-white/70 bg-transparent"
+                  />
+                </div>
+
+                {/* CTA */}
+                <button
+                  className="inline-flex items-center bg-[#F5D238] hover:bg-[#e6c531] text-[#1A1B16] font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F5D238] focus:ring-offset-transparent"
+                >
+                  <span>Encuentra un profesional</span>
+                  <Search className="ml-2 size-4 text-[#1A1B16]" />
+                </button>
               </div>
             </motion.div>
-          ) : (
-            <motion.div
-              key="loaded-banner"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
-              style={{
-                backgroundImage: `url(${banners[0]?.image || BannerImg})`,
-              }}
-            >
-              <div className="absolute inset-0 bg-blue-950/75"></div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="relative h-full flex items-center">
-          <div className="container mx-auto px-6 md:px-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={!isLoading ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="max-w-2xl text-white"
-            >
-              <motion.h1
-                initial={{ opacity: 0 }}
-                animate={!isLoading ? { opacity: 1 } : {}}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 drop-shadow-lg"
-              >
-                {banners[0]?.title || "Bienvenido al Colegio de Topógrafos"}
-              </motion.h1>
-              
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={!isLoading ? { opacity: 1 } : {}}
-                transition={{ delay: 0.7, duration: 0.8 }}
-                className="text-xl text-gray-200 mb-8 drop-shadow-md"
-              >
-                {banners[0]?.subtitle || "Formación especializada para profesionales"}
-              </motion.p>
-              
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={!isLoading ? { opacity: 1 } : {}}
-                transition={{ delay: 0.9, duration: 0.8 }}
-                className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
-              >
-                <Link
-                  to="/contacto"
-                  className="bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 hover:from-green-500 hover:via-emerald-600 hover:to-green-700 text-white font-bold py-3 px-10 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/20 backdrop-blur-sm"
-                >
-                  Contactar
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
+          </motion.div>
         </div>
-
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 1440 100"
-            className="fill-white w-full block"
-            preserveAspectRatio="none"
-            style={{ height: "100px" }}
-          >
-            <path d="M0,32L60,42.7C120,53,240,75,360,74.7C480,75,600,53,720,42.7C840,32,960,32,1080,37.3C1200,43,1320,53,1380,58.7L1440,64L1440,100L1380,100C1320,100,1200,100,1080,100C960,100,840,100,720,100C600,100,480,100,360,100C240,100,120,100,60,100L0,100Z"></path>
-          </svg>
-        </div>
-      </section>
+      </div>
+    </section>
 
     {/* Cada contratista en Directorii - forced brand colors */}
   <section className="py-16 !bg-[#1A1B16] text-white">

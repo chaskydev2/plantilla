@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { Menu, X, ChevronDown, ChevronUp, LogIn } from "lucide-react";
-import LogoImg from "@/assets/images/Logopin-HD.png";
+
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -81,12 +81,12 @@ const Header = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <img
-                src={LogoImg}
+             
                 alt="Logo"
                 className="w-13 h-10 mr-13 object-contain transition-all duration-300"
               />
               <span className={`text-lg hidden xs:block font-bold ${shouldBeTransparent ? "text-white" : "text-gray-800"}`}>
-                COLEGIO DE TOPOGRAFOS DE BOLIVIA DEPARTAMENTAL COCHABAMBA
+              GU
               </span>
             </Link>
           </div>
