@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { EyeClosedIcon, EyeIcon } from "lucide-react";
+import { EyeClosedIcon, EyeIcon, Mail, Lock, Loader2 } from "lucide-react";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
@@ -52,44 +52,69 @@ export default function SignInForm() {
             </p>
           </div>
           <div>
-            <form onSubmit={handleSignIn}>
+            <form onSubmit={handleSignIn} aria-label="Formulario de inicio de sesión">
               <div className="space-y-6">
+                {/* Email */}
                 <div>
                   <Label>
                     Correo Electrónico <span className="text-error-500">*</span>
                   </Label>
-                  <Input 
-                    name="email"
-                    type="email"
-                    placeholder="Ingresa tu email" 
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Mail className="size-4" />
+                    </span>
+                    <Input 
+                      name="email"
+                      type="email"
+                      placeholder="Ingresa tu email" 
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="pl-9"
+                      aria-label="Correo Electrónico"
+                      autoComplete="email"
+                      required
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400">Usa el correo con el que te registraste.</p>
                 </div>
+
+                {/* Password */}
                 <div>
                   <Label>
                     Contraseña <span className="text-error-500">*</span>
                   </Label>
                   <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Lock className="size-4" />
+                    </span>
                     <Input
                       name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Ingresa tu contraseña"
                       value={formData.password}
                       onChange={handleChange}
+                      className="pl-9 pr-10"
+                      aria-label="Contraseña"
+                      autoComplete="current-password"
+                      required
                     />
-                    <span
+                    <button
+                      type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                      className="absolute z-30 -translate-y-1/2 right-3 top-1/2 text-gray-400 hover:text-gray-600"
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                     >
                       {showPassword ? (
-                        <EyeIcon className="dark:fill-gray-400 size-5" />
+                        <EyeIcon className="size-5" />
                       ) : (
-                        <EyeClosedIcon className="dark:fill-gray-400 size-5" />
+                        <EyeClosedIcon className="size-5" />
                       )}
-                    </span>
+                    </button>
                   </div>
+                  <p className="mt-1 text-xs text-gray-400">Mínimo 8 caracteres.</p>
                 </div>
+
+                {/* Links */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Link
@@ -107,12 +132,15 @@ export default function SignInForm() {
                     </Link>
                   </div>
                 </div>
+
+                {/* Submit */}
                 <div>
-                  <Button disabled={isLoading} className="w-full bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f]" size="sm" type="submit">
+                  <Button disabled={isLoading} className="w-full bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f] shadow-sm hover:shadow-md" size="sm" type="submit">
                     {isLoading ? (
-                      <>
-                        <span className="loading loading-spinner"></span>loading
-                      </>
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2 className="size-4 animate-spin" />
+                        Iniciando…
+                      </span>
                     ) : (
                       <span>Iniciar Sesión</span>
                     )}

@@ -16,6 +16,9 @@ interface InputProps {
   success?: boolean;
   error?: boolean;
   hint?: string;
+  autoComplete?: string;
+  required?: boolean;
+  ariaLabel?: string;
 }
 
 const Input: FC<InputProps> = ({
@@ -33,6 +36,9 @@ const Input: FC<InputProps> = ({
   success = false,
   error = false,
   hint,
+  autoComplete,
+  required,
+  ariaLabel,
 }) => {
   let inputClasses = ` h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${className}`;
 
@@ -43,7 +49,7 @@ const Input: FC<InputProps> = ({
   } else if (success) {
     inputClasses += `  border-success-500 focus:border-success-300 focus:ring-success-500/20 dark:text-success-400 dark:border-success-500 dark:focus:border-success-800`;
   } else {
-    inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-green-300 focus:ring-green-500/20 dark:border-gray-700 dark:text-white/90  dark:focus:border-green-800`;
+    inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-[#F5D238] focus:ring-[rgba(245,210,56,0.35)] dark:border-gray-700 dark:text-white/90  dark:focus:border-[#C9A92F]`;
   }
 
   return (
@@ -59,6 +65,9 @@ const Input: FC<InputProps> = ({
         max={max}
         step={step}
         disabled={disabled}
+        autoComplete={autoComplete}
+        aria-label={ariaLabel}
+        required={required}
         className={inputClasses}
       />
 
