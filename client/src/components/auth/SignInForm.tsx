@@ -91,15 +91,24 @@ export default function SignInForm() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Link
-                    to="/reset-password"
-                    className="text-sm text-green-500 hover:text-green-600 dark:text-green-400"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      to="/reset-password"
+                      className="text-sm text-[#F5D238] hover:text-[#e0c02f]"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                    <span className="text-gray-300">|</span>
+                    <Link
+                      to="/formulario_solicitud"
+                      className="text-sm text-[#F5D238] hover:text-[#e0c02f]"
+                    >
+                      ¿No estás registrado?
+                    </Link>
+                  </div>
                 </div>
                 <div>
-                  <Button disabled={isLoading} className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500" size="sm" type="submit">
+                  <Button disabled={isLoading} className="w-full bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f]" size="sm" type="submit">
                     {isLoading ? (
                       <>
                         <span className="loading loading-spinner"></span>loading

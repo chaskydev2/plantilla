@@ -2,46 +2,48 @@ import { MapPin, HardHat, LineChart, ShieldCheck, Search, FileText, CalendarDays
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import BannerImg from "@/assets/images/backgroudHD.jpg";
-import { createApiService } from '@/core/services/api.service'
 import { useEffect, useState } from "react";
-import type { IBanner } from "@/core/types/IBanner";
 import React from "react";
 // removed: announcements
 
 const HomePage = () => {
-  const [banners, setBanners] = useState<IBanner[]>([]);
-  // removed: announcements state
+  // removed: banners/announcements state
   const [isLoading, setIsLoading] = useState(true);
-
-  const BannerService = createApiService({ basePath: 'banners' });
+  const [servicesModalOpen, setServicesModalOpen] = useState(false);
   // removed: AnnouncementService
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await Promise.all([
-          getBanners(),
-          // removed: announcements, courses and events fetching
-        ]);
-      } catch (error) {
-        console.error("Error loading data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    setIsLoading(false);
   }, []);
 
-  const getBanners = async () => {
-    const response = await BannerService.get("all");
-    setBanners(response.data);
-  }
+  // Popular services data reused in carousel and modal
+  const popularServices = [
+    { title: 'Roofing', img: 'https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Gutters', img: 'https://images.unsplash.com/photo-1560785496-3c9d27877182?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Siding', img: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Windows', img: 'https://images.unsplash.com/photo-1584516025402-5ce32f67b86e?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Painting', img: 'https://images.unsplash.com/photo-1593282192539-9bdb07f6aa1f?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Drywall', img: 'https://images.unsplash.com/photo-1617695271857-0cf6e8404a89?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Solar', img: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=1400&auto=format&fit=crop' },
+    { title: 'Insulation', img: 'https://images.unsplash.com/photo-1600191729101-f54d9fba6032?q=80&w=1400&auto=format&fit=crop' },
+  ];
+
+  // removed: JS-based auto-scroll for services (replaced by CSS marquee)
+
+  // Close modal on Escape
+  useEffect(() => {
+    if (!servicesModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setServicesModalOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [servicesModalOpen]);
 
    const bannerContent = {
-    topText: "Protección de familias en los EE. UU. y Canadá",
-    title: "Solo profesionales examinados. Respaldado por nuestra garantía de $250,000",
-    subtitle: "Todos los contratistas son verificados en sus antecedentes y examinados financieramente, y si meten la pata, su proyecto está protegido.",
+    topText: "Protecting families in the U.S. and Canada",
+    title: "Only vetted professionals. Backed by our $250,000 guarantee",
+    subtitle: "All contractors are background-checked and financially screened—and if they mess up, your project is protected.",
   };
 
   // removed: getAnnouncements
@@ -112,29 +114,30 @@ const HomePage = () => {
               transition={{ delay: 1.1, duration: 0.8 }}
               className="flex flex-col items-center w-full justify-center"
             >
-              <div className="flex w-full max-w-2xl items-center bg-white/10 border border-white/20 rounded-full shadow-xl p-1 backdrop-blur-md">
+              <div className="flex w-full max-w-2xl items-center rounded-full p-1 pr-2 shadow-xl backdrop-blur-md bg-white/15 border border-white/25">
                 {/* Service select */}
                 <div className="relative flex-1">
                   <svg aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 8v8"/><path d="M8 12h8"/>
                   </svg>
                   <select
-                    aria-label="Seleccione un servicio"
-                    className="w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-white bg-transparent appearance-none cursor-pointer border-r border-white/20"
+                    aria-label="Select a service"
+                    className="w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-white bg-transparent appearance-none cursor-pointer"
                   >
-                    <option className="text-[#1A1B16]">Seleccione un servicio</option>
-                    <option className="text-[#1A1B16]">Opción 1</option>
-                    <option className="text-[#1A1B16]">Opción 2</option>
+                    <option className="text-[#1A1B16]">Select a service</option>
+                    <option className="text-[#1A1B16]">Option 1</option>
+                    <option className="text-[#1A1B16]">Option 2</option>
                   </select>
                 </div>
 
                 {/* Location input */}
                 <div className="relative flex-1">
+                  <span className="hidden md:block pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 h-6 w-px bg-white/30" aria-hidden></span>
                   <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-white/70" />
                   <input
                     type="text"
-                    aria-label="Ingrese su código postal o ciudad"
-                    placeholder="Ingrese su código postal o ciudad"
+                    aria-label="Enter your ZIP code or city"
+                    placeholder="Enter your ZIP code or city"
                     className="w-full py-3 pl-10 pr-3 focus:outline-none text-white placeholder-white/70 bg-transparent"
                   />
                 </div>
@@ -143,7 +146,7 @@ const HomePage = () => {
                 <button
                   className="inline-flex items-center bg-[#F5D238] hover:bg-[#e6c531] text-[#1A1B16] font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F5D238] focus:ring-offset-transparent"
                 >
-                  <span>Encuentra un profesional</span>
+                  <span>Find a professional</span>
                   <Search className="ml-2 size-4 text-[#1A1B16]" />
                 </button>
               </div>
@@ -153,11 +156,11 @@ const HomePage = () => {
       </div>
     </section>
 
-    {/* Cada contratista en Directorii - forced brand colors */}
+    {/* Every contractor on Directorii - forced brand colors */}
   <section className="py-16 !bg-[#1A1B16] text-white">
         <div className="container mx-auto px-6 md:px-12">
           <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">
-            Cada contratista en Directorii
+            Every contractor on Directorii
           </h2>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
@@ -166,7 +169,7 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-[#F5D238] ring-opacity-50">
                 <HardHat className="size-8 text-[#F5D238]" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Con licencia y antecedentes verificados</h3>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Licensed and background-checked</h3>
             </div>
 
             {/* Item 2 */}
@@ -174,7 +177,7 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-[#F5D238] ring-opacity-50">
                 <LineChart className="size-8 text-[#F5D238]" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Verificado financieramente</h3>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Financially verified</h3>
             </div>
 
             {/* Item 3 */}
@@ -182,8 +185,8 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-[#F5D238] ring-opacity-50">
                 <ShieldCheck className="size-8 text-[#F5D238]" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Protegido por una garantía</h3>
-              <p className="mt-2 text-sm text-gray-300">Hasta $250,000</p>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Protected by a guarantee</h3>
+              <p className="mt-2 text-sm text-gray-300">Up to $250,000</p>
             </div>
           </div>
         </div>
@@ -234,7 +237,7 @@ const HomePage = () => {
           
 
           {/* How it works */}
-          <section className="py-16 bg-gray-50">
+          <section className="py-16 bg-[#EEF2F7]">
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">
                 How it works
@@ -379,71 +382,83 @@ const HomePage = () => {
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center">Real Stories, Real Payouts</h2>
               <p className="text-center text-gray-600 mt-3 mb-10">See actual claims we've paid to protect homeowners like you.</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {/* Card 1 */}
-                <article className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-5 flex flex-col">
-                  <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden mb-5">
+                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-[#F5D238] max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400&auto=format&fit=crop" alt="Neighborhood" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">"I was charged $4K after my contractor shut down. Directorii took care of it"</h3>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="size-10 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-5 text-gray-400" />
+                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"I was charged $4K after my contractor shut down. Directorii took care of it"</h3>
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User className="size-3 text-gray-400" />
                     </div>
-                    <span className="font-semibold text-gray-700">Ben & Susan Smith</span>
+                    <span className="font-semibold text-gray-700 text-sm md:text-base">Ben & Susan Smith</span>
                   </div>
-                  <ul className="mt-auto space-y-2 text-gray-600">
-                    <li className="flex items-center gap-2"><MapPin className="size-4 text-gray-400" /> Oklahoma, OK</li>
-                    <li className="flex items-center gap-2"><Wrench className="size-4 text-gray-400" /> Roofing</li>
-                    <li className="flex items-center gap-2"><CalendarDays className="size-4 text-gray-400" /> Jan 2023</li>
-                  </ul>
-                  <button className="mt-4 self-end inline-flex items-center justify-center size-10 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
-                    <ArrowRightIcon className="size-5 text-[#1A1B16]" />
-                  </button>
+                  <div className="mt-auto">
+                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
+                      <li className="flex items-center gap-2"><MapPin className="size-4 text-gray-400" /> Oklahoma, OK</li>
+                      <li className="flex items-center gap-2"><Wrench className="size-4 text-gray-400" /> Roofing</li>
+                    </ul>
+                    <div className="mt-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base"><CalendarDays className="size-4 text-gray-400" /> Jan 2023</div>
+                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
+                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
+                      </button>
+                    </div>
+                  </div>
                 </article>
 
                 {/* Card 2 */}
-                <article className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-5 flex flex-col">
-                  <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden mb-5">
+                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-[#F5D238] max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1400&auto=format&fit=crop" alt="Home exterior" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">"A contractor destroyed my siding, but Directorii paid $15K to fix it"</h3>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="size-10 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-5 text-gray-400" />
+                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"A contractor destroyed my siding, but Directorii paid $15K to fix it"</h3>
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User className="size-3 text-gray-400" />
                     </div>
-                    <span className="font-semibold text-gray-700">Brandy Oberg</span>
+                    <span className="font-semibold text-gray-700 text-sm md:text-base">Brandy Oberg</span>
                   </div>
-                  <ul className="mt-auto space-y-2 text-gray-600">
-                    <li className="flex items-center gap-2"><MapPin className="size-4 text-gray-400" /> Minnesota, MN</li>
-                    <li className="flex items-center gap-2"><Wrench className="size-4 text-gray-400" /> Roofing</li>
-                    <li className="flex items-center gap-2"><CalendarDays className="size-4 text-gray-400" /> Apr 2022</li>
-                  </ul>
-                  <button className="mt-4 self-end inline-flex items-center justify-center size-10 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
-                    <ArrowRightIcon className="size-5 text-[#1A1B16]" />
-                  </button>
+                  <div className="mt-auto">
+                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
+                      <li className="flex items-center gap-2"><MapPin className="size-4 text-gray-400" /> Minnesota, MN</li>
+                      <li className="flex items-center gap-2"><Wrench className="size-4 text-gray-400" /> Roofing</li>
+                    </ul>
+                    <div className="mt-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base"><CalendarDays className="size-4 text-gray-400" /> Apr 2022</div>
+                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
+                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
+                      </button>
+                    </div>
+                  </div>
                 </article>
 
                 {/* Card 3 */}
-                <article className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-5 flex flex-col">
-                  <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden mb-5">
+                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-[#F5D238] max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img src="https://images.unsplash.com/photo-1585842378054-ee2e52f94ba3?q=80&w=1400&auto=format&fit=crop" alt="Roof repair" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">"A contractor damaged my roof. Directorii paid $8K to replace it"</h3>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="size-10 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-5 text-gray-400" />
+                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"A contractor damaged my roof. Directorii paid $8K to replace it"</h3>
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User className="size-3 text-gray-400" />
                     </div>
-                    <span className="font-semibold text-gray-700">Lisa Brown</span>
+                    <span className="font-semibold text-gray-700 text-sm md:text-base">Lisa Brown</span>
                   </div>
-                  <ul className="mt-auto space-y-2 text-gray-600">
-                    <li className="flex items-center gap-2"><MapPin className="size-4 text-gray-400" /> New York, NY</li>
-                    <li className="flex items-center gap-2"><Wrench className="size-4 text-gray-400" /> Roofing</li>
-                    <li className="flex items-center gap-2"><CalendarDays className="size-4 text-gray-400" /> Jun 2024</li>
-                  </ul>
-                  <button className="mt-4 self-end inline-flex items-center justify-center size-10 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
-                    <ArrowRightIcon className="size-5 text-[#1A1B16]" />
-                  </button>
+                  <div className="mt-auto">
+                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
+                      <li className="flex items-center gap-2"><MapPin className="size-4 text-gray-400" /> New York, NY</li>
+                      <li className="flex items-center gap-2"><Wrench className="size-4 text-gray-400" /> Roofing</li>
+                    </ul>
+                    <div className="mt-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base"><CalendarDays className="size-4 text-gray-400" /> Jun 2024</div>
+                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
+                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
+                      </button>
+                    </div>
+                  </div>
                 </article>
               </div>
             </div>
@@ -489,9 +504,9 @@ const HomePage = () => {
               <div className="overflow-hidden rounded-[28px] shadow-sm border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   {/* Left: Directorii */}
-                  <div className="bg-[#FEF3C7]">
+                  <div className="bg-[#EEF2F7]">
                     {/* Header */}
-                    <div className="px-6 md:px-10 py-6 bg-[#1A1B16] text-white font-extrabold text-2xl md:text-3xl">
+                    <div className="px-6 md:px-10 py-6 bg-[#F5D238] text-[#1A1B16] font-extrabold text-2xl md:text-3xl">
                       Directorii
                     </div>
                     {/* Rows */}
@@ -565,43 +580,109 @@ const HomePage = () => {
           {/* Popular Services Near You */}
           <section className="py-16 bg-[#F8FAFC]">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16]">Popular Services Near You</h2>
-              <p className="text-center text-gray-600 mt-3 mb-10">We work in the US and Canada with 100% vetted contractors.</p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  { title: 'Roofing', img: 'https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Gutters', img: 'https://images.unsplash.com/photo-1560785496-3c9d27877182?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Siding', img: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Windows', img: 'https://images.unsplash.com/photo-1584516025402-5ce32f67b86e?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Painting', img: 'https://images.unsplash.com/photo-1593282192539-9bdb07f6aa1f?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Drywall', img: 'https://images.unsplash.com/photo-1617695271857-0cf6e8404a89?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Solar', img: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=1400&auto=format&fit=crop' },
-                  { title: 'Insulation', img: 'https://images.unsplash.com/photo-1600191729101-f54d9fba6032?q=80&w=1400&auto=format&fit=crop' },
-                ].map((s) => (
-                  <article key={s.title} className="group">
-                    <div className="relative w-full pt-[66%] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
-                      <img
-                        src={s.img}
-                        alt={s.title}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                    </div>
-                    <h3 className="mt-4 text-center text-xl md:text-2xl font-semibold text-[#1A1B16]">{s.title}</h3>
-                  </article>
-                ))}
+              <div className="text-center mb-1">
+                <h2 className="text-3xl md:text-5xl font-bold text-[#1A1B16]">Popular Services Near You</h2>
               </div>
-              <div className="mt-8 flex justify-center">
+              <p className="text-center text-gray-600 mt-1 mb-10">We work in the US and Canada with 100% vetted contractors.</p>
+
+              {/* Carousel */}
+              <div className="relative">
+                {/* edge fades */}
+                <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10 hidden md:block"></div>
+                <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10 hidden md:block"></div>
+
+                {/* viewport using CSS marquee */}
+                <div className="relative overflow-hidden group/services">
+                  <div className="flex gap-6 w-[200%] animate-[scroll-left_40s_linear_infinite] group-hover/services:[animation-play-state:paused]">
+                    {/* first strip */}
+                    <div className="flex gap-6">
+                      {popularServices.map((s) => (
+                        <article key={`a-${s.title}`} className="group shrink-0 w-[280px] sm:w-[320px]">
+                          <div className="relative w-full pt-[66%] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+                            <img
+                              src={s.img}
+                              alt={s.title}
+                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                          </div>
+                          <h3 className="mt-4 text-center text-xl md:text-2xl font-semibold text-[#1A1B16]">{s.title}</h3>
+                        </article>
+                      ))}
+                    </div>
+                    {/* second strip */}
+                    <div className="flex gap-6">
+                      {popularServices.map((s) => (
+                        <article key={`b-${s.title}`} className="group shrink-0 w-[280px] sm:w-[320px]">
+                          <div className="relative w-full pt-[66%] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+                            <img
+                              src={s.img}
+                              alt={s.title}
+                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                          </div>
+                          <h3 className="mt-4 text-center text-xl md:text-2xl font-semibold text-[#1A1B16]">{s.title}</h3>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* controls removed to keep clean centered layout */}
+              </div>
+              {/* Show more button below carousel */}
+              <div className="mt-6 flex justify-center">
                 <button
                   type="button"
-                  className="px-6 py-3 rounded-2xl border border-gray-300 bg-white text-[#1A1B16] font-semibold shadow-sm hover:shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F5D238]"
+                  onClick={() => setServicesModalOpen(true)}
+                  className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-[#1A1B16] hover:bg-gray-50 shadow-sm"
                 >
                   Show more
                 </button>
               </div>
             </div>
           </section>
+
+          {/* Popular Services Modal */}
+          <AnimatePresence>
+            {servicesModalOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                aria-modal="true"
+                role="dialog"
+                onMouseDown={(e) => { if (e.target === e.currentTarget) setServicesModalOpen(false); }}
+              >
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 10, opacity: 0 }}
+                  className="w-full max-w-5xl bg-white rounded-2xl shadow-xl max-h-[85vh] flex flex-col overflow-hidden"
+                >
+                  <div className="p-6 overflow-y-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                      {popularServices.map((s) => (
+                        <article key={s.title} className="group">
+                          <div className="relative w-full pt-[66%] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+                            <img
+                              src={s.img}
+                              alt={s.title}
+                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                          </div>
+                          <h4 className="mt-3 text-lg font-semibold text-[#1A1B16]">{s.title}</h4>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* What Our Customers Say - infinite scroll carousel */}
           <section className="py-16 bg-white">
@@ -640,7 +721,7 @@ const HomePage = () => {
                             </div>
                           </div>
                           <p className="text-gray-600 line-clamp-5">{t.text}</p>
-                          <button className="mt-4 text-[#16A34A] font-semibold hover:underline">Read more</button>
+                          <button className="mt-4 text-[#1A1B16] font-semibold hover:text-[#F5D238]">Read more</button>
                         </article>
                       ));
                     })()}
@@ -679,7 +760,7 @@ const HomePage = () => {
                       <div className="mt-7">
                         <Link
                           to="/contractors"
-                          className="inline-flex items-center justify-center px-6 py-4 rounded-2xl bg-[#22C55E] text-white font-bold shadow hover:shadow-md transition"
+                          className="inline-flex items-center justify-center px-6 py-4 rounded-2xl bg-[#F5D238] text-[#1A1B16] font-bold shadow hover:shadow-md transition"
                         >
                           Find Your Guaranteed Contractor
                         </Link>
@@ -727,10 +808,12 @@ const FaqItem = ({ question, answer }: { question: string; answer: string }) => 
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-start justify-between gap-4 text-left"
+        className="group w-full flex items-start justify-between gap-4 text-left"
       >
         <span className="text-lg md:text-xl font-semibold text-[#1A1B16]">{question}</span>
-        <span className="shrink-0 inline-flex items-center justify-center size-9 rounded-full border border-gray-300 text-[#1A1B16] bg-white">
+        <span
+          className="shrink-0 inline-flex items-center justify-center size-9 rounded-full border border-gray-300 text-[#1A1B16] bg-white transform transition-colors transition-transform duration-200 ease-out group-hover:bg-[#F5D238] group-hover:border-[#F5D238] group-hover:text-[#1A1B16] group-hover:scale-110"
+        >
           {open ? <Minus className="size-5" /> : <Plus className="size-5" />}
         </span>
       </button>

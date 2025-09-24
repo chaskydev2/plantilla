@@ -3,6 +3,7 @@ import { ThemeToggleButton } from "../common/ThemeToggleButton";
 import NotificationDropdown from "./NotificationDropdown";
 import UserDropdown from "./UserDropdown";
 import { Link } from "react-router";
+import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
 
 // Define the interface for the props
 interface HeaderProps {
@@ -80,14 +81,16 @@ const Header: React.FC<HeaderProps> = ({ onClick, onToggle }) => {
 
           <Link to="/" className="lg:hidden">
             <img
-              className="dark:hidden"
-              src="./images/logo/logo.svg"
+              className="dark:hidden h-8 w-auto"
+              src={NewLogoUrl}
               alt="Logo"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; e.currentTarget.src = "/vite.svg"; }}
             />
             <img
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
+              className="hidden dark:block h-8 w-auto"
+              src={NewLogoUrl}
               alt="Logo"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; e.currentTarget.src = "/vite.svg"; }}
             />
           </Link>
 

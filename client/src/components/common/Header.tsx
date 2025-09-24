@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
-import { Menu, X, ChevronDown, ChevronUp, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, LogIn, BadgeCheck } from "lucide-react";
+import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
 
 
 const Header = () => {
@@ -32,40 +33,24 @@ const Header = () => {
   const shouldBeTransparent = isHomePage && !scrolled && !isMenuOpen;
 
   const menuItems = [
-    { name: "Inicio", path: "/" },
     {
-      name: "Nosotros",
+      name: "Services",
       submenu: [
-        { name: "Principios", path:"/mision"},
-        { name: "Historia", path: "/historia" },
-        { name: "Directiva", path: "/directiva" },
-        { name: "Estatutos", path: "/estatutos" },
+        { name: "Roofing", path: "#" },
+        { name: "Siding", path: "#" },
+        { name: "Windows", path: "#" },
       ],
     },
+    { name: "Scam alerts", path: "#" },
+    { name: "Fair price check", path: "#" },
     {
-      name: "Colegiados",
+      name: "Directorii Guarantee",
       submenu: [
-        { name: "Afiliados", path: "/afiliados" },
-        { name: "Requisitos", path: "/Requisitos" },
-        { name: "Renovacion y actualizacion de datos", path: "/renovacion_datos" },
+        { name: "How it works", path: "#" },
+        { name: "What’s covered", path: "#" },
       ],
     },
-/*     {
-      name: "Servicios",
-      submenu: [
-        { name: "Visado de planos", path: "/visado_planos" },
-        { name: "Formulario de solicitud", path: "/formulario_solicitud" },
-      ],
-    }, */
-    {
-      name: "Capacitaciones",
-      submenu: [
-        { name: "Cursos, talleres y diplomados", path: "/cursos" },
-        { name: "Convenios", path: "/convenios" },
-      ],
-    },
-    { name: "Eventos", path: "/events" },
-    { name: "Contacto", path: "/contacto" },
+    { name: "Register Guarantee", path: "#", icon: <BadgeCheck className="w-4 h-4 mr-2" /> },
   ];
 
   return (
@@ -73,25 +58,26 @@ const Header = () => {
       className={`fixed w-full z-50 transition-all duration-300 ${
         shouldBeTransparent
           ? "bg-transparent text-white"
-          : "bg-white text-gray-800 shadow-md"
+          : "bg-[#F5D238] text-[#1A1B16] shadow-md"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          <div className="flex items-center">
+        <div className="grid grid-cols-3 items-center py-4 relative">
+          <div className="flex items-center justify-self-start">
             <Link to="/" className="flex items-center space-x-2">
               <img
-             
+                src={NewLogoUrl}
                 alt="Logo"
-                className="w-13 h-10 mr-13 object-contain transition-all duration-300"
+                className="h-10 w-auto mr-3 object-contain transition-all duration-300"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; e.currentTarget.src = "/vite.svg"; }}
               />
-              <span className={`text-lg hidden xs:block font-bold ${shouldBeTransparent ? "text-white" : "text-gray-800"}`}>
+              <span className={`text-lg hidden xs:block font-bold ${shouldBeTransparent ? "text-white" : "text-[#1A1B16]"}`}>
               GU
               </span>
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center gap-6 xl:gap-8 justify-self-center whitespace-nowrap">
             {menuItems.map((item) => (
               <div
                 key={item.name}
@@ -104,16 +90,17 @@ const Header = () => {
                     to={item.submenu ? '#' : item.path}
                     className={`
                       px-4 py-2 transition-all duration-300 relative flex items-center
-                      ${shouldBeTransparent ? "text-white hover:text-gray-200" : "text-gray-800 hover:text-primary"}
+                      ${shouldBeTransparent ? "text-white hover:text-gray-200" : "text-[#1A1B16] hover:text-[#1A1B16]"}
                       after:content-[''] after:absolute after:bottom-0 after:left-4
                       after:w-[calc(100%-2rem)] after:h-0.5
                       after:transition-all after:duration-300 after:transform
                       ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
-                        ? "after:scale-x-100 after:bg-white"
-                        : "after:scale-x-0 after:bg-white hover:after:scale-x-100"
+                        ? `after:scale-x-100 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"}`
+                        : `after:scale-x-0 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} hover:after:scale-x-100`
                       }
                     `}
                   >
+                    {('icon' in item && (item as any).icon) ? <span className="mr-1 -ml-1">{(item as any).icon}</span> : null}
                     {item.name}
                     {item.submenu && (
                       <ChevronDown
@@ -121,7 +108,7 @@ const Header = () => {
                         className={`
                           ml-1 transition-transform duration-300
                           ${hoveredItem === item.name ? "rotate-180" : ""}
-                          ${shouldBeTransparent ? "text-white group-hover:text-gray-200" : "text-gray-800 group-hover:text-primary"}
+                          ${shouldBeTransparent ? "text-white group-hover:text-gray-200" : "text-[#1A1B16] group-hover:text-[#1A1B16]"}
                         `}
                       />
                     )}
@@ -163,29 +150,30 @@ const Header = () => {
               </div>
             ))}
             
+          </nav>
+
+          {/* Right actions (desktop) */}
+          <div className="hidden md:flex items-center justify-self-end">
             <Link
               to="/login"
               className={`
                 ml-4 px-4 py-2 rounded-md flex items-center
                 transition-colors duration-200
                 ${shouldBeTransparent 
-                  ? "bg-white text-primary hover:bg-gray-100" 
-                  : "bg-primary text-white hover:bg-primary-dark"
+                  ? "bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f]" 
+                  : "bg-white text-[#1A1B16] hover:bg-white/90 shadow-sm"
                 }
               `}
             >
               <LogIn size={16} className="mr-2" />
               Ingresar
             </Link>
-          </nav>
+          </div>
 
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center justify-self-end">
             <Link
               to="/login"
-              className={`
-                mr-4 p-2 rounded-full
-                ${shouldBeTransparent ? "text-white" : "text-primary"}
-              `}
+              className={`mr-4 p-2 rounded-full ${shouldBeTransparent ? "text-white" : "text-[#1A1B16]"}`}
             >
               <LogIn size={20} />
             </Link>
