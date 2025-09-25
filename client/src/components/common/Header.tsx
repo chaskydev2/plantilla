@@ -50,7 +50,7 @@ const Header = () => {
         { name: "What’s covered", path: "#" },
       ],
     },
-    { name: "Register Guarantee", path: "#", icon: <BadgeCheck className="w-4 h-4 mr-2" /> },
+    { name: "Register Guara", path: "#", icon: <BadgeCheck className="w-4 h-4 mr-2" /> },
   ];
 
   return (

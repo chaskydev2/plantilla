@@ -4,7 +4,6 @@ import Logo from "@/assets/images/CTB-LOGO.png";
 import {
   LayoutDashboard,
   Users,
-  Mail,
   Calendar,
   BookOpen,
   Globe,
@@ -74,19 +73,6 @@ const navItems: MenuItem[] = [
     ],
   },
   {
-    name: "Comunicados",
-    icon: <Mail className="w-5 h-5" />,
-    permissions: ["comunicado_listar"],
-    subItems: [
-      {
-        name: "Lista de Comunicados",
-        path: "/admin/comunicados",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["comunicado_listar"]
-      },
-    ],
-  },
-  {
     name: "Eventos",
     icon: <Calendar className="w-5 h-5" />,
     permissions: ["tipo_evento_listar"],
@@ -105,19 +91,7 @@ const navItems: MenuItem[] = [
       },
     ],
   },
-  {
-    name: "Cursos",
-    icon: <BookOpen className="w-5 h-5" />,
-    permissions: ["curso_listar"],
-    subItems: [
-      {
-        name: "Lista de Cursos",
-        path: "/admin/cursos",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["curso_listar"]
-      },
-    ],
-  },
+ 
   {
     name: "Pagos",
     icon: <BookOpen className="w-5 h-5" />,
@@ -392,7 +366,7 @@ const AppSidebar: React.FC = () => {
       })}>
         <Link to="/" className="flex items-center gap-2 text-gray-400">
           {isExpanded || isHovered || isMobileOpen ? (
-            "Colegio Topografos Cochabamba"
+            "GU"
           ) : (
             <img src={Logo} alt="Logo" width={32} height={32} />
           )}
