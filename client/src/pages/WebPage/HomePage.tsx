@@ -160,7 +160,7 @@ const HomePage = () => {
   <section className="py-16 !bg-[#1A1B16] text-white">
         <div className="container mx-auto px-6 md:px-12">
           <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">
-            Every contractor on Directorii
+            Que encontraras en Comercial
           </h2>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
@@ -198,7 +198,7 @@ const HomePage = () => {
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">
-                What is Directorii.com
+                Que es Comercial
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
