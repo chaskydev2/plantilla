@@ -50,14 +50,14 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col">
-     <section className="relative min-h-screen overflow-hidden bg-[#1A1B16] text-white">
-      {/* Background image + overlay */}
+     <section className="relative min-h-screen overflow-hidden bg-[#F5D238] text-[#1A1B16]">
+      {/* Background image + overlay - subtle overlay for yellow background */}
       <div className="absolute inset-0">
         <div
-          className="absolute inset-0 bg-center bg-cover"
+          className="absolute inset-0 bg-center bg-cover opacity-10"
           style={{ backgroundImage: `url(${BannerImg})` }}
         />
-        <div className="absolute inset-0 bg-[#1A1B16]/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F5D238]/90 to-[#e6c531]/95" />
       </div>
 
       <div className="relative z-10 h-full flex items-center justify-center text-center py-16">
@@ -68,27 +68,27 @@ const HomePage = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="flex flex-col items-center"
           >
-            {/* Top orange pill */}
+            {/* Top pill - now white with dark text */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={!isLoading ? { opacity: 1 } : {}}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="px-4 py-1 mb-6 rounded-full text-[#1A1B16] bg-[#F5D238] text-sm font-semibold shadow ring-1 ring-inset ring-black/5"
+              className="px-4 py-1 mb-6 rounded-full text-[#1A1B16] bg-white text-sm font-semibold shadow-lg ring-1 ring-inset ring-black/10"
             >
               {bannerContent.topText}
             </motion.div>
 
-            {/* Main title */}
+            {/* Main title - now dark text */}
             <motion.h1
               initial={{ opacity: 0 }}
               animate={!isLoading ? { opacity: 1 } : {}}
               transition={{ delay: 0.7, duration: 0.8 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-3 text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.2)]"
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-3 text-[#1A1B16] drop-shadow-[0_1px_0_rgba(255,255,255,0.3)]"
             >
               {bannerContent.title.split('.').map((sentence, index, arr) => (
                 <React.Fragment key={index}>
                   {index === 1 ? (
-                    <span className="text-[#F5D238]">{sentence.trim()}</span>
+                    <span className="text-[#1A1B16]">{sentence.trim()}</span>
                   ) : (
                     <>{sentence.trim()}</>
                   )}
@@ -97,12 +97,12 @@ const HomePage = () => {
               ))}
             </motion.h1>
 
-            {/* Subtitle */}
+            {/* Subtitle - now dark text */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={!isLoading ? { opacity: 1 } : {}}
               transition={{ delay: 0.9, duration: 0.8 }}
-              className="text-lg md:text-xl text-white/90 mb-10 max-w-3xl"
+              className="text-lg md:text-xl text-[#1A1B16]/80 mb-10 max-w-3xl"
             >
               {bannerContent.subtitle}
             </motion.p>
@@ -114,17 +114,17 @@ const HomePage = () => {
               transition={{ delay: 1.1, duration: 0.8 }}
               className="flex flex-col items-center w-full justify-center"
             >
-              <div className="flex w-full max-w-2xl items-center rounded-full p-1 pr-2 shadow-xl backdrop-blur-md bg-white/15 border border-white/25">
+              <div className="flex w-full max-w-2xl items-center rounded-full p-1 pr-2 shadow-2xl bg-white border border-gray-200">
                 {/* Service select */}
                 <div className="relative flex-1">
-                  <svg aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 8v8"/><path d="M8 12h8"/>
                   </svg>
                   <select
                     aria-label="Select a service"
-                    className="w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-white bg-transparent appearance-none cursor-pointer"
+                    className="w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-[#1A1B16] bg-transparent appearance-none cursor-pointer"
                   >
-                    <option className="text-[#1A1B16]">Select a service</option>
+                    <option className="text-[#1A1B16]">What can we do for you?</option>
                     <option className="text-[#1A1B16]">Option 1</option>
                     <option className="text-[#1A1B16]">Option 2</option>
                   </select>
@@ -132,22 +132,22 @@ const HomePage = () => {
 
                 {/* Location input */}
                 <div className="relative flex-1">
-                  <span className="hidden md:block pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 h-6 w-px bg-white/30" aria-hidden></span>
-                  <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-white/70" />
+                  <span className="hidden md:block pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 h-6 w-px bg-gray-300" aria-hidden></span>
+                  <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
                   <input
                     type="text"
                     aria-label="Enter your ZIP code or city"
-                    placeholder="Enter your ZIP code or city"
-                    className="w-full py-3 pl-10 pr-3 focus:outline-none text-white placeholder-white/70 bg-transparent"
+                    placeholder="City, ZIP"
+                    className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#1A1B16] placeholder-gray-500 bg-transparent"
                   />
                 </div>
 
                 {/* CTA */}
                 <button
-                  className="inline-flex items-center bg-[#F5D238] hover:bg-[#e6c531] text-[#1A1B16] font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F5D238] focus:ring-offset-transparent"
+                  className="inline-flex items-center bg-[#1A1B16] hover:bg-[#2A2B26] text-white font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1A1B16] focus:ring-offset-white"
                 >
-                  <span>Find a professional</span>
-                  <Search className="ml-2 size-4 text-[#1A1B16]" />
+                  <span>Find a Pro</span>
+                  <Search className="ml-2 size-4 text-white" />
                 </button>
               </div>
             </motion.div>
@@ -160,7 +160,7 @@ const HomePage = () => {
   <section className="py-16 !bg-[#1A1B16] text-white">
         <div className="container mx-auto px-6 md:px-12">
           <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">
-            Every contractor on Directorii
+            Que encontraras en Comercial
           </h2>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
@@ -198,7 +198,7 @@ const HomePage = () => {
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">
-                What is Directorii.com
+                Que es Comercial
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
