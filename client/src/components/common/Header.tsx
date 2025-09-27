@@ -44,7 +44,7 @@ const Header = () => {
     { name: "Scam alerts", path: "#" },
     { name: "Fair price check", path: "#" },
     {
-      name: "Directorii Guarantee",
+      name: "GU Guarantee",
       submenu: [
         { name: "How it works", path: "#" },
         { name: "What’s covered", path: "#" },

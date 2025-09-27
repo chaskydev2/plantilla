@@ -61,7 +61,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="text-center">
             <div className="inline-flex items-center gap-2">
-              <span className="text-4xl md:text-5xl font-extrabold tracking-tight">Directorii</span>
+              <span className="text-4xl md:text-5xl font-extrabold tracking-tight">GU</span>
             </div>
             <p className="mt-6 text-gray-300 text-lg">
               {mainContact.address || '16650 Bass Lake Rd, Suite 102, Maple Grove, MN, 55311'}
@@ -133,7 +133,7 @@ const Footer = () => {
             </div>
 
             <p className="mt-4 text-sm text-gray-400">
-              Copyright © {new Date().getFullYear()} Directorii LLC. All Rights Reserved
+              Copyright © {new Date().getFullYear()} GU LLC. All Rights Reserved
             </p>
           </div>
         </div>

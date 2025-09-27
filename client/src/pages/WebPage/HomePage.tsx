@@ -156,11 +156,11 @@ const HomePage = () => {
       </div>
     </section>
 
-    {/* Every contractor on Directorii - forced brand colors */}
+    {/* Every contractor on GU - forced brand colors */}
   <section className="py-16 !bg-[#1A1B16] text-white">
         <div className="container mx-auto px-6 md:px-12">
           <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">
-            Que encontraras en Comercial
+            What you'll find at GU
           </h2>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
@@ -194,11 +194,11 @@ const HomePage = () => {
 
       {!isLoading && (
         <>
-          {/* What is Directorii.com - video section */}
+          {/* What is GU.com - video section */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">
-                Que es Comercial
+                Que es GU
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -388,7 +388,7 @@ const HomePage = () => {
                   <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400&auto=format&fit=crop" alt="Neighborhood" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"I was charged $4K after my contractor shut down. Directorii took care of it"</h3>
+                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"I was charged $4K after my contractor shut down. GU took care of it"</h3>
                   <div className="flex items-center gap-2.5 mb-2.5">
                     <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
                       <User className="size-3 text-gray-400" />
@@ -414,7 +414,7 @@ const HomePage = () => {
                   <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1400&auto=format&fit=crop" alt="Home exterior" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"A contractor destroyed my siding, but Directorii paid $15K to fix it"</h3>
+                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"A contractor destroyed my siding, but GU paid $15K to fix it"</h3>
                   <div className="flex items-center gap-2.5 mb-2.5">
                     <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
                       <User className="size-3 text-gray-400" />
@@ -440,7 +440,7 @@ const HomePage = () => {
                   <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img src="https://images.unsplash.com/photo-1585842378054-ee2e52f94ba3?q=80&w=1400&auto=format&fit=crop" alt="Roof repair" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"A contractor damaged my roof. Directorii paid $8K to replace it"</h3>
+                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">"A contractor damaged my roof. GU paid $8K to replace it"</h3>
                   <div className="flex items-center gap-2.5 mb-2.5">
                     <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
                       <User className="size-3 text-gray-400" />
@@ -496,18 +496,18 @@ const HomePage = () => {
               </div>
             </div>
           </section>
-          {/* Why Directorii? comparison - restyled to project brand */}
+          {/* Why GU? comparison - restyled to project brand */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-[#1A1B16] text-center mb-10">Why Directorii?</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-[#1A1B16] text-center mb-10">Why GU?</h2>
 
               <div className="overflow-hidden rounded-[28px] shadow-sm border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                  {/* Left: Directorii */}
+                  {/* Left: GU */}
                   <div className="bg-[#EEF2F7]">
                     {/* Header */}
                     <div className="px-6 md:px-10 py-6 bg-[#F5D238] text-[#1A1B16] font-extrabold text-2xl md:text-3xl">
-                      Directorii
+                      GU
                     </div>
                     {/* Rows */}
                     <ul className="divide-y divide-[#F5D238]/30">
@@ -704,7 +704,7 @@ const HomePage = () => {
                       const items = [
                         { name: 'Adam B.', rating: 5.0, date: 'Apr 2024', text: 'The entire process was smooth. Most importantly I was always informed of what and when to expect the next step. When questions came up, I got immediate responses from my sales guy.' },
                         { name: 'Ryan Quarless', rating: 5.0, date: 'May 2025', text: 'I highly recommend Richard & Camel City Roofing if you are looking to have any roofing work done! Richard was very knowledgeable & was quickly responsive to all my questions/concerns.' },
-                        { name: 'Chris Munson', rating: 5.0, date: 'Mar 2025', text: 'Directorii is the best! They vet the contractors to make sure only the best are allowed. They stand behind the work and are making the roofing space a much better place.' },
+                        { name: 'Chris Munson', rating: 5.0, date: 'Mar 2025', text: 'GU is the best! They vet the contractors to make sure only the best are allowed. They stand behind the work and are making the roofing space a much better place.' },
                         { name: 'Joseph Wisnaskas', rating: 5.0, date: 'Feb 2025', text: 'Brehm Roofing recently completed a re-roof of our home and we are very happy with the new roof and installation process. Quick response to questions and professional crew.' },
                       ];
                       const loop = [...items, ...items];
@@ -773,16 +773,16 @@ const HomePage = () => {
           </section>
           {/* Removed: Noticias y Comunicados section */}
 
-          {/* FAQ - Questions about Directorii (final section at bottom) */}
+          {/* FAQ - Questions about GU (final section at bottom) */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16] mb-6">Questions about Directorii</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16] mb-6">Questions about GU</h2>
               <div className="max-w-4xl mx-auto divide-y divide-gray-200">
                 {[
-                  { q: 'How do I use Directorii?', a: 'Search for your project type and location, compare vetted contractors, and hire with confidence under our protection program.' },
-                  { q: 'How are Directorii contractors different?', a: 'All contractors on Directorii are verified, financially screened, and backed by our guarantee to protect homeowners.' },
+                  { q: 'How do I use GU?', a: 'Search for your project type and location, compare vetted contractors, and hire with confidence under our protection program.' },
+                  { q: 'How are GU contractors different?', a: 'All contractors on GU are verified, financially screened, and backed by our guarantee to protect homeowners.' },
                   { q: 'What if there are no contractors in my area?', a: 'We are expanding rapidly. If none are listed, leave your info and we will notify you as soon as vetted contractors are available.' },
-                  { q: 'How much does it cost?', a: 'Using Directorii is free for homeowners. Contractors may have membership fees, but your protection is always included.' },
+                  { q: 'How much does it cost?', a: 'Using GU is free for homeowners. Contractors may have membership fees, but your protection is always included.' },
                   { q: 'What does the $250,000 Guarantee cover?', a: 'It covers eligible losses such as contractor abandonment, shoddy workmanship, or damage caused during the project, up to the specified limit.' },
                 ].map((item, idx) => (
                   <FaqItem key={idx} question={item.q} answer={item.a} />
