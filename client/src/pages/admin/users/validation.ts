@@ -19,9 +19,10 @@ export const userStoreSchema = yup.object().shape({
   confirmPassword: yup.string()
     .oneOf([yup.ref('password')], 'Las contraseñas no coinciden')
     .required('Debes confirmar tu contraseña'),
-  role_id: yup.string()
-    .nullable()
-    .notRequired(),
+  role_ids: yup.array()
+    .of(yup.number())
+    .min(1, 'Debe seleccionar al menos un rol')
+    .max(5, 'Máximo 2 roles permitidos'),
 });
 
 export const userUpdateSchema = yup.object().shape({
@@ -42,7 +43,8 @@ export const userUpdateSchema = yup.object().shape({
     .nullable()
     .notRequired()
     .min(5, 'La contraseña debe tener al menos 5 caracteres'),
-  role_id: yup.string()
-    .nullable()
-    .notRequired(),
+  role_ids: yup.array()
+    .of(yup.number())
+    .min(1, 'Debe seleccionar al menos un rol')
+    .max(5, 'Máximo 5 roles permitidos'),
 });

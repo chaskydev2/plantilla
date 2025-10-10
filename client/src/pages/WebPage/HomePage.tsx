@@ -16,6 +16,7 @@ const HomePage = () => {
     setIsLoading(false);
   }, []);
 
+
   // Popular services data reused in carousel and modal
   const popularServices = [
     { title: 'Roofing', img: 'https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?q=80&w=1400&auto=format&fit=crop' },

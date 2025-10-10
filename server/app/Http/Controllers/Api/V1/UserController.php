@@ -22,6 +22,7 @@ class UserController extends Controller
         Gate::authorize('usuario_listar');
 
         $query = User::query()
+            ->with('roles')
             ->withTrashed()
             ->excludeAdmin()
             ->search($request->input('search'))
@@ -70,13 +71,23 @@ class UserController extends Controller
 
         $user = User::create($request->validated());
 
-        if ($request->has('role_id')) {
+        // Manejar múltiples roles
+        if ($request->has('role_ids') && is_array($request->role_ids)) {
+            $roles = Role::whereIn('id', $request->role_ids)->pluck('name')->toArray();
+            if (!empty($roles)) {
+                $user->syncRoles($roles);
+            }
+        } elseif ($request->has('role_id')) {
+            // Mantener compatibilidad con rol único
             $role = Role::find($request->role_id);
-
             if ($role) {
                 $user->syncRoles([$role->name]);
             }
         }
+
+        // Cargar los roles después de asignarlos
+        $user->load('roles');
+
         return (new UserResource($user))
             ->additional([
                 'success' => true,
@@ -93,13 +104,23 @@ class UserController extends Controller
         $result = User::findOrFail($id);
         $result->update($request->validated());
 
-        if ($request->has('role_id')) {
+        // Manejar múltiples roles
+        if ($request->has('role_ids') && is_array($request->role_ids)) {
+            $roles = Role::whereIn('id', $request->role_ids)->pluck('name')->toArray();
+            if (!empty($roles)) {
+                $result->syncRoles($roles);
+            }
+        } elseif ($request->has('role_id')) {
+            // Mantener compatibilidad con rol único
             $role = Role::find($request->role_id);
-
             if ($role) {
                 $result->syncRoles([$role->name]);
             }
         }
+
+        // Cargar los roles después de actualizar
+        $result->load('roles');
+
         return (new UserResource($result))
             ->additional([
                 'success' => true,

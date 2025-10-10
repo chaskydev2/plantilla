@@ -45,12 +45,23 @@ const columns = [
   },
   {
     key: "role",
-    header: "Rol",
-    render: (item: IItemResource) => (
-      <span className="badge badge-primary">
-        {(item as any).role_name || "Usuario"}
-      </span>
-    ),
+    header: "Roles",
+    render: (item: IItemResource) => {
+      // Manejar múltiples roles
+      const roles = (item as any).roles || [];
+      if (roles.length === 0) {
+        return <span className="badge badge-secondary">Sin rol</span>;
+      }
+      return (
+        <div className="flex flex-wrap gap-1">
+          {roles.map((role: any, index: number) => (
+            <span key={index} className="badge badge-primary text-xs">
+              {role.name}
+            </span>
+          ))}
+        </div>
+      );
+    },
   },
   {
     key: "status",
@@ -133,6 +144,24 @@ export default function UserList() {
   useEffect(() => {
     getAllPermissions();
   }, []);
+
+  // Imprimir usuarios por consola cuando cambien
+  useEffect(() => {
+    if (items && items.length > 0) {
+      console.log("===== TODOS LOS USUARIOS =====");
+      console.log(items);
+      console.log("===== DETALLE DE CADA USUARIO =====");
+      items.forEach((user, index) => {
+        const typedUser = user as IItemResource;
+        console.log(`Usuario ${index + 1}:`, typedUser);
+        console.log(`- ID: ${typedUser.id}`);
+        console.log(`- Nombre: ${typedUser.name}`);
+        console.log(`- Email: ${typedUser.email}`);
+        console.log(`- Roles:`, (typedUser as any).roles || 'Sin roles');
+        console.log("----------------------------");
+      });
+    }
+  }, [items]);
 
   const getAllPermissions = async () => {
     const res = await RolService.getAll();
@@ -267,6 +296,27 @@ export default function UserList() {
             Agregar
           </button>
         </WithPermission>
+        <button
+          className="bg-blue-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-blue-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+          onClick={() => {
+            console.log("===== IMPRESIÓN MANUAL DE USUARIOS =====");
+            console.log("Total usuarios:", items.length);
+            console.log("Datos completos:", items);
+            items.forEach((user, index) => {
+              const typedUser = user as IItemResource;
+              console.log(`\n--- Usuario ${index + 1} ---`);
+              console.log("Objeto completo:", typedUser);
+              console.log("ID:", typedUser.id);
+              console.log("Nombre:", typedUser.name);
+              console.log("Email:", typedUser.email);
+              console.log("Roles:", (typedUser as any).roles);
+              console.log("Estado:", typedUser.deleted_id == null ? "Activo" : "Inactivo");
+              console.log("Perfil actualizado:", typedUser.edit_profile);
+            });
+          }}
+        >
+          🖨️ Imprimir Usuarios
+        </button>
       </div>
       <div className="relative w-full sm:w-64">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-700 dark:text-gray-300">

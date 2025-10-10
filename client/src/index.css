@@ -3,19 +3,44 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* Importar utilidades de tema personalizadas */
+@import "./styles/theme-utilities.css";
+
 @custom-variant dark (&:is(.dark *));
 
 /* Override DaisyUI theme to use brand colors */
 :root,
 [data-theme] {
-  /* DaisyUI expects raw HSL values (no hsl()) */
-  /* Primary (#F5D238) */
-  --p: 49 90% 59% !important;
-  --pc: 0 0% 100% !important; /* white text on primary */
+  /* Colores principales de la aplicación */
+  --color-primary: #F5D238;
+  --color-primary-500: #F5D238;
+  --color-secondary: #1A1B16;      
+  --color-secondary-500: #1A1B16;
 
-  /* Secondary (#1A1B16) */
+  /* DaisyUI expects raw HSL values (no hsl()) */
+  /* Primary (#F5D238) convertido a HSL */
+  --p: 49 90% 59% !important;
+  --pc: 0 0% 0% !important; /* texto negro en primario */
+  --pf: 48 85% 55% !important; /* primario focus */
+
+  /* Secondary (#1A1B16) convertido a HSL */
   --s: 72 10% 9% !important;
-  --sc: 0 0% 100% !important; /* white text on secondary */
+  --sc: 49 90% 59% !important; /* texto primario en secundario */
+  --sf: 72 12% 12% !important; /* secundario focus */
+
+  /* Accent usando el color primario */
+  --a: 49 90% 59% !important;
+  --ac: 0 0% 0% !important;
+
+  /* Neutral usando el color secundario */
+  --n: 72 10% 9% !important;
+  --nc: 0 0% 100% !important;
+
+  /* Base colors */
+  --b1: 0 0% 100% !important; /* fondo blanco */
+  --b2: 0 0% 98% !important; /* fondo gris claro */
+  --b3: 0 0% 95% !important; /* fondo gris más oscuro */
+  --bc: 72 10% 9% !important; /* texto base usando secundario */
 }
 
 /* Simple one-turn spin animation */
@@ -126,11 +151,34 @@
   --color-white: #ffffff;
   --color-black: #101828;
 
+  /* COLORES PRINCIPALES DE LA APLICACIÓN */
   --color-primary: #F5D238;
+  --color-primary-25: #fefdf8;
+  --color-primary-50: #fdfbf1;
+  --color-primary-100: #faf6e1;
+  --color-primary-200: #f5ebc6;
+  --color-primary-300: #f0da96;
+  --color-primary-400: #eac564;
   --color-primary-500: #F5D238;
+  --color-primary-600: #e6bd20;
+  --color-primary-700: #c19d1a;
+  --color-primary-800: #9e7d1a;
+  --color-primary-900: #82651b;
+  --color-primary-950: #4a360c;
 
-  --color-secondary: #1A1B16;      
-  --color-secondary-500: #1A1B16;  
+  --color-secondary: #1A1B16;
+  --color-secondary-25: #fafafa;
+  --color-secondary-50: #f5f5f4;
+  --color-secondary-100: #e7e5e4;
+  --color-secondary-200: #d6d3d1;
+  --color-secondary-300: #a8a29e;
+  --color-secondary-400: #78716c;
+  --color-secondary-500: #1A1B16;
+  --color-secondary-600: #161710;
+  --color-secondary-700: #13140e;
+  --color-secondary-800: #0f100c;
+  --color-secondary-900: #0b0c0a;
+  --color-secondary-950: #060608;  
 
   --color-brand-25: #f2f7ff;
   --color-brand-50: #ecf3ff;
