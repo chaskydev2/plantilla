@@ -1,4 +1,4 @@
-import { InputField, PasswordField, SelectField, SwitchField } from '@/components/form-field';
+import { InputField, PasswordField, SwitchField, MultiSelectField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
 import type { 
@@ -39,7 +39,7 @@ const UserModal = ({
         last_name: initialData.last_name || '',
         email: initialData.email || '',
         password: '',
-        role_id : initialData.role_id || '',
+        role_ids: (initialData as any)?.roles?.map((role: any) => role.id) || [],
         edit_profile: initialData.edit_profile || false,
       }
     : {
@@ -48,7 +48,7 @@ const UserModal = ({
         email: '',
         password: '',
         confirmPassword: '',
-        role_id: '',
+        role_ids: [],
         edit_profile: false,
       };
 
@@ -147,12 +147,14 @@ const UserModal = ({
           )}
 
           <div className="md:col-span-2">
-            <SelectField
-              label='Seleccionar el rol'
-              name="role_id"
+            <MultiSelectField
+              label='Seleccionar roles'
+              name="role_ids"
               options={roles}
               valueKey="id"
               labelKey="name"
+              placeholder="Selecciona roles para el usuario"
+              helperText="Puedes seleccionar múltiples roles"
             />
           </div>
 

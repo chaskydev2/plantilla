@@ -13,7 +13,6 @@ import NotFound from "@/pages/OtherPage/NotFound";
 import Unauthorized from "@/pages/OtherPage/Unauthorized";
 import HomePage from '@/pages/WebPage/HomePage';
 import ContactPage from "@/pages/WebPage/ContactPage";
-import EventsPage from "@/pages/WebPage/EventsPage";
 import PrivateRoute from "./PrivateRoute";
 import GuestRoute from "./GuestRoute";
 
@@ -33,7 +32,6 @@ import HistoryAdminPage from "@/pages/admin/histories/Main";
 import ContactAdminPage from "@/pages/admin/contacts/Main";
 import BeginningPage from "@/pages/admin/beginnings/Main";
 import MoralValuePage from "@/pages/admin/moral-values/Main";
-import DirectivityAdminPage from "@/pages/admin/directivities/Main";
 import RequirementAdminPage from "@/pages/admin/requirements/Main";
 import AgreementAdminPage from "@/pages/admin/agreements/Main";
 import NewsletterPage from "@/pages/admin/newsletters/Main";
@@ -41,15 +39,9 @@ import FaqPage from "@/pages/admin/faqs/Main";
 import BannerPage from "@/pages/admin/banners/Main";
 import SocialNetworkPage from "@/pages/admin/social-networks/Main";
 
-import Historypage from "@/pages/WebPage/Historypage";
-import Directivapage from "@/pages/WebPage/DirectivePage";
+
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
-import Estatutospage from "@/pages/WebPage/StatutesPage";
-import Visionpage from "@/pages/WebPage/Visionpage";
-import Coursespage from "@/pages/WebPage/CoursesPage";
-import Conveniospage from "@/pages/WebPage/AgreementsPage";
 import Renovationpage from "@/pages/WebPage/RenovationPage";
-import Visadopage from "@/pages/WebPage/Visadopage";
 import Certificacionespage from "@/pages/WebPage/CertificationsPage";
 import Formulariopage from "@/pages/WebPage/FormPage";
 import AffiliatesPage from "@/pages/WebPage/AffiliatesPage";
@@ -88,16 +80,8 @@ export default function App() {
           <Route element={<AppLayoutWeb />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/contacto" element={<ContactPage />} />
-            <Route path="/cursos" element={<Coursespage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/historia" element={<Historypage />} />
-            <Route path="/mision" element={<Visionpage />} />
-            <Route path="/convenios" element={<Conveniospage />} />
-            <Route path="/directiva" element={<Directivapage />} />
-            <Route path="/estatutos" element={<Estatutospage />} />
             <Route path="/requisitos" element={<Requisitospage />} />
             <Route path="/renovacion_datos" element={<Renovationpage />} />
-            <Route path="/visado_planos" element={<Visadopage />} />
             <Route path="/afiliados" element={<AffiliatesPage />} />
             <Route path="/certificacion_trabajo" element={<Certificacionespage />} />
             <Route path="/formulario_solicitud" element={<Formulariopage />} />
@@ -123,7 +107,6 @@ export default function App() {
               <Route path="/admin/contactos" element={<ContactAdminPage/>} />
               <Route path="/admin/principios" element={<BeginningPage/>} />
               <Route path="/admin/valores_morales" element={<MoralValuePage/>} />
-              <Route path="/admin/directiva" element={<DirectivityAdminPage/>} />
               <Route path="/admin/requisitos" element={<RequirementAdminPage/>} />
               <Route path="/admin/acuerdos" element={<AgreementAdminPage/>} />
               <Route path="/admin/consultas" element={<NewsletterPage/>} />

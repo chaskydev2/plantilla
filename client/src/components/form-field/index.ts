@@ -5,6 +5,8 @@ import TextAreaField from "./TextAreaField";
 import SwitchField from "./SwitchField";
 import InputFileField from "./InputFileField";
 
+import MultiSelectField from "./MultiSelectField";
+
 export {
     InputField,
     PasswordField,
@@ -12,4 +14,5 @@ export {
     TextAreaField,
     SwitchField,
     InputFileField,
+    MultiSelectField,
 }

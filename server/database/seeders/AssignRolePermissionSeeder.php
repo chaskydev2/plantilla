@@ -23,6 +23,17 @@ class AssignRolePermissionSeeder extends Seeder
             'guard_name' => 'api'
         ]);
 
+        // Crear roles adicionales
+        $roleManager = Role::firstOrCreate([
+            'name' => 'manager',
+            'guard_name' => 'api'
+        ]);
+
+        $roleEditor = Role::firstOrCreate([
+            'name' => 'editor',
+            'guard_name' => 'api'
+        ]);
+
         $roleAdmin->syncPermissions(Permission::where('guard_name', 'api')->get());
 
         $user = User::firstOrCreate(
@@ -33,7 +44,12 @@ class AssignRolePermissionSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        $user->syncRoles($roleAdmin);
+        
+        // Asignar múltiples roles usando array de nombres
+        $user->syncRoles(['admin', 'manager', 'editor']);
+        
+        // O usando array de objetos Role
+        // $user->syncRoles([$roleAdmin, $roleManager, $roleEditor]);
 
         $this->command->info('Admin role and permissions assigned successfully!');
     }

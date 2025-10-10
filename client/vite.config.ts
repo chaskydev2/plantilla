@@ -14,7 +14,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     },
   },
-  base: '/app/',
+  base: '/',
   build: {
     outDir: '../server/public/app',
     emptyOutDir: true,
