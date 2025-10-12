@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
-
+import { Link } from "react-router";
 // Minimal typings for Google Places to avoid using any
 type PlacesPrediction = { description: string; place_id: string };
 type PlacesAutocompleteService = {
@@ -138,6 +138,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   const [locationPredictions, setLocationPredictions] = useState<Array<{ description: string; place_id: string }>>([]);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+
   useEffect(() => {
     function update() {
       const el = containerRef.current;
@@ -441,11 +442,13 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
           />
         </div>
 
-        {/* CTA */}
-        <button className="inline-flex items-center bg-[#1A1B16] hover:bg-[#2A2B26] text-white font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1A1B16] focus:ring-offset-white">
+        <Link
+          to="/findpro"
+          className="inline-flex items-center bg-[#1A1B16] hover:bg-[#2A2B26] text-white font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1A1B16] focus:ring-offset-white"
+        >
           <span>Find a Pro</span>
           <Search className="ml-2 size-4 text-white" />
-        </button>
+        </Link>
       </motion.div>
       {open && rect && typeof document !== "undefined"
         ? createPortal(
