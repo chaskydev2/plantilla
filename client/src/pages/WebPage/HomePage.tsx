@@ -90,7 +90,7 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-screen overflow-hidden bg-[#F5D238] text-[#1A1B16]">
+      <section className="relative min-h-screen overflow-hidden bg-primary text-[#1A1B16]">
         <div className="relative h-full flex items-center justify-center text-center py-16">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <motion.div
@@ -149,24 +149,24 @@ const HomePage = () => {
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
             {/* Item 1 */}
             <div className="flex-1 flex flex-col items-center text-center px-0 md:px-10 mb-10 md:mb-0">
-              <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-[#F5D238] ring-opacity-50">
-                <HardHat className="size-8 text-[#F5D238]" />
+              <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
+                <HardHat className="size-8 text-primary" />
               </div>
               <h3 className="text-xl md:text-2xl font-semibold leading-snug">Licensed and background-checked</h3>
             </div>
 
             {/* Item 2 */}
             <div className="flex-1 flex flex-col items-center text-center px-0 md:px-10 mb-10 md:mb-0">
-              <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-[#F5D238] ring-opacity-50">
-                <LineChart className="size-8 text-[#F5D238]" />
+              <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
+                <LineChart className="size-8 text-primary" />
               </div>
               <h3 className="text-xl md:text-2xl font-semibold leading-snug">Financially verified</h3>
             </div>
 
             {/* Item 3 */}
             <div className="flex-1 flex flex-col items-center text-center px-0 md:px-10">
-              <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-[#F5D238] ring-opacity-50">
-                <ShieldCheck className="size-8 text-[#F5D238]" />
+              <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
+                <ShieldCheck className="size-8 text-primary" />
               </div>
               <h3 className="text-xl md:text-2xl font-semibold leading-snug">Protected by a guarantee</h3>
               <p className="mt-2 text-sm text-gray-300">Up to $250,000</p>
@@ -223,16 +223,16 @@ const HomePage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Step 1 */}
-                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-[#F5D238]/50 hover:border-[#F5D238] hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
+                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-primary/50 hover:border-primary hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
                   <div className="relative min-h-[260px] [transform-style:preserve-3d]">
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 1
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <Search className="size-12 text-[#F5D238]" />
+                          <Search className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Search</h3>
                         <p className="text-gray-600">Enter your location and project type</p>
@@ -240,12 +240,12 @@ const HomePage = () => {
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 1
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <Search className="size-12 text-[#F5D238]" />
+                          <Search className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Search</h3>
                         <p className="text-gray-600">Enter your location and project type</p>
@@ -255,16 +255,16 @@ const HomePage = () => {
                 </div>
 
                 {/* Step 2 */}
-                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-[#F5D238]/50 hover:border-[#F5D238] hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
+                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-primary/50 hover:border-primary hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
                   <div className="relative min-h-[260px] [transform-style:preserve-3d]">
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 2
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <FileText className="size-12 text-[#F5D238]" />
+                          <FileText className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Quotes</h3>
                         <p className="text-gray-600">Receive quotes from pre-screened contractors</p>
@@ -272,12 +272,12 @@ const HomePage = () => {
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 2
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <FileText className="size-12 text-[#F5D238]" />
+                          <FileText className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Quotes</h3>
                         <p className="text-gray-600">Receive quotes from pre-screened contractors</p>
@@ -287,16 +287,16 @@ const HomePage = () => {
                 </div>
 
                 {/* Step 3 */}
-                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-[#F5D238]/50 hover:border-[#F5D238] hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
+                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-primary/50 hover:border-primary hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
                   <div className="relative min-h-[260px] [transform-style:preserve-3d]">
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 3
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <HardHat className="size-12 text-[#F5D238]" />
+                          <HardHat className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Select</h3>
                         <p className="text-gray-600">Choose the best contractor for your project</p>
@@ -304,12 +304,12 @@ const HomePage = () => {
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 3
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <HardHat className="size-12 text-[#F5D238]" />
+                          <HardHat className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Select</h3>
                         <p className="text-gray-600">Choose the best contractor for your project</p>
@@ -319,16 +319,16 @@ const HomePage = () => {
                 </div>
 
                 {/* Step 4 */}
-                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-[#F5D238]/50 hover:border-[#F5D238] hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
+                <div className="group relative bg-white rounded-2xl shadow-md transition-shadow p-8 border border-primary/50 hover:border-primary hover:shadow-[0_0_0_2px_rgba(245,210,56,0.45)] overflow-hidden origin-center transform-gpu will-change-transform [transform-style:preserve-3d] hover:animate-[y-spin-once_700ms_linear_1] motion-reduce:animate-none motion-reduce:[transform:none]">
                   <div className="relative min-h-[260px] [transform-style:preserve-3d]">
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 4
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <ShieldCheck className="size-12 text-[#F5D238]" />
+                          <ShieldCheck className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Guaranteed</h3>
                         <p className="text-gray-600">Your project is protected up to $250,000</p>
@@ -336,12 +336,12 @@ const HomePage = () => {
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-[#F5D238] rounded-full px-3 py-1 shadow">
+                      <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
                         Step 4
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
-                          <ShieldCheck className="size-12 text-[#F5D238]" />
+                          <ShieldCheck className="size-12 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Guaranteed</h3>
                         <p className="text-gray-600">Your project is protected up to $250,000</p>
@@ -363,7 +363,7 @@ const HomePage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {/* Card 1 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-[#F5D238] max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
                   <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img
                       src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400&auto=format&fit=crop"
@@ -393,7 +393,7 @@ const HomePage = () => {
                       <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
                         <CalendarDays className="size-4 text-gray-400" /> Jan 2023
                       </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
+                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
                         <ArrowRightIcon className="size-4 text-[#1A1B16]" />
                       </button>
                     </div>
@@ -401,7 +401,7 @@ const HomePage = () => {
                 </article>
 
                 {/* Card 2 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-[#F5D238] max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
                   <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img
                       src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1400&auto=format&fit=crop"
@@ -431,7 +431,7 @@ const HomePage = () => {
                       <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
                         <CalendarDays className="size-4 text-gray-400" /> Apr 2022
                       </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
+                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
                         <ArrowRightIcon className="size-4 text-[#1A1B16]" />
                       </button>
                     </div>
@@ -439,7 +439,7 @@ const HomePage = () => {
                 </article>
 
                 {/* Card 3 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-[#F5D238] max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
                   <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
                     <img
                       src="https://images.unsplash.com/photo-1585842378054-ee2e52f94ba3?q=80&w=1400&auto=format&fit=crop"
@@ -469,7 +469,7 @@ const HomePage = () => {
                       <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
                         <CalendarDays className="size-4 text-gray-400" /> Jun 2024
                       </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-[#F5D238] shadow hover:shadow-md transition">
+                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
                         <ArrowRightIcon className="size-4 text-[#1A1B16]" />
                       </button>
                     </div>
@@ -484,8 +484,8 @@ const HomePage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
                 {/* Stat 1 */}
                 <div className="flex flex-col items-center">
-                  <div className="group mb-6 inline-flex items-center justify-center size-14 rounded-full bg-white/5 ring-2 ring-[#F5D238]/30 transition-all duration-300 [perspective:800px] group-hover:ring-[#F5D238]/40 group-hover:bg-[#F5D238]/5">
-                    <BadgeDollarSign className="size-7 text-[#F5D238] origin-center transform-gpu will-change-transform [transform-style:preserve-3d] animate-[planet-spin_6s_linear_infinite] transition-transform duration-300 ease-out group-hover:animate-none group-hover:[transform:rotateY(0deg)]" />
+                  <div className="group mb-6 inline-flex items-center justify-center size-14 rounded-full bg-white/5 ring-2 ring-primary/30 transition-all duration-300 [perspective:800px] group-hover:ring-primary/40 group-hover:bg-primary/5">
+                    <BadgeDollarSign className="size-7 text-primary origin-center transform-gpu will-change-transform [transform-style:preserve-3d] animate-[planet-spin_6s_linear_infinite] transition-transform duration-300 ease-out group-hover:animate-none group-hover:[transform:rotateY(0deg)]" />
                   </div>
                   <div className="text-white text-4xl md:text-5xl font-extrabold tracking-tight">100%</div>
                   <div className="mt-2 text-gray-300 text-base md:text-lg">Claims Paid</div>
@@ -493,8 +493,8 @@ const HomePage = () => {
 
                 {/* Stat 2 */}
                 <div className="flex flex-col items-center">
-                  <div className="group mb-6 inline-flex items-center justify-center size-14 rounded-full bg-white/5 ring-2 ring-[#F5D238]/30 transition-all duration-300 [perspective:800px] group-hover:ring-[#F5D238]/40 group-hover:bg-[#F5D238]/5">
-                    <CalendarClock className="size-7 text-[#F5D238] origin-center transform-gpu will-change-transform [transform-style:preserve-3d] animate-[planet-spin_6s_linear_infinite] transition-transform duration-300 ease-out group-hover:animate-none group-hover:[transform:rotateY(0deg)]" />
+                  <div className="group mb-6 inline-flex items-center justify-center size-14 rounded-full bg-white/5 ring-2 ring-primary/30 transition-all duration-300 [perspective:800px] group-hover:ring-primary/40 group-hover:bg-primary/5">
+                    <CalendarClock className="size-7 text-primary origin-center transform-gpu will-change-transform [transform-style:preserve-3d] animate-[planet-spin_6s_linear_infinite] transition-transform duration-300 ease-out group-hover:animate-none group-hover:[transform:rotateY(0deg)]" />
                   </div>
                   <div className="text-white text-4xl md:text-5xl font-extrabold tracking-tight">15–30 Days</div>
                   <div className="mt-2 text-gray-300 text-base md:text-lg">Average Resolution</div>
@@ -502,8 +502,8 @@ const HomePage = () => {
 
                 {/* Stat 3 */}
                 <div className="flex flex-col items-center">
-                  <div className="group mb-6 inline-flex items-center justify-center size-14 rounded-full bg-white/5 ring-2 ring-[#F5D238]/30 transition-all duration-300 [perspective:800px] group-hover:ring-[#F5D238]/40 group-hover:bg-[#F5D238]/5">
-                    <HandCoins className="size-7 text-[#F5D238] origin-center transform-gpu will-change-transform [transform-style:preserve-3d] animate-[planet-spin_6s_linear_infinite] transition-transform duration-300 ease-out group-hover:animate-none group-hover:[transform:rotateY(0deg)]" />
+                  <div className="group mb-6 inline-flex items-center justify-center size-14 rounded-full bg-white/5 ring-2 ring-primary/30 transition-all duration-300 [perspective:800px] group-hover:ring-primary/40 group-hover:bg-primary/5">
+                    <HandCoins className="size-7 text-primary origin-center transform-gpu will-change-transform [transform-style:preserve-3d] animate-[planet-spin_6s_linear_infinite] transition-transform duration-300 ease-out group-hover:animate-none group-hover:[transform:rotateY(0deg)]" />
                   </div>
                   <div className="text-white text-4xl md:text-5xl font-extrabold tracking-tight">$8,000</div>
                   <div className="mt-2 text-gray-300 text-base md:text-lg">Average Claim</div>
@@ -521,13 +521,13 @@ const HomePage = () => {
                   {/* Left: GU */}
                   <div className="bg-[#EEF2F7]">
                     {/* Header */}
-                    <div className="px-6 md:px-10 py-6 bg-[#F5D238] text-[#1A1B16] font-extrabold text-2xl md:text-3xl">
+                    <div className="px-6 md:px-10 py-6 bg-primary text-[#1A1B16] font-extrabold text-2xl md:text-3xl">
                       GU
                     </div>
                     {/* Rows */}
-                    <ul className="divide-y divide-[#F5D238]/30">
+                    <ul className="divide-y divide-primary/30">
                       <li className="flex items-center gap-4 px-6 md:px-10 py-5">
-                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-[#F5D238] text-[#1A1B16] bg-white">
+                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-primary text-[#1A1B16] bg-white">
                           ✓
                         </span>
                         <span className="text-[#1A1B16] text-base md:text-lg font-medium">
@@ -535,7 +535,7 @@ const HomePage = () => {
                         </span>
                       </li>
                       <li className="flex items-center gap-4 px-6 md:px-10 py-5">
-                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-[#F5D238] text-[#1A1B16] bg-white">
+                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-primary text-[#1A1B16] bg-white">
                           ✓
                         </span>
                         <span className="text-[#1A1B16] text-base md:text-lg font-medium">
@@ -543,25 +543,25 @@ const HomePage = () => {
                         </span>
                       </li>
                       <li className="flex items-center gap-4 px-6 md:px-10 py-5">
-                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-[#F5D238] text-[#1A1B16] bg-white">
+                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-primary text-[#1A1B16] bg-white">
                           ✓
                         </span>
                         <span className="text-[#1A1B16] text-base md:text-lg font-medium">Data-driven rankings</span>
                       </li>
                       <li className="flex items-center gap-4 px-6 md:px-10 py-5">
-                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-[#F5D238] text-[#1A1B16] bg-white">
+                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-primary text-[#1A1B16] bg-white">
                           ✓
                         </span>
                         <span className="text-[#1A1B16] text-base md:text-lg font-medium">We pay homeowners</span>
                       </li>
                       <li className="flex items-center gap-4 px-6 md:px-10 py-5">
-                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-[#F5D238] text-[#1A1B16] bg-white">
+                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-primary text-[#1A1B16] bg-white">
                           ✓
                         </span>
                         <span className="text-[#1A1B16] text-base md:text-lg font-medium">Real-life support</span>
                       </li>
                       <li className="flex items-center gap-4 px-6 md:px-10 py-5">
-                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-[#F5D238] text-[#1A1B16] bg-white">
+                        <span className="inline-flex items-center justify-center size-8 rounded-full border-2 border-primary text-[#1A1B16] bg-white">
                           ✓
                         </span>
                         <span className="text-[#1A1B16] text-base md:text-lg font-medium">
@@ -803,7 +803,7 @@ const HomePage = () => {
                             </div>
                           </div>
                           <p className="text-gray-600 line-clamp-5">{t.text}</p>
-                          <button className="mt-4 text-[#1A1B16] font-semibold hover:text-[#F5D238]">Read more</button>
+                          <button className="mt-4 text-[#1A1B16] font-semibold hover:text-primary">Read more</button>
                         </article>
                       ));
                     })()}
@@ -842,7 +842,7 @@ const HomePage = () => {
                       <div className="mt-7">
                         <Link
                           to="/contractors"
-                          className="inline-flex items-center justify-center px-6 py-4 rounded-2xl bg-[#F5D238] text-[#1A1B16] font-bold shadow hover:shadow-md transition"
+                          className="inline-flex items-center justify-center px-6 py-4 rounded-2xl bg-primary text-[#1A1B16] font-bold shadow hover:shadow-md transition"
                         >
                           Find Your Guaranteed Contractor
                         </Link>
@@ -908,7 +908,7 @@ const FaqItem = ({ question, answer }: { question: string; answer: string }) => 
         className="group w-full flex items-start justify-between gap-4 text-left"
       >
         <span className="text-lg md:text-xl font-semibold text-[#1A1B16]">{question}</span>
-        <span className="shrink-0 inline-flex items-center justify-center size-9 rounded-full border border-gray-300 text-[#1A1B16] bg-white transform transition-colors transition-transform duration-200 ease-out group-hover:bg-[#F5D238] group-hover:border-[#F5D238] group-hover:text-[#1A1B16] group-hover:scale-110">
+        <span className="shrink-0 inline-flex items-center justify-center size-9 rounded-full border border-gray-300 text-[#1A1B16] bg-white transform transition-colors transition-transform duration-200 ease-out group-hover:bg-primary group-hover:border-primary group-hover:text-[#1A1B16] group-hover:scale-110">
           {open ? <Minus className="size-5" /> : <Plus className="size-5" />}
         </span>
       </button>
