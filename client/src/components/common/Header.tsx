@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
-import { Menu, X, ChevronDown, ChevronUp, LogIn, BadgeCheck } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, LogIn } from "lucide-react";
 import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
 
 
@@ -33,24 +33,17 @@ const Header = () => {
   const shouldBeTransparent = isHomePage && !scrolled && !isMenuOpen;
 
   const menuItems = [
+    { name: "Services", path: "/services"},
+    { name: "Scam alerts", path: "/scam-alerts" },
+    { name: "Fair price check", path: "/fair-price-check" },
+    { name: "GU Guarantee", path: "/gu-guarantee" },
     {
-      name: "Services",
+      name: "Register Guara",
       submenu: [
-        { name: "Roofing", path: "#" },
-        { name: "Siding", path: "#" },
-        { name: "Windows", path: "#" },
+        { name: "How it works", path: "/register-guara" },
+        { name: "What’s covered", path: "/register-guara" },
       ],
     },
-    { name: "Scam alerts", path: "#" },
-    { name: "Fair price check", path: "#" },
-    {
-      name: "GU Guarantee",
-      submenu: [
-        { name: "How it works", path: "#" },
-        { name: "What’s covered", path: "#" },
-      ],
-    },
-    { name: "Register Guara", path: "#", icon: <BadgeCheck className="w-4 h-4 mr-2" /> },
   ];
 
   return (

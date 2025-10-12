@@ -39,6 +39,11 @@ import FaqPage from "@/pages/admin/faqs/Main";
 import BannerPage from "@/pages/admin/banners/Main";
 import SocialNetworkPage from "@/pages/admin/social-networks/Main";
 
+import ScamAlerts from "@/pages/WebPage/ScamAlerts";
+import FairPriceCheck from "@/pages/WebPage/FairPriceCheck";
+import GuGuarantee from "@/pages/WebPage/GuGuarantee";
+import RegisterGuara from "@/pages/WebPage/RegisterGuara";
+import Services from "@/pages/WebPage/Services";
 
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
 import Renovationpage from "@/pages/WebPage/RenovationPage";
@@ -85,6 +90,13 @@ export default function App() {
             <Route path="/afiliados" element={<AffiliatesPage />} />
             <Route path="/certificacion_trabajo" element={<Certificacionespage />} />
             <Route path="/formulario_solicitud" element={<Formulariopage />} />
+            <Route path="/scam-alerts" element={<ScamAlerts />} />
+            <Route path="/fair-price-check" element={<FairPriceCheck />} />
+            <Route path="/gu-guarantee" element={<GuGuarantee />} />
+            <Route path="/register-guara" element={<RegisterGuara />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/loader" element={<LoaderScreen />} />
+
           </Route>
 
           {/* Dashboard Layout */}
