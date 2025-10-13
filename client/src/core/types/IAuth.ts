@@ -13,6 +13,14 @@ export interface IAuthRequest {
   password: string;
 }
 
+export interface IRegisterHomeownerRequest {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
 export interface IAuthResponse {
   data: {
     access_token: string;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
-import { Menu, X, ChevronDown, ChevronUp, LogIn, BadgeCheck } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, LogIn, BadgeCheck, UserPlus } from "lucide-react";
 import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
 
 
@@ -153,11 +153,31 @@ const Header = () => {
           </nav>
 
           {/* Right actions (desktop) */}
-          <div className="hidden md:flex items-center justify-self-end">
+          <div className="hidden md:flex items-center justify-self-end gap-3">
+            {/* Register Button - Distinguished */}
+            <Link
+              to="/formulario_solicitud"
+              className={`
+                px-6 py-3 rounded-lg flex items-center font-bold
+                transition-all duration-300 transform hover:scale-105
+                shadow-md hover:shadow-lg border-2 relative overflow-hidden
+                ${shouldBeTransparent 
+                  ? "bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white border-white/20 hover:from-[#1A1B16] hover:to-black" 
+                  : "bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white border-[#1A1B16] hover:from-black hover:to-[#1A1B16]"
+                }
+                before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent
+                before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700
+              `}
+            >
+              <UserPlus size={18} className="mr-2" />
+              Register
+            </Link>
+
+            {/* Login Button - Regular */}
             <Link
               to="/login"
               className={`
-                ml-4 px-4 py-2 rounded-md flex items-center
+                px-4 py-2 rounded-md flex items-center
                 transition-colors duration-200
                 ${shouldBeTransparent 
                   ? "bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f]" 
@@ -171,6 +191,12 @@ const Header = () => {
           </div>
 
           <div className="md:hidden flex items-center justify-self-end">
+            <Link
+              to="/formulario_solicitud"
+              className={`mr-3 p-2 rounded-full bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white shadow-md ${shouldBeTransparent ? "ring-2 ring-white/20" : ""}`}
+            >
+              <UserPlus size={18} />
+            </Link>
             <Link
               to="/login"
               className={`mr-4 p-2 rounded-full ${shouldBeTransparent ? "text-white" : "text-[#1A1B16]"}`}
@@ -272,6 +298,22 @@ const Header = () => {
               </div>
             ))}
             
+             {/* Mobile Register Button - Distinguished */}
+            <Link
+              to="/formulario_solicitud"
+              onClick={toggleMenu}
+              className={`
+                flex items-center px-3 py-3 rounded-md text-base font-bold 
+                transition-all duration-300 transform hover:scale-102
+                bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white
+                shadow-lg border border-gray-600 mx-2 mb-2
+              `}
+            >
+              <UserPlus size={18} className="mr-3" />
+              Register Account
+            </Link>
+            
+            {/* Mobile Login Button - Regular */}
             <Link
               to="/login"
               onClick={toggleMenu}

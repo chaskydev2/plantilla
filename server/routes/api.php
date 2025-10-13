@@ -35,6 +35,8 @@ Route::prefix('/v1')
 
         Route::post('login', [AuthController::class, 'login']);
         
+        Route::post('register/homeowner', [AuthController::class, 'registerHomeowner']);
+        
         Route::get('agreements/all', [AgreementController::class, 'all']);
 
         Route::get('announcements/all', [AnnouncementController::class, 'all']); 

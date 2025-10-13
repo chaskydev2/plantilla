@@ -19,14 +19,8 @@ return new class extends Migration
             $table->text('address')->nullable()->after('registration_code');
             $table->string('mobile_number')->nullable()->after('address');
             $table->string('phone_number')->nullable()->after('mobile_number');
-            $table->date('college_affiliation_date')->nullable()->after('phone_number');
-            $table->string('linkedin_url')->nullable()->after('college_affiliation_date');
-            $table->string('portfolio_url')->nullable()->after('linkedin_url');
-            $table->text('professional_summary')->nullable()->after('portfolio_url');
-            $table->boolean('travel_availability')->default(false)->after('professional_summary');
-            $table->boolean('has_driving_license')->default(false)->after('travel_availability');
-            $table->string('driving_license_category')->nullable()->after('has_driving_license');
-            $table->boolean('edit_profile')->default(false)->after('driving_license_category');
+            $table->boolean('edit_profile')->default(false);
+            $table->boolean('verification')->default(false)->after('edit_profile');
         });
     }
 

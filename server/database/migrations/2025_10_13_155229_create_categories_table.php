@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('histories', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->text('description')->nullable();
-            $table->text('content')->nullable();
-            $table->text('banner1')->nullable();
-            $table->text('banner2')->nullable();
-            $table->text('banner3')->nullable();
+            $table->string('icon')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('histories');
+        Schema::dropIfExists('categories');
     }
 };

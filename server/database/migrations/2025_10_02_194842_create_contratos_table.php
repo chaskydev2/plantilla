@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('address_line1', 200)->nullable();
             $table->string('address_line2', 200)->nullable();
             $table->string('city', 120)->nullable();
+            $table->string('company_name');
+            $table->string('license_number')->unique();
+            $table->boolean('is_insured')->default(false);
+            $table->string('service_area');
+            $table->decimal('average_rating', 3, 2)->default(0.00); 
             $table->string('state_code', 10)->nullable();
             $table->string('country_code', 2)->default('US')->notNull();
             $table->decimal('lat', 9, 6)->nullable();

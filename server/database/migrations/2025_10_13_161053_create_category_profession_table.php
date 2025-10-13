@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('directivities', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->required();
-            $table->string('position')->required();
-            $table->text('photo')->required();
-            $table->timestamps();
+        Schema::create('category_profession', function (Blueprint $table) {
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('profession_id')->constrained('professions')->cascadeOnDelete();
+            $table->primary(['category_id','profession_id']);
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('directivities');
+        Schema::dropIfExists('category_profession');
     }
 };

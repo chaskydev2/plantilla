@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('moral_values', function (Blueprint $table) {
+        Schema::create('attributes', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->required();
-            $table->string('description')->required();
+            $table->string('name', 120);
+            $table->string('slug', 140)->unique();
+            $table->text('description')->nullable();
+            $table->enum('required_for', ['homeowner', 'contractor', 'both'])->default('contractor');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('moral_values');
+        Schema::dropIfExists('attributes');
     }
 };
