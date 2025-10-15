@@ -9,7 +9,8 @@ export const useFormValidation = () => {
     const errors: FormValidationErrors = {};
     if (!((data.firstName ?? "").trim())) errors.firstName = "First name is required.";
     if (!((data.lastName ?? "").trim())) errors.lastName = "Last name is required.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email ?? "")) errors.email = "Enter a valid email address.";
+    const email = (data.email ?? "").trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Enter a valid email address.";
     if ((data.password ?? "").length < 6) errors.password = "Password must be at least 6 characters.";
     if ((data.password ?? "") !== (data.confirmPassword ?? "")) errors.confirmPassword = "Passwords do not match.";
     return errors;
@@ -17,7 +18,8 @@ export const useFormValidation = () => {
 
   const validateHomeowner = (data: Extract<FormData, { userType: "ownerHome" }>): FormValidationErrors => {
     const errors = validateCommonAuth(data);
-    if (!/^[+]?\d[\d\s-]{6,}$/.test(data.phone || "")) errors.phone = "Enter a valid phone number.";
+    // Más flexible: acepta números con espacios, guiones, paréntesis, y opcionalmente el +
+    if (!/^[\+]?[(]?[\d\s\-\(\)]{7,}$/.test(data.phone || "")) errors.phone = "Enter a valid phone number.";
     return errors;
   };
 

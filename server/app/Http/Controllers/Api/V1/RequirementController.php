@@ -18,7 +18,7 @@ class RequirementController extends Controller
 {
     public function index(PaginationRequest $request): JsonResponse
     {
-        Gate::authorize('requisito_listar');
+       // Gate::authorize('requisito_listar');
 
         $query = Requirement::query()
             ->search($request->input('search'))
@@ -46,7 +46,7 @@ class RequirementController extends Controller
 
     public function show($id): JsonResponse
     {
-        Gate::authorize('requisito_ver');
+        //Gate::authorize('requisito_ver');
 
         $requirement = Requirement::findOrFail($id);
 
@@ -57,7 +57,7 @@ class RequirementController extends Controller
 
     public function store(StoreRequirementRequest $request): JsonResponse
     {
-        Gate::authorize('requisito_crear');
+        //Gate::authorize('requisito_crear');
 
         $requirement = Requirement::create($request->validated());
 
@@ -72,7 +72,7 @@ class RequirementController extends Controller
 
     public function update(UpdateRequirementRequest $request, $id)
     {
-        Gate::authorize('requisito_editar');
+        //Gate::authorize('requisito_editar');
 
         $requirement = Requirement::findOrFail($id);
         $requirement->update($request->validated());
@@ -88,7 +88,7 @@ class RequirementController extends Controller
 
     public function destroy($id): JsonResponse
     {
-        Gate::authorize('requisito_eliminar');
+        //Gate::authorize('requisito_eliminar');
 
         $requirement = Requirement::findOrFail($id);
         $requirement->delete();

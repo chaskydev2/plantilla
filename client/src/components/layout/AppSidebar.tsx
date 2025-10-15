@@ -21,7 +21,8 @@ import {
   HelpCircle,
   Image,
   Share2,
-  BarChart2
+  BarChart2,
+  Briefcase
 } from "lucide-react";
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
@@ -91,7 +92,7 @@ const navItems: MenuItem[] = [
       },
     ],
   },
- 
+  
   {
     name: "Pagos",
     icon: <BookOpen className="w-5 h-5" />,
@@ -111,6 +112,34 @@ const navItems: MenuItem[] = [
       },
     ],
   },
+  {
+    name: "Profesions",
+    icon: <Briefcase className="w-5 h-5" />,
+    //permissions: ["profesion_listar"],
+    subItems: [
+      {
+        name: "Lista de Profesiones",
+        path: "/admin/profesiones",
+        icon: <Briefcase className="w-4 h-4" />,
+      //  permissions: ["profesion_listar"]
+      },
+    ],
+  },
+  {
+    name: "Requerimientos",
+    icon: <Briefcase className="w-5 h-5" />,
+    //permissions: ["profesion_listar"],
+    subItems: [
+      {
+        name: "Lista de Requerimientos",
+        path: "/admin/atributes",
+        icon: <Briefcase className="w-4 h-4" />,
+      //  permissions: ["profesion_listar"]
+      },
+    ],
+  },
+
+
 ];
 
 const webItems: MenuItem[] = [

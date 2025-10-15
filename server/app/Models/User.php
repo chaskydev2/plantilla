@@ -21,8 +21,15 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'email_verified_at',
         'password',
+        'ci',
+        'registration_code',
+        'address',
+        'mobile_number',
+        'phone_number',
         'edit_profile',
+        'verification',
         'created_id',
         'updated_id',
         'deleted_id',
@@ -43,6 +50,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'edit_profile' => 'boolean',
+            'verification' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
+            'restored_at' => 'datetime',
         ];
     }
 
@@ -81,6 +94,20 @@ class User extends Authenticatable
         );
     }
 
+    protected function ci(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value ? strtoupper(trim($value)) : null,
+        );
+    }
+
+    protected function registrationCode(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value ? strtoupper(trim($value)) : null,
+        );
+    }
+
     
     protected function fullName(): Attribute
     {
@@ -107,7 +134,11 @@ class User extends Authenticatable
 
         return $query->where(function($q) use ($search) {
             $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
-                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
+                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%'])
+                ->orWhereRaw('LOWER(first_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                ->orWhereRaw('UPPER(ci) LIKE ?', ['%' . strtoupper($search) . '%'])
+                ->orWhereRaw('UPPER(registration_code) LIKE ?', ['%' . strtoupper($search) . '%']);
         });
     }
 
@@ -137,6 +168,31 @@ class User extends Authenticatable
         return $query->with(['roles', 'permissions']);
     }
 
+    public function scopeVerified(Builder $query): Builder
+    {
+        return $query->where('verification', true);
+    }
+
+    public function scopeUnverified(Builder $query): Builder
+    {
+        return $query->where('verification', false);
+    }
+
+    public function scopeCanEditProfile(Builder $query): Builder
+    {
+        return $query->where('edit_profile', true);
+    }
+
+    public function scopeWithCI(Builder $query): Builder
+    {
+        return $query->whereNotNull('ci');
+    }
+
+    public function scopeWithRegistrationCode(Builder $query): Builder
+    {
+        return $query->whereNotNull('registration_code');
+    }
+
     public function academicTrainings()
     {
         return $this->hasMany(AcademicTraining::class);
@@ -155,5 +211,37 @@ class User extends Authenticatable
      public function workReferences()
     {
         return $this->hasMany(WorkReference::class);
+    }
+
+    public function contractor()
+    {
+        return $this->hasOne(Contractor::class, 'user_id');
+    }
+
+    public function professions()
+    {
+        return $this->belongsToMany(Profession::class, 'contractor_professions', 'contractor_user_id', 'profession_id')
+            ->withTimestamps();
+    }
+
+    // Audit relationships
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_id');
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_id');
+    }
+
+    public function restoredBy()
+    {
+        return $this->belongsTo(User::class, 'restored_id');
     }
 }

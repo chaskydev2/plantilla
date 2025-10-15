@@ -9,7 +9,9 @@ use App\Http\Controllers\Api\V1\Auth\WorkExperienceController;
 use App\Http\Controllers\Api\V1\Auth\WorkReferenceController;
 use App\Http\Controllers\Api\V1\BeginningController;
 use App\Http\Controllers\Api\V1\ContactController;
+use App\Http\Controllers\Api\V1\ContractorController;
 use App\Http\Controllers\Api\V1\DirectivityController;
+use App\Http\Controllers\Api\V1\ProfessionController;
 use App\Http\Controllers\Api\V1\MoralValueController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\EventController;
@@ -27,6 +29,8 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AttributeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('/v1')
@@ -62,6 +66,13 @@ Route::prefix('/v1')
         Route::get('requirements/all', [RequirementController::class, 'all']);
 
         Route::get('social_networks/all', [SocialNetworkController::class, 'all']);
+
+        Route::get('professions/all', [ProfessionController::class, 'all']);
+
+        Route::get('categories/all', [CategoryController::class, 'index']);
+        Route::get('categories/tree', [CategoryController::class, 'tree']);
+        Route::get('categories/roots', [CategoryController::class, 'roots']);
+        Route::get('categories/search', [CategoryController::class, 'search']);
 
         Route::post('newsletters/send', [NewsletterController::class, 'send']);
 
@@ -137,6 +148,46 @@ Route::prefix('/v1')
 
             Route::apiResource('social_networks', SocialNetworkController::class);
 
-            Route::apiResource('payment', PaymentController::class); 
+            Route::apiResource('payment', PaymentController::class);
+
+            // Contractor routes
+            Route::get('contractors/stats', [ContractorController::class, 'stats']);
+            Route::get('contractors/status/{status}', [ContractorController::class, 'byStatus']);
+            Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
+            Route::patch('contractors/{contractor}/approve', [ContractorController::class, 'approve']);
+            Route::patch('contractors/{contractor}/reject', [ContractorController::class, 'reject']);
+            Route::patch('contractors/{contractor}/suspend', [ContractorController::class, 'suspend']);
+            Route::apiResource('contractors', ContractorController::class);
+
+            // Profession routes
+            Route::get('professions/available', [ProfessionController::class, 'available']);
+            Route::get('professions/stats', [ProfessionController::class, 'stats']);
+            Route::get('professions/popular', [ProfessionController::class, 'popular']);
+            Route::get('professions/with-contractors', [ProfessionController::class, 'withContractorsInArea']);
+            Route::get('professions/slug/{slug}', [ProfessionController::class, 'bySlug']);
+            
+            // Custom routes without model binding
+            Route::get('professions', [ProfessionController::class, 'index']);
+            Route::post('professions', [ProfessionController::class, 'store']);
+            Route::get('professions/{id}', [ProfessionController::class, 'show']);
+            Route::put('professions/{id}', [ProfessionController::class, 'update']);
+            Route::patch('professions/{id}', [ProfessionController::class, 'update']);
+            Route::delete('professions/{id}', [ProfessionController::class, 'destroy']);
+
+            // Category routes
+            Route::get('categories/{category}/ancestors', [CategoryController::class, 'ancestors']);
+            Route::get('categories/{category}/descendants', [CategoryController::class, 'descendants']);
+            Route::get('categories/{category}/breadcrumbs', [CategoryController::class, 'breadcrumbs']);
+            Route::patch('categories/{category}/move', [CategoryController::class, 'move']);
+            Route::patch('categories/{category}/move-to', [CategoryController::class, 'moveTo']);
+            Route::post('categories/{category}/subcategories', [CategoryController::class, 'addSubcategories']);
+            Route::delete('categories/{category}/with-children', [CategoryController::class, 'destroyWithChildren']);
+            Route::apiResource('categories', CategoryController::class);
+
+            // Attribute routes
+            Route::get('attributes/for-contractors', [AttributeController::class, 'forContractors']);
+            Route::get('attributes/for-homeowners', [AttributeController::class, 'forHomeowners']);
+            Route::get('attributes/statistics', [AttributeController::class, 'statistics']);
+            Route::apiResource('attributes', AttributeController::class);
         });
     });

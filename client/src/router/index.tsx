@@ -38,6 +38,10 @@ import NewsletterPage from "@/pages/admin/newsletters/Main";
 import FaqPage from "@/pages/admin/faqs/Main";
 import BannerPage from "@/pages/admin/banners/Main";
 import SocialNetworkPage from "@/pages/admin/social-networks/Main";
+import ProfessionPage from "@/pages/admin/professions/Main";
+
+import AtributesPage from "@/pages/admin/attributes/Main";
+
 
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
 import Renovationpage from "@/pages/WebPage/RenovationPage";
@@ -46,6 +50,14 @@ import Formulariopage from "@/pages/WebPage/FormPage";
 import AffiliatesPage from "@/pages/WebPage/AffiliatesPage";
 import FindProPage from "@/pages/WebPage/FindPro/FindProPage";
 import UserProfiles from "@/pages/admin/UserProfiles";
+
+
+import ScamAlerts from "@/pages/WebPage/ScamAlerts";
+import FairPriceCheck from "@/pages/WebPage/FairPriceCheck";
+import GuGuarantee from "@/pages/WebPage/GuGuarantee";
+import RegisterGuara from "@/pages/WebPage/RegisterGuara";
+import Services from "@/pages/WebPage/Services";
+
 
 import LoaderScreen from "@/components/common/LoaderScreen";
 import { ToastContainer } from "react-toastify";
@@ -83,6 +95,13 @@ export default function App() {
             <Route path="/afiliados" element={<AffiliatesPage />} />
             <Route path="/certificacion_trabajo" element={<Certificacionespage />} />
             <Route path="/formulario_solicitud" element={<Formulariopage />} />
+            <Route path="/scam-alerts" element={<ScamAlerts />} />
+            <Route path="/fair-price-check" element={<FairPriceCheck />} />
+            <Route path="/gu-guarantee" element={<GuGuarantee />} />
+            <Route path="/register-guara" element={<RegisterGuara />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/loader" element={<LoaderScreen />} />
+
           </Route>
 
           {/* Dashboard Layout */}
@@ -111,6 +130,9 @@ export default function App() {
               <Route path="/admin/preguntas_frecuentes" element={<FaqPage />} />
               <Route path="/admin/banners" element={<BannerPage />} />
               <Route path="/admin/redes_sociales" element={<SocialNetworkPage />} />
+              <Route path="/admin/profesiones" element={<ProfessionPage />} />
+              
+              <Route path="/admin/atributes" element={<AtributesPage />} />
             </Route>
           </Route>
 

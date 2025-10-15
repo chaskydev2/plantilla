@@ -86,6 +86,17 @@ const CertificationRequestForm_SignupStepper: React.FC = () => {
 
   const isFormMinimallyValid = validation.isFormMinimallyValid(formData, userType);
 
+  // Debug: Log form validation status
+  useEffect(() => {
+    console.log("Form Data:", formData);
+    console.log("User Type:", userType);
+    console.log("Is Form Valid:", isFormMinimallyValid);
+    if (userType === "ownerHome") {
+      const validationErrors = validation.validateHomeowner(formData as Extract<FormData, { userType: "ownerHome" }>);
+      console.log("Validation Errors:", validationErrors);
+    }
+  }, [formData, userType, isFormMinimallyValid, validation]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
@@ -310,12 +321,13 @@ const CertificationRequestForm_SignupStepper: React.FC = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading || !isFormMinimallyValid}
-                className="px-6 py-3 rounded-xl border font-bold shadow-sm"
+                className="px-6 py-3 rounded-xl border font-bold shadow-sm transition-all duration-200"
                 style={{
-                  background: "var(--color-secondary)",
-                  color: "var(--color-primary)",
+                  background: loading || !isFormMinimallyValid ? "#ccc" : "var(--color-secondary)",
+                  color: loading || !isFormMinimallyValid ? "#666" : "var(--color-primary)",
                   ...borderPrimary,
-                  opacity: loading || !isFormMinimallyValid ? 0.8 : 1,
+                  opacity: loading || !isFormMinimallyValid ? 0.6 : 1,
+                  cursor: loading || !isFormMinimallyValid ? "not-allowed" : "pointer"
                 }}
               >
                 {loading ? "Creating…" : "Create Account"}

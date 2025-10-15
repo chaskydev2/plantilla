@@ -151,6 +151,13 @@ export type IPermission =
   | "red_social_editar"
   | "red_social_eliminar" 
 
+  // Profesión
+  | "profesion_listar"
+  | "profesion_ver"
+  | "profesion_crear"
+  | "profesion_editar"
+  | "profesion_eliminar" 
+
     // Pagos
   | "payment_listar"
   | "payment_ver"

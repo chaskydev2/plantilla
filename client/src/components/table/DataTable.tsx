@@ -241,10 +241,15 @@ const DataTable = <T,>({
                                 title={action.label}
                                 key={i}
                                 onClick={() => action.onClick(item)}
-                                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm transition-colors ${action.variant === 'primary'
+                                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm transition-colors ${
+                                  action.variant === 'primary'
                                     ? 'bg-gray-600 text-white hover:bg-gray-700'
+                                    : action.variant === 'secondary'
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                    : action.variant === 'success'
+                                    ? 'bg-green-600 text-white hover:bg-green-700'
                                     : 'bg-red-600 text-white hover:bg-red-700'
-                                  }`}
+                                }`}
                                 type="button"
                               >
                                 {action.icon}

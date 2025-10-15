@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { User, Mail, Phone, Lock, KeyRound, Building, FileText, Wrench, Calendar, Star } from "lucide-react";
 import { FormInput } from "./FormInput";
 import { MultiSelectField } from "./MultiSelectField";
 import type { FormData } from "./types";
@@ -50,10 +51,11 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
               value={formData.fullName}
               onChange={onInputChange}
               placeholder="Enter your full name"
-              icon="👤"
+              icon={<User size={20} />}
               required
               error={errors.fullName}
               submitted={submitted}
+              hasIcon
             />
           </div>
 
@@ -64,10 +66,11 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={formData.email}
             onChange={onInputChange}
             placeholder="name@example.com"
-            icon="📧"
+            icon={<Mail size={20} />}
             required
             error={errors.email}
             submitted={submitted}
+            hasIcon
           />
 
           <FormInput
@@ -77,11 +80,12 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={(formData as any).phone}
             onChange={onInputChange}
             placeholder="+591 7xx xxx xx"
-            icon="📱"
+            icon={<Phone size={20} />}
             required
             error={errors.phone}
             submitted={submitted}
             inputMode="tel"
+            hasIcon
           />
 
           <FormInput
@@ -91,10 +95,11 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={formData.password}
             onChange={onInputChange}
             placeholder="Minimum 6 characters"
-            icon="🔒"
+            icon={<Lock size={20} />}
             required
             error={errors.password}
             submitted={submitted}
+            hasIcon
           />
 
           <FormInput
@@ -104,10 +109,11 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={formData.confirmPassword}
             onChange={onInputChange}
             placeholder="Type password again"
-            icon="🔐"
+            icon={<KeyRound size={20} />}
             required
             error={errors.confirmPassword}
             submitted={submitted}
+            hasIcon
           />
 
           <div className="md:col-span-2 group">
@@ -174,10 +180,11 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={(formData as any).company}
             onChange={onInputChange}
             placeholder="Your company name"
-            icon="🏢"
+            icon={<Building size={20} />}
             required
             error={errors.company}
             submitted={submitted}
+            hasIcon
           />
 
           <FormInput
@@ -186,10 +193,11 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={(formData as any).licenseNumber}
             onChange={onInputChange}
             placeholder="Registration/License #"
-            icon="📋"
+            icon={<FileText size={20} />}
             required
             error={errors.licenseNumber}
             submitted={submitted}
+            hasIcon
           />
 
           <div className="md:col-span-2">
@@ -199,9 +207,10 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
               value={(formData as any).services}
               onChange={onInputChange}
               placeholder="e.g., Plumbing, Electrical, HVAC"
-              icon="🛠️"
+              icon={<Wrench size={20} />}
               error={errors.services}
               submitted={submitted}
+              hasIcon
             />
           </div>
 
@@ -212,11 +221,12 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={(formData as any).yearsOfExperience}
             onChange={onInputChange}
             placeholder="5"
-            icon="📅"
+            icon={<Calendar size={20} />}
             min="0"
             max="50"
             error={errors.yearsOfExperience}
             submitted={submitted}
+            hasIcon
           />
 
           <FormInput
@@ -226,9 +236,10 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
             value={(formData as any).portfolioUrl}
             onChange={onInputChange}
             placeholder="https://your-portfolio.com"
-            icon="🌟"
+            icon={<Star size={20} />}
             error={errors.portfolioUrl}
             submitted={submitted}
+            hasIcon
           />
 
           <div className="md:col-span-2 flex items-center justify-between gap-3">

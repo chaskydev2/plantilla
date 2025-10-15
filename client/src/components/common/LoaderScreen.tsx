@@ -1,28 +1,36 @@
+import Logo from "@/assets/images/LOGO GUD.svg";
+
 export default function LoaderScreen() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-green-50 dark:bg-gray-900 z-9999">
-            <div className="relative w-40 h-40 mb-6">
-                <div className="absolute inset-0 rounded-full border-[3px] border-green-600 dark:border-green-400 shadow-lg"></div>
-
-                <div className="absolute inset-5 rounded-full border border-green-300 dark:border-green-700 flex items-center justify-center">
-                    <span className="absolute top-0 text-sm font-bold text-green-700 dark:text-green-300 -translate-y-1/2">N</span>
-                    <span className="absolute right-0 text-sm font-bold text-green-700 dark:text-green-300 translate-x-1/2">E</span>
-                    <span className="absolute bottom-0 text-sm font-bold text-green-700 dark:text-green-300 translate-y-1/2">S</span>
-                    <span className="absolute left-0 text-sm font-bold text-green-700 dark:text-green-300 -translate-x-1/2">W</span>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 z-9999">
+            <div className="relative w-48 h-48 mb-8">
+                {/* Logo principal */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <img 
+                        src={Logo} 
+                        alt="GU Logo" 
+                        className="w-32 h-32 animate-pulse"
+                    />
                 </div>
 
-                <div className="absolute top-1/2 left-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2">
-                    <div className="relative w-full h-full animate-spin-slow">
-                        <div className="absolute top-2 left-1/2 w-1.5 h-1/2 bg-red-600 rounded-t-full -translate-x-1/2 shadow-md"></div>
-                        <div className="absolute bottom-2 left-1/2 w-1.5 h-1/2 bg-gray-400 rounded-b-full -translate-x-1/2 shadow-md"></div>
-                    </div>
-                </div>
+                {/* Anillo exterior giratorio */}
+                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F5D238] border-r-[#1A1B16] animate-spin-slow"></div>
+                
+                {/* Anillo interior giratorio en dirección opuesta */}
+                <div className="absolute inset-4 rounded-full border-2 border-transparent border-b-[#F5D238] border-l-[#1A1B16] animate-spin-slow-reverse"></div>
 
-                <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-green-700 dark:bg-green-300 rounded-full transform -translate-x-1/2 -translate-y-1/2 z-10 border-2 border-white"></div>
+                {/* Punto central */}
+                <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-[#F5D238] rounded-full transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
             </div>
 
-            <p className="text-lg font-medium text-green-700 dark:text-green-300 animate-pulse text-center">
-                Midiendo coordenadas, conectando conocimiento…
+            {/* Texto de carga */}
+            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 animate-pulse text-center mb-4">
+                Cargando...
+            </p>
+
+            {/* Texto secundario opcional */}
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md">
+                Por favor espere mientras cargamos el contenido
             </p>
 
             <style>
@@ -31,8 +39,15 @@ export default function LoaderScreen() {
               0% { transform: rotate(0deg); }
               100% { transform: rotate(360deg); }
             }
+            @keyframes spin-slow-reverse {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(-360deg); }
+            }
             .animate-spin-slow {
-              animation: spin-slow 5s linear infinite;
+              animation: spin-slow 3s linear infinite;
+            }
+            .animate-spin-slow-reverse {
+              animation: spin-slow-reverse 2s linear infinite;
             }
           `}
             </style>

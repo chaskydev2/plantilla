@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { User, Mail, Home, Lock, KeyRound } from "lucide-react";
 import { FormInput } from "./FormInput";
 import type { FormData } from "./types";
 
@@ -34,7 +35,7 @@ export const HomeownerForm: React.FC<HomeownerFormProps> = ({
           value={formData.fullName}
           onChange={onInputChange}
           placeholder="Enter your full name"
-          icon="👤"
+          icon={<User size={20} />}
           required
           error={errors.fullName}
           submitted={submitted}
@@ -49,7 +50,7 @@ export const HomeownerForm: React.FC<HomeownerFormProps> = ({
         value={formData.email}
         onChange={onInputChange}
         placeholder="name@example.com"
-        icon="📧"
+        icon={<Mail size={20} />}
         required
         error={errors.email}
         submitted={submitted}
@@ -62,7 +63,7 @@ export const HomeownerForm: React.FC<HomeownerFormProps> = ({
         value={(formData as any).address}
         onChange={onInputChange}
         placeholder="Your home address"
-        icon="🏠"
+        icon={<Home size={20} />}
         required
         error={errors.address}
         submitted={submitted}
@@ -76,10 +77,11 @@ export const HomeownerForm: React.FC<HomeownerFormProps> = ({
         value={formData.password}
         onChange={onInputChange}
         placeholder="Minimum 6 characters"
-        icon="🔒"
+        icon={<Lock size={20} />}
         required
         error={errors.password}
         submitted={submitted}
+        hasIcon
       />
 
       <FormInput
@@ -89,10 +91,11 @@ export const HomeownerForm: React.FC<HomeownerFormProps> = ({
         value={formData.confirmPassword}
         onChange={onInputChange}
         placeholder="Type password again"
-        icon="🔐"
+        icon={<KeyRound size={20} />}
         required
         error={errors.confirmPassword}
         submitted={submitted}
+        hasIcon
       />
 
       {/* Submit Button for Homeowner */}
@@ -115,11 +118,11 @@ export const HomeownerForm: React.FC<HomeownerFormProps> = ({
         >
           {loading ? (
             <span className="flex items-center gap-2">
-              <span className="inline-block animate-spin">🔄</span> Creating Account...
+              <span className="inline-block animate-spin">⟳</span> Creating Account...
             </span>
           ) : (
             <span className="flex items-center gap-2">
-              🚀 Create Account
+               Create Account
             </span>
           )}
         </motion.button>

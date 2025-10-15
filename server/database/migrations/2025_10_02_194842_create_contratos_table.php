@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contratos', function (Blueprint $table) {
+        Schema::create('contractors', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->primary();
             $table->string('preferred_zip', 15)->nullable();
             $table->string('address_line1', 200)->nullable();
@@ -51,6 +51,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contratos');
+        Schema::dropIfExists('contractors');
     }
 };

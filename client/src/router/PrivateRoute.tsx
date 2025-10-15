@@ -31,6 +31,7 @@ const PrivateRoute = () => {
     "/admin/preguntas_frecuentes": ["pregunta_frecuente_listar"] as IPermission[],
     "/admin/banners": ["banner_listar"] as IPermission[],
     "/admin/redes_sociales": ["red_social_listar"] as IPermission[],
+    "/admin/profesiones": null, // ["profesion_listar"] as IPermission[], - Comentado temporalmente
   };
 
   if (!isAuthenticated) {

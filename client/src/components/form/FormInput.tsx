@@ -8,7 +8,7 @@ interface FormInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
-  icon?: string;
+  icon?: string | React.ReactNode;
   required?: boolean;
   error?: string;
   submitted?: boolean;
@@ -78,7 +78,7 @@ export const FormInput: React.FC<FormInputProps> = ({
           className={errorText}
           style={{ color: "var(--color-secondary)" }}
         >
-          <span>⚠️</span> {error}
+          <span className="text-red-500">⚠️</span> {error}
         </motion.p>
       )}
     </div>
