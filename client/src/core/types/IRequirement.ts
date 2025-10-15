@@ -4,6 +4,8 @@ export interface IRequirement {
     description: string;
     type: string;
     order: number;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface IRequirementCreateRequest {

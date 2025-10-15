@@ -1,13 +1,13 @@
 import { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { RequirementService as ItemService } from '@/core/services/requirement/requirement.service';
-import type { IRequirement as IItemResource } from "@/core/types/IRequirement";
-import { Search, Plus, Trash2, Edit } from "lucide-react";
-import Form from "./form";
+import { TagService as ItemService } from "@/core/services/tag/tag.service";
+import type { ITag as IItemResource } from "@/core/types/ITag";
+import { Search, Plus, Trash2, Edit, Tag } from "lucide-react";
+import Form from "./form.tsx";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toastify } from "@/core/utils/toastify";
-import useAuth from "@/core/hooks/useAuth";
+// import useAuth from "@/core/hooks/useAuth"; // TODO: Descomentar cuando se configuren los permisos
 import DataTable from "@/components/table/DataTable";
 
 const columns = [
@@ -22,52 +22,43 @@ const columns = [
     sortable: true,
   },
   {
-    key: "title",
-    header: "Titulo",
+    key: "name",
+    header: "Nombre",
     render: (item: IItemResource) => (
-      <div className="font-bold">{item?.title || '-'}</div>
+      <div className="flex items-center gap-2">
+        <Tag className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        <span className="font-bold">{item?.name || '-'}</span>
+      </div>
     ),
     sortable: true,
   },
   {
-    key: "Description",
-    header: "Descripcion",
+    key: "slug",
+    header: "Slug",
     render: (item: IItemResource) => (
-      <div className="font-bold">{item?.description || '-'}</div>
+      <div className="font-mono text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+        {item?.slug || '-'}
+      </div>
     ),
     sortable: true,
   },
   {
-    key: "Type",
-    header: "tipo de requisito",
+    key: "created_at",
+    header: "Fecha de Creación",
     render: (item: IItemResource) => (
-      <div className="font-bold">{item?.type === 'inscription' ? 'Inscripción' : item?.type === 'renovation' ? 'Renovación' : 'Actualización de Información'}</div>
-    ),
-    sortable: true,
-  },
-    {
-    key: "Order",
-    header: "orden",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item?.order || '-'}</div>
+      <div className="text-sm text-gray-600 dark:text-gray-400">
+        {item?.created_at ? new Date(item.created_at).toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }) : '-'}
+      </div>
     ),
     sortable: true,
   },
 ];
 
-const tableFilters = [
-  {
-    key: 'type',
-    label: 'Filtrar por tipo de requisito',
-    options: [
-      { value: 'inscription', label: 'Inscripción' },
-      { value: 'renovation', label: 'Renovación' },
-      { value: 'updateinfo', label: 'Actualización de Información' },
-    ],
-  },
-];
-
-export default function RequirementList() {
+export default function TagList() {
   const {
     items,
     loading,
@@ -82,15 +73,9 @@ export default function RequirementList() {
     fetchItems,
   } = useResource({
     service: ItemService,
-    defaultSort: { key: "id", direction: "asc" },
-    defaultPerPage: 5,
-    initialFilters: { type: 'inscription' },
+    defaultSort: { key: "name", direction: "asc" },
+    defaultPerPage: 10,
   });
-
-  // Debug: Ver qué datos están llegando
-  console.log('Items recibidos:', items);
-  console.log('Loading:', loading);
-  console.log('Pagination:', pagination);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<IItemResource | null>(null);
@@ -103,7 +88,7 @@ export default function RequirementList() {
     variant: "primary" | "danger";
   } | null>(null);
 
-  const { hasPermission } = useAuth();
+  // const { hasPermission } = useAuth(); // TODO: Descomentar cuando se configuren los permisos
 
   const openDialog = (
     title: string,
@@ -132,19 +117,21 @@ export default function RequirementList() {
   const confirmDelete = (item: IItemResource) => {
     openDialog(
       "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el requisito ${item.title}?`,
+      `¿Estás seguro que deseas eliminar la etiqueta "${item.name}"?`,
       () => handleDelete(item),
       "danger"
     );
   };
 
   const handleDelete = async (item: IItemResource) => {
+    setIsProcessing(true);
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || "Etiqueta eliminada");
       fetchItems();
-    } catch (error) {
-      console.error("Error al eliminar el requisito:", error);
+    } catch (error: any) {
+      console.error("Error al eliminar la etiqueta:", error);
+      toastify.error(error.response?.data?.message || "Error al eliminar la etiqueta");
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -157,24 +144,21 @@ export default function RequirementList() {
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
-      show: (item: IItemResource) =>
-        item.id && hasPermission("requisito_editar"),
+      show: () => true, // hasPermission("etiqueta_editar") - TODO: Agregar permisos
     },
     {
       label: "Eliminar",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
-      show: (item: IItemResource) =>
-        item.id && hasPermission("requisito_eliminar"),
+      show: () => true, // hasPermission("etiqueta_eliminar") - TODO: Agregar permisos
     },
   ];
 
   const renderToolbar = () => (
     <div className="flex flex-col gap-4 w-full sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-2">
-        {
-          ( hasPermission('requisito_crear') ) &&
+        {/* hasPermission("etiqueta_crear") && */ true && (
           <button
             className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
             onClick={() => {
@@ -183,9 +167,9 @@ export default function RequirementList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            Agregar Etiqueta
           </button>
-        }
+        )}
       </div>
       <div className="relative w-full sm:w-64">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-700 dark:text-gray-300">
@@ -193,22 +177,21 @@ export default function RequirementList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
-          className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
+          placeholder="Buscar etiquetas..."
+          className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
         />
-      </div> 
+      </div>
     </div>
   );
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Requisitos" />
+      <PageBreadcrumb pageTitle="Etiquetas" />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
-        filters={tableFilters}
         actions={actions}
         sort={sort}
         onSortChange={handleSortChange}
@@ -217,7 +200,7 @@ export default function RequirementList() {
         pagination={pagination}
         onPageChange={handlePageChange}
         onLimitChange={handleLimitChange}
-        availableLimits={[5, 10, 20, 50]}
+        availableLimits={[10, 20, 50, 100]}
         loading={loading}
         renderTopToolbar={renderToolbar}
       />
@@ -239,9 +222,7 @@ export default function RequirementList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
-          }
+          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Confirmar"}
         />
       )}
     </div>

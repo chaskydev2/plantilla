@@ -12,6 +12,8 @@ class AttributeModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'attributes';
+
     protected $fillable = [
         'name',
         'slug',

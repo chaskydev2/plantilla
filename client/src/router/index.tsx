@@ -39,8 +39,9 @@ import FaqPage from "@/pages/admin/faqs/Main";
 import BannerPage from "@/pages/admin/banners/Main";
 import SocialNetworkPage from "@/pages/admin/social-networks/Main";
 import ProfessionPage from "@/pages/admin/professions/Main";
+import TagPage from "@/pages/admin/tags/Main";
 
-import AtributesPage from "@/pages/admin/attributes/Main";
+import AtributesPage from "@/pages/admin/requirements/Main";
 
 
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
@@ -131,6 +132,7 @@ export default function App() {
               <Route path="/admin/banners" element={<BannerPage />} />
               <Route path="/admin/redes_sociales" element={<SocialNetworkPage />} />
               <Route path="/admin/profesiones" element={<ProfessionPage />} />
+              <Route path="/admin/etiquetas" element={<TagPage />} />
               
               <Route path="/admin/atributes" element={<AtributesPage />} />
             </Route>

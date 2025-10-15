@@ -22,7 +22,8 @@ import {
   Image,
   Share2,
   BarChart2,
-  Briefcase
+  Briefcase,
+  Tag
 } from "lucide-react";
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
@@ -115,13 +116,19 @@ const navItems: MenuItem[] = [
   {
     name: "Profesions",
     icon: <Briefcase className="w-5 h-5" />,
-    //permissions: ["profesion_listar"],
+    //permissions: ["profesion_listar", "etiqueta_listar"],
     subItems: [
       {
         name: "Lista de Profesiones",
         path: "/admin/profesiones",
         icon: <Briefcase className="w-4 h-4" />,
       //  permissions: ["profesion_listar"]
+      },
+      {
+        name: "Etiquetas",
+        path: "/admin/etiquetas",
+        icon: <Tag className="w-4 h-4" />,
+      //  permissions: ["etiqueta_listar"]
       },
     ],
   },

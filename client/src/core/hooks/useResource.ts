@@ -97,7 +97,14 @@ export const useResource = <T>({
       }
 
       if (!abortController.signal.aborted && response.success) {
-        setItems(response.data);
+        console.log('✅ Response from API:', response);
+        console.log('✅ Data received:', response.data);
+        console.log('✅ Data is array?:', Array.isArray(response.data));
+        
+        // Validar que response.data sea un array
+        const dataArray = Array.isArray(response.data) ? response.data : [];
+        setItems(dataArray);
+        
         setPagination(response.meta?.pagination || {
           ...defaultPagination,
           per_page: pagination.per_page,
@@ -105,7 +112,8 @@ export const useResource = <T>({
       }
     } catch (error: any) {
       if (error.name !== 'AbortError') {
-        console.error('Error fetching items:', error);
+        console.error('❌ Error fetching items:', error);
+        console.error('❌ Error response:', error.response?.data);
       }
     } finally {
       if (abortControllerRef.current === abortController) {
