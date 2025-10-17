@@ -29,7 +29,7 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\AttributeController;
 use Illuminate\Support\Facades\Route;
 

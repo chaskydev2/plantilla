@@ -41,6 +41,7 @@ import SocialNetworkPage from "@/pages/admin/social-networks/Main";
 import ProfessionPage from "@/pages/admin/professions/Main";
 
 import AtributesPage from "@/pages/admin/attributes/Main";
+import CategoryPage from "@/pages/admin/categories/Main";
 
 
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
@@ -133,6 +134,8 @@ export default function App() {
               <Route path="/admin/profesiones" element={<ProfessionPage />} />
               
               <Route path="/admin/atributes" element={<AtributesPage />} />
+
+              <Route path="/admin/categories" element={<CategoryPage />} />
             </Route>
           </Route>
 
