@@ -42,7 +42,8 @@ import ProfessionPage from "@/pages/admin/professions/Main";
 import TagPage from "@/pages/admin/tags/Main";
 import ContractorPage from "@/pages/admin/contractors/Main";
 
-import AtributesPage from "@/pages/admin/requirements/Main";
+import AtributesPage from "@/pages/admin/attributes/Main";
+import CategoryPage from "@/pages/admin/categories/Main";
 
 
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
@@ -137,6 +138,8 @@ export default function App() {
               <Route path="/admin/trabajadores" element={<ContractorPage />} />
               
               <Route path="/admin/atributes" element={<AtributesPage />} />
+
+              <Route path="/admin/categories" element={<CategoryPage />} />
             </Route>
           </Route>
 

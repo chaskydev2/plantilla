@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
 // Dashboard Statistics Component
@@ -55,13 +56,13 @@ const UserItem = ({ name, role, avatar, status }: {
 );
 
 export default function Dashboard() {
-  const stats = {
+  const [stats, setStats] = useState({
     earnings: { current: '$34,542', previous: '$26,845' },
     newWorkers: 1247,
     newHomeowners: 892,
     activeJobs: 324,
     completedJobs: 1156
-  };
+  });
 
   const users = [
     { name: "Carlos Martinez", role: "Electrician", avatar: "CM", status: "online" as const },
