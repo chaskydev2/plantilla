@@ -29,7 +29,12 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
+<<<<<<< HEAD
 use App\Http\Controllers\Api\V1\CategoryController;
+=======
+use App\Http\Controllers\Api\V1\TagController;
+use App\Http\Controllers\CategoryController;
+>>>>>>> 2407008262ee3d02104f4f420d96189241c716cf
 use App\Http\Controllers\AttributeController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +71,8 @@ Route::prefix('/v1')
         Route::get('requirements/all', [RequirementController::class, 'all']);
 
         Route::get('social_networks/all', [SocialNetworkController::class, 'all']);
+
+        Route::get('tags/all', [TagController::class, 'all']);
 
         Route::get('professions/all', [ProfessionController::class, 'all']);
 
@@ -147,6 +154,8 @@ Route::prefix('/v1')
             Route::apiResource('banners', BannerController::class);  
 
             Route::apiResource('social_networks', SocialNetworkController::class);
+
+            Route::apiResource('tags', TagController::class);
 
             Route::apiResource('payment', PaymentController::class);
 

@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Requirement extends Model
 {
+    public $timestamps = true;
 
     protected $fillable = [
         'title',
         'description',
         'type',
         'order',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function scopeSearch(Builder $query, ?string $search): Builder
