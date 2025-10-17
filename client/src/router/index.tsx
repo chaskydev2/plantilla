@@ -40,6 +40,7 @@ import BannerPage from "@/pages/admin/banners/Main";
 import SocialNetworkPage from "@/pages/admin/social-networks/Main";
 import ProfessionPage from "@/pages/admin/professions/Main";
 import TagPage from "@/pages/admin/tags/Main";
+import ContractorPage from "@/pages/admin/contractors/Main";
 
 import AtributesPage from "@/pages/admin/requirements/Main";
 
@@ -133,6 +134,7 @@ export default function App() {
               <Route path="/admin/redes_sociales" element={<SocialNetworkPage />} />
               <Route path="/admin/profesiones" element={<ProfessionPage />} />
               <Route path="/admin/etiquetas" element={<TagPage />} />
+              <Route path="/admin/trabajadores" element={<ContractorPage />} />
               
               <Route path="/admin/atributes" element={<AtributesPage />} />
             </Route>

@@ -46,7 +46,7 @@ class StoreContractorRequest extends FormRequest
             'portfolio_url' => ['nullable', 'url', 'max:500'],
             'affiliation_date' => ['nullable', 'date', 'before_or_equal:today'],
             'approval_date' => ['nullable', 'date', 'before_or_equal:today', 'after_or_equal:affiliation_date'],
-            'contract_status' => ['required', Rule::in([
+            'contract_status' => ['nullable', Rule::in([
                 Contractor::STATUS_PENDING,
                 Contractor::STATUS_APPROVED,
                 Contractor::STATUS_REJECTED,

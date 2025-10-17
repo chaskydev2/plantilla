@@ -61,6 +61,12 @@ const navItems: MenuItem[] = [
         permissions: ["usuario_listar"]
       },
       {
+        name: "Trabajadores",
+        path: "/admin/trabajadores",
+        icon: <Users className="w-4 h-4" />,
+      //  permissions: ["trabajador_listar"]
+      },
+      {
         name: "Roles",
         path: "/admin/roles",
         icon: <Shield className="w-4 h-4" />,

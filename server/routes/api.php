@@ -155,7 +155,7 @@ Route::prefix('/v1')
 
             Route::apiResource('payment', PaymentController::class);
 
-            // Contractor routes
+            // Contractor routes (también accesible como trabajadores)
             Route::get('contractors/stats', [ContractorController::class, 'stats']);
             Route::get('contractors/status/{status}', [ContractorController::class, 'byStatus']);
             Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
@@ -163,6 +163,15 @@ Route::prefix('/v1')
             Route::patch('contractors/{contractor}/reject', [ContractorController::class, 'reject']);
             Route::patch('contractors/{contractor}/suspend', [ContractorController::class, 'suspend']);
             Route::apiResource('contractors', ContractorController::class);
+            
+            // Trabajadores routes (alias para contractors)
+            Route::get('trabajadores/stats', [ContractorController::class, 'stats']);
+            Route::get('trabajadores/status/{status}', [ContractorController::class, 'byStatus']);
+            Route::get('trabajadores/near', [ContractorController::class, 'nearLocation']);
+            Route::patch('trabajadores/{contractor}/approve', [ContractorController::class, 'approve']);
+            Route::patch('trabajadores/{contractor}/reject', [ContractorController::class, 'reject']);
+            Route::patch('trabajadores/{contractor}/suspend', [ContractorController::class, 'suspend']);
+            Route::apiResource('trabajadores', ContractorController::class);
 
             // Profession routes
             Route::get('professions/available', [ProfessionController::class, 'available']);
