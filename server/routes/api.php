@@ -29,12 +29,8 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
-<<<<<<< HEAD
-use App\Http\Controllers\Api\V1\CategoryController;
-=======
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\CategoryController;
->>>>>>> 2407008262ee3d02104f4f420d96189241c716cf
 use App\Http\Controllers\AttributeController;
 use Illuminate\Support\Facades\Route;
 

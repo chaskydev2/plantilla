@@ -41,12 +41,8 @@ import SocialNetworkPage from "@/pages/admin/social-networks/Main";
 import ProfessionPage from "@/pages/admin/professions/Main";
 import TagPage from "@/pages/admin/tags/Main";
 
-<<<<<<< HEAD
 import AtributesPage from "@/pages/admin/attributes/Main";
 import CategoryPage from "@/pages/admin/categories/Main";
-=======
-import AtributesPage from "@/pages/admin/requirements/Main";
->>>>>>> 2407008262ee3d02104f4f420d96189241c716cf
 
 
 import Requisitospage from "@/pages/WebPage/RequirementsPage";
