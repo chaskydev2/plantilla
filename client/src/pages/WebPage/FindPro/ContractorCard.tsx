@@ -11,6 +11,8 @@ export type Contractor = {
   extraServicesCount?: number;
   distanceMiles: number;
   locationLabel: string; // e.g., "Oklahoma City, OK, 73131"
+  lat: number; // Latitud para Google Maps
+  lng: number; // Longitud para Google Maps
   logoUrl?: string;
   quote?: { author: string; text: string };
 };
