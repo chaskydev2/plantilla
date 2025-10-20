@@ -32,6 +32,7 @@ export default function SignInForm() {
     setIsLoading(false);
 
     if (login.fulfilled.match(resultAction)) {
+      console.log('Login successful:', resultAction.payload);
       toastify.success("Signed in successfully")
       navigate('/admin');
     } else {

@@ -20,7 +20,7 @@ const columns = [
   },
   {
     key: 'professional_title',
-    header: 'Título profesional',
+    header: 'Professional Title',
     render: (item: IAcademic) => (
       <p className="text-sm font-medium text-gray-700 dark:text-gray-100">{item.professional_title}</p>
     ),
@@ -28,7 +28,7 @@ const columns = [
   },
   {
     key: 'academic_degree',
-    header: 'Grado académico',
+    header: 'Academic Degree',
     render: (item: IAcademic) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.academic_degree}</p>
     ),
@@ -36,7 +36,7 @@ const columns = [
   },
   {
     key: 'graduated_from',
-    header: 'Titulado de la institución',
+    header: 'Graduated From',
     render: (item: IAcademic) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.graduated_from}</p>
     ),
@@ -44,7 +44,7 @@ const columns = [
   },
   {
     key: 'relevant_certifications',
-    header: 'Certificaciones relevantes',
+    header: 'Relevant Certifications',
     render: (item: IAcademic) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.relevant_certifications}</p>
     ),
@@ -52,7 +52,7 @@ const columns = [
   },
   {
     key: 'graduation_date',
-    header: 'Fecha de egreso',
+    header: 'Graduation Date',
     render: (item: IAcademic) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.graduation_date}</p>
     ),
@@ -60,7 +60,7 @@ const columns = [
   },
   {
     key: 'degree_date',
-    header: 'Fecha de obtención del título',
+    header: 'Degree Date',
     render: (item: IAcademic) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.degree_date}</p>
     ),
@@ -115,8 +115,8 @@ export default function UserAcademicsCard() {
 
   const confirmDelete = (item: IAcademic) => {
     openDialog(
-      'Confirmar eliminación',
-      `¿Estás seguro que deseas eliminar el título "${item.professional_title}"?`,
+      'Confirm Deletion',
+      `Are you sure you want to delete the title "${item.professional_title}"?`,
       () => handleDelete(item),
       'danger'
     );
@@ -129,10 +129,10 @@ export default function UserAcademicsCard() {
   const handleDelete = async (item: IAcademic) => {
     try {
       const response = await AcademicTrainingService.remove(user?.id, item.id);
-      toastify.success(response?.message || 'Registro eliminado');
+      toastify.success(response?.message || 'Record deleted');
       fetchItems();
     } catch (error) {
-      toastify.error("Error al eliminar");
+      toastify.error("Error deleting record");
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -141,13 +141,13 @@ export default function UserAcademicsCard() {
 
   const actions = [
     {
-      label: 'Editar',
+      label: 'Edit',
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IAcademic) => handleEdit(item),
       variant: 'primary' as const,
     },
     {
-      label: 'Eliminar',
+      label: 'Delete',
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IAcademic) => confirmDelete(item),
       variant: 'danger' as const,
@@ -164,7 +164,7 @@ export default function UserAcademicsCard() {
         }}
       >
         <Plus className="w-5 h-5" />
-        Agregar
+        Add
       </button>
 
       <div className="relative w-full sm:w-64">
@@ -173,7 +173,7 @@ export default function UserAcademicsCard() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-transparent py-2 pl-10 pr-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -186,7 +186,7 @@ export default function UserAcademicsCard() {
     <div className="grid grid-cols-12">
       <div className="col-span-12">
         <DataTable
-          title="Formación Académica"
+          title="Academic Training"
           data={items as IAcademic[]}
           columns={columns}
           actions={actions}
@@ -219,7 +219,7 @@ export default function UserAcademicsCard() {
             onCancel={closeDialog}
             isProcessing={isProcessing}
             variant={dialogConfig.variant}
-            confirmText={dialogConfig.variant === 'danger' ? 'Eliminar' : 'Confirmar'}
+            confirmText={dialogConfig.variant === 'danger' ? 'Delete' : 'Confirm'}
           />
         )}
       </div>

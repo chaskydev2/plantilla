@@ -20,9 +20,15 @@ const registerHomeowner = async (data: IRegisterHomeownerRequest): Promise<IAuth
   return response.data;
 };
 
+const registerContractor = async (data: any): Promise<IAuthResponse> => {
+  const response = await axios.post('/v1/register/contractor', data);
+  return response.data;
+};
+
 export const AuthService = {
   login,
   me,
   logout,
-  registerHomeowner
+  registerHomeowner,
+  registerContractor
 }

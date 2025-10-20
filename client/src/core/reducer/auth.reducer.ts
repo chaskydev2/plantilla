@@ -11,14 +11,26 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   permissions: IPermission[];
+  roles: string[];
 }
 
+// Helper function to safely parse localStorage data
+const getStoredData = (key: string, fallback: any = null) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 const initialState: AuthState = {
-  user: null,
+  user: getStoredData(variables.session.userData),
   isAuthenticated: !!localStorage.getItem(variables.session.tokenName),
   isLoading: false,
   error: null,
-  permissions: [],
+  permissions: getStoredData(variables.session.userPermissions, []),
+  roles: getStoredData(variables.session.userRoles, []),
 };
 
 export const login = createAsyncThunk(
@@ -26,7 +38,14 @@ export const login = createAsyncThunk(
   async (credentials: IAuthRequest, { rejectWithValue }) => {
     try {
       const response = await AuthService.login(credentials);
+      console.log('Login successful:', response);
+      
+      // Store token and additional user data
       localStorage.setItem(variables.session.tokenName, response.data.access_token);
+      localStorage.setItem(variables.session.userData, JSON.stringify(response.data.user));
+      localStorage.setItem(variables.session.userRoles, JSON.stringify(response.data.roles));
+      localStorage.setItem(variables.session.userPermissions, JSON.stringify(response.data.permissions));
+      
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
@@ -39,10 +58,19 @@ export const getMe = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await AuthService.me();
+      
+      // Update localStorage with fresh data
+      localStorage.setItem(variables.session.userData, JSON.stringify(response.data.user));
+      localStorage.setItem(variables.session.userRoles, JSON.stringify(response.data.roles));
+      localStorage.setItem(variables.session.userPermissions, JSON.stringify(response.data.permissions));
+      
       return response.data;
     } catch (error: any) {
       localStorage.removeItem(variables.session.tokenName);
-      return rejectWithValue(error.response?.data?.message || "No se pudo obtener el usuario");
+      localStorage.removeItem(variables.session.userData);
+      localStorage.removeItem(variables.session.userRoles);
+      localStorage.removeItem(variables.session.userPermissions);
+      return rejectWithValue(error.response?.data?.message || "Could not get user information");
     }
   }
 );
@@ -50,6 +78,9 @@ export const getMe = createAsyncThunk(
 export const logout = createAsyncThunk('auth/logout', async () => {
   await AuthService.logout();
   localStorage.removeItem(variables.session.tokenName);
+  localStorage.removeItem(variables.session.userData);
+  localStorage.removeItem(variables.session.userRoles);
+  localStorage.removeItem(variables.session.userPermissions);
 });
 
 const authSlice = createSlice({
@@ -68,6 +99,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.permissions = action.payload.permissions;
+        state.roles = action.payload.roles;
         state.isAuthenticated = true;
         state.isLoading = false;
       })
@@ -76,6 +108,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.isLoading = false;
         state.permissions = [];
+        state.roles = [];
       })
 
       // GetMe
@@ -87,6 +120,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload.user;
         state.permissions = action.payload.permissions;
+        state.roles = action.payload.roles;
         state.isAuthenticated = true;
       })
       .addCase(getMe.rejected, (state, action) => {
@@ -94,6 +128,7 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.permissions = [];
+        state.roles = [];
         state.error = action.payload as string;
       })
 
@@ -102,6 +137,7 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.permissions = [];
+        state.roles = [];
       });
   },
 });

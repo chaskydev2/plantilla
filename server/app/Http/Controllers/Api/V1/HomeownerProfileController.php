@@ -1,107 +1,221 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Models\HomeownerProfile;
+use App\Http\Requests\HomeownerProfile\StoreHomeownerProfileRequest;
+use App\Http\Requests\HomeownerProfile\UpdateHomeownerProfileRequest;
+use App\Http\Resources\HomeownerProfileResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class HomeownerProfileController extends Controller
 {
-    public function index(): JsonResponse
+    /**
+     * Display a listing of homeowner profiles.
+     */
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $homeownerProfiles = HomeownerProfile::with('user')->get();
+        $query = HomeownerProfile::with('user');
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })->orWhere('city', 'like', "%{$search}%")
+              ->orWhere('preferred_zip', 'like', "%{$search}%");
+        }
+
+        // Filter by city
+        if ($request->filled('city')) {
+            $query->where('city', 'like', "%{$request->city}%");
+        }
+
+        // Filter by country
+        if ($request->filled('country_code')) {
+            $query->where('country_code', $request->country_code);
+        }
+
+        // Apply sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDir = $request->get('sort_dir', 'desc');
         
-        return response()->json([
-            'data' => $homeownerProfiles,
-            'success' => true
-        ], Response::HTTP_OK);
+        if (in_array($sortBy, ['created_at', 'updated_at', 'city', 'country_code'])) {
+            $query->orderBy($sortBy, $sortDir);
+        }
+
+        // Pagination
+        $perPage = $request->get('per_page', 15);
+        $homeownerProfiles = $query->paginate($perPage);
+
+        return HomeownerProfileResource::collection($homeownerProfiles);
     }
 
+    /**
+     * Display the specified homeowner profile.
+     */
     public function show($userId): JsonResponse
     {
-        $homeownerProfile = HomeownerProfile::with('user')->find($userId);
-        
-        if (!$homeownerProfile) {
+        try {
+            $homeownerProfile = HomeownerProfile::with('user')->findOrFail($userId);
+            
             return response()->json([
-                'success' => false,
-                'message' => 'Perfil no encontrado'
-            ], Response::HTTP_NOT_FOUND);
+                'message' => 'Perfil de propietario encontrado',
+                'data' => new HomeownerProfileResource($homeownerProfile)
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Perfil de propietario no encontrado',
+                'error' => "No se encontró un perfil con el ID: {$userId}"
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener el perfil',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        
-        return response()->json([
-            'data' => $homeownerProfile,
-            'success' => true
-        ], Response::HTTP_OK);
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * Store a newly created homeowner profile.
+     */
+    public function store(StoreHomeownerProfileRequest $request): JsonResponse
     {
-        // Validar que el user_id no tenga ya un perfil
-        $existingProfile = HomeownerProfile::where('user_id', $request->user_id)->first();
-        if ($existingProfile) {
+        try {
+            $data = $request->validated();
+            
+            // Set default country code if not provided
+            if (!isset($data['country_code'])) {
+                $data['country_code'] = 'US';
+            }
+            
+            $homeownerProfile = HomeownerProfile::create($data);
+            $homeownerProfile->load('user');
+            
             return response()->json([
-                'success' => false,
-                'message' => 'El usuario ya tiene un perfil de propietario'
-            ], Response::HTTP_CONFLICT);
+                'message' => 'Perfil de propietario creado exitosamente',
+                'data' => new HomeownerProfileResource($homeownerProfile)
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear el perfil',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $data = $request->only([
-            'user_id', 'preferred_zip', 'address_line1', 'address_line2',
-            'city', 'state_code', 'country_code', 'lat', 'lng'
-        ]);
-        
-        $homeownerProfile = HomeownerProfile::create($data);
-        
-        return response()->json([
-            'data' => $homeownerProfile->load('user'),
-            'success' => true,
-            'message' => 'Perfil creado correctamente'
-        ], Response::HTTP_CREATED);
     }
 
-    public function update(Request $request, $userId): JsonResponse
+    /**
+     * Update the specified homeowner profile.
+     */
+    public function update(UpdateHomeownerProfileRequest $request, $userId): JsonResponse
     {
-        $homeownerProfile = HomeownerProfile::find($userId);
-        
-        if (!$homeownerProfile) {
+        try {
+            $homeownerProfile = HomeownerProfile::findOrFail($userId);
+            
+            $data = $request->validated();
+            $homeownerProfile->update($data);
+            $homeownerProfile->load('user');
+            
             return response()->json([
-                'success' => false,
-                'message' => 'Perfil no encontrado'
-            ], Response::HTTP_NOT_FOUND);
+                'message' => 'Perfil de propietario actualizado exitosamente',
+                'data' => new HomeownerProfileResource($homeownerProfile)
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Perfil de propietario no encontrado',
+                'error' => "No se encontró un perfil con el ID: {$userId}"
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el perfil',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $data = $request->only([
-            'preferred_zip', 'address_line1', 'address_line2',
-            'city', 'state_code', 'country_code', 'lat', 'lng'
-        ]);
-        
-        $homeownerProfile->update($data);
-        
-        return response()->json([
-            'data' => $homeownerProfile->fresh('user'),
-            'success' => true,
-            'message' => 'Perfil actualizado correctamente'
-        ], Response::HTTP_OK);
     }
 
+    /**
+     * Remove the specified homeowner profile.
+     */
     public function destroy($userId): JsonResponse
     {
-        $homeownerProfile = HomeownerProfile::find($userId);
-        
-        if (!$homeownerProfile) {
+        try {
+            $homeownerProfile = HomeownerProfile::findOrFail($userId);
+            $homeownerProfile->delete();
+            
             return response()->json([
-                'success' => false,
-                'message' => 'Perfil no encontrado'
-            ], Response::HTTP_NOT_FOUND);
+                'message' => 'Perfil de propietario eliminado exitosamente'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Perfil de propietario no encontrado',
+                'error' => "No se encontró un perfil con el ID: {$userId}"
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar el perfil',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
+
+    /**
+     * Get homeowner profile statistics.
+     */
+    public function stats(): JsonResponse
+    {
+        $stats = [
+            'total_profiles' => HomeownerProfile::count(),
+            'profiles_by_country' => HomeownerProfile::selectRaw('country_code, COUNT(*) as count')
+                ->groupBy('country_code')
+                ->get(),
+            'profiles_with_address' => HomeownerProfile::whereNotNull('address_line1')->count(),
+            'profiles_with_coordinates' => HomeownerProfile::whereNotNull('lat')
+                ->whereNotNull('lng')
+                ->count(),
+            'recent_profiles' => HomeownerProfile::with('user')
+                ->latest()
+                ->limit(5)
+                ->get(['user_id', 'city', 'country_code', 'created_at']),
+        ];
+
+        return response()->json($stats);
+    }
+
+    /**
+     * Get all homeowner profiles without pagination.
+     */
+    public function all(Request $request): AnonymousResourceCollection
+    {
+        $query = HomeownerProfile::with('user');
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })->orWhere('city', 'like', "%{$search}%");
+        }
+
+        // Filter by country
+        if ($request->filled('country_code')) {
+            $query->where('country_code', $request->country_code);
+        }
+
+        // Apply sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDir = $request->get('sort_dir', 'desc');
         
-        $homeownerProfile->delete();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Perfil eliminado correctamente'
-        ], Response::HTTP_OK);
+        if (in_array($sortBy, ['created_at', 'updated_at', 'city', 'country_code'])) {
+            $query->orderBy($sortBy, $sortDir);
+        }
+
+        $homeownerProfiles = $query->get();
+
+        return HomeownerProfileResource::collection($homeownerProfiles);
     }
 }

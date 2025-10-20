@@ -30,7 +30,8 @@ use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
 use App\Http\Controllers\Api\V1\TagController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Api\V1\HomeownerProfileController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\AttributeController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,8 @@ Route::prefix('/v1')
         Route::post('login', [AuthController::class, 'login']);
         
         Route::post('register/homeowner', [AuthController::class, 'registerHomeowner']);
+        
+        Route::post('register/contractor', [AuthController::class, 'registerContractor']);
         
         Route::get('agreements/all', [AgreementController::class, 'all']);
 
@@ -198,10 +201,15 @@ Route::prefix('/v1')
             Route::delete('categories/{category}/with-children', [CategoryController::class, 'destroyWithChildren']);
             Route::apiResource('categories', CategoryController::class);
 
-            // Attribute routes
+                        // Attribute routes
             Route::get('attributes/for-contractors', [AttributeController::class, 'forContractors']);
             Route::get('attributes/for-homeowners', [AttributeController::class, 'forHomeowners']);
             Route::get('attributes/statistics', [AttributeController::class, 'statistics']);
             Route::apiResource('attributes', AttributeController::class);
+
+            // Homeowner Profile routes
+            Route::get('homeowner-profiles/all', [HomeownerProfileController::class, 'all']);
+            Route::get('homeowner-profiles/stats', [HomeownerProfileController::class, 'stats']);
+             Route::apiResource('homeowner-profiles', HomeownerProfileController::class);
         });
     });

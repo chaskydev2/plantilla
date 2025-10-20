@@ -20,6 +20,7 @@ class AuthResource extends JsonResource
             'expires_at' => $this->expires_at,
             'user'=> new UserResource($this->user),
             'permissions' => $this->permissions,
+            'roles' => $this->roles,
         ];
     }
 }

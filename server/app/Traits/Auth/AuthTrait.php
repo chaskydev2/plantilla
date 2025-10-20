@@ -19,7 +19,8 @@ trait AuthTrait
             'access_token' => $tokenResult->accessToken,
             'expires_at' => $token->expires_at,
             'user' => $user,
-            'permissions' => $user->getAllPermissions()->pluck('name')->toArray()
+            'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+            'roles' => $user->getRoleNames()->toArray()
         ]);
     }
 
@@ -27,7 +28,8 @@ trait AuthTrait
     {
          return new MeResource((object)[
             'user' => $user,
-            'permissions' => $user->getAllPermissions()->pluck('name')->toArray()
+            'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+            'roles' => $user->getRoleNames()->toArray()
         ]);
     }
 

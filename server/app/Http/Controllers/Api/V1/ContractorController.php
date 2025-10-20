@@ -51,7 +51,7 @@ class ContractorController extends Controller
         }
 
         // Location-based search
-        if ($request->filled(['lat', 'lng'])) {
+        if ($request->filled('near_location')) {
             $radius = $request->filled('radius') ? (float) $request->radius : 50;
             $query->withinRadius((float) $request->lat, (float) $request->lng, $radius);
         }
@@ -65,7 +65,7 @@ class ContractorController extends Controller
         $perPage = $request->get('per_page', 15);
         $contractors = $query->paginate($perPage);
 
-        return new ContractorCollection($contractors);
+        return ContractorResource::collection($contractors);
     }
 
     /**
@@ -211,7 +211,7 @@ class ContractorController extends Controller
         $perPage = $request->get('per_page', 15);
         $contractors = $query->paginate($perPage);
 
-        return new ContractorCollection($contractors);
+        return ContractorResource::collection($contractors);
     }
 
     /**

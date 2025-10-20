@@ -3,8 +3,30 @@ import type { IApiResponse, IPaginationRequest } from '@/core/types/IApi';
 import type { IContractorForm, IContractorFilters, ContractStatus } from '@/core/types/IContractor';
 
 export const getAllPaginated = async (params?: IPaginationRequest & IContractorFilters, config: { signal?: AbortSignal } = {}): Promise<IApiResponse> => {
-  const res = await axios.get('/v1/trabajadores', { params, ...config });
-  return res.data;
+  try {
+    const res = await axios.get('/v1/trabajadores', { params, ...config });
+  
+    // 🔧 SOLUCION: Transformar la respuesta para que useResource la entienda
+    const transformedResponse: IApiResponse = {
+      success: true,                    // ← Agregar el campo success que falta
+      data: res.data.data || [],        // ← Los contratistas están en res.data.data
+      meta: res.data.meta ? {           // ← Transformar la paginación si existe
+        pagination: res.data.meta
+      } : undefined,
+      message: 'Contractors retrieved successfully'
+    };
+    
+    console.log('🔧 TRANSFORMED RESPONSE:', transformedResponse);
+    console.log('🔧 Transformed success:', transformedResponse.success);
+    console.log('🔧 Transformed data:', transformedResponse.data);
+    console.log('🔧 Transformed data length:', transformedResponse.data?.length);
+    
+    return transformedResponse;
+  } catch (error: any) {
+    console.error('❌ Error fetching contractors:', error);
+    console.error('❌ Error response:', error.response?.data);
+    throw error;
+  }
 }
 
 export const create = async (request: IContractorForm): Promise<IApiResponse> => {

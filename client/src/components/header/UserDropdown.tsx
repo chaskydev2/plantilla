@@ -35,7 +35,7 @@ export default function UserDropdown() {
     if (logout.fulfilled.match(resultAction)) {
       navigate('/login');
     } else {
-      alert('Login fallido: ' + (resultAction.payload as string));
+      alert('Login failed: ' + (resultAction.payload as string));
     }
     setIsLoading(false);
   }
@@ -109,7 +109,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Editar perfil
+              Edit Profile
             </DropdownItem>
           </li>
         </ul>
@@ -133,7 +133,7 @@ export default function UserDropdown() {
               fill=""
             />
           </svg>
-          Cerrar Sesión
+          Sign Out
         </button>
       </Dropdown>
     </div>

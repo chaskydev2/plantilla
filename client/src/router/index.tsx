@@ -59,6 +59,8 @@ import ScamAlerts from "@/pages/WebPage/ScamAlerts";
 import FairPriceCheck from "@/pages/WebPage/FairPriceCheck";
 import GuGuarantee from "@/pages/WebPage/GuGuarantee";
 import RegisterGuara from "@/pages/WebPage/RegisterGuara";
+
+import HomeownerPage from "@/pages/admin/homeowners/Main";
 import Services from "@/pages/WebPage/Services";
 
 
@@ -140,6 +142,7 @@ export default function App() {
               <Route path="/admin/atributes" element={<AtributesPage />} />
 
               <Route path="/admin/categories" element={<CategoryPage />} />
+              <Route path="/admin/homeowners" element={<HomeownerPage />} />
             </Route>
           </Route>
 

@@ -27,6 +27,7 @@ export interface IAuthResponse {
     expires_at: string;
     user: IAuth;
     permissions: IPermission[];
+    roles: string[];
   }; 
 }
 
@@ -34,5 +35,6 @@ export interface IMeResponse {
   data: {
     user: IAuth;
     permissions: IPermission[];
+    roles: string[];
   };
 }

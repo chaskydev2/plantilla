@@ -20,7 +20,7 @@ const columns = [
   },
   {
     key: 'company_name',
-    header: 'Institución o Empresa',
+    header: 'Company Name',
     render: (item: IWorkExperience) => (
       <p className="text-sm font-medium text-gray-700 dark:text-gray-100">{item.company_name}</p>
     ),
@@ -28,7 +28,7 @@ const columns = [
   },
   {
     key: 'company_location',
-    header: 'Ubicación de la empresa',
+    header: 'Company Location',
     render: (item: IWorkExperience) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.company_location}</p>
     ),
@@ -36,7 +36,7 @@ const columns = [
   },
   {
     key: 'start_date',
-    header: 'Fecha de inicio',
+    header: 'Start Date',
     render: (item: IWorkExperience) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.start_date}</p>
     ),
@@ -44,7 +44,7 @@ const columns = [
   },
   {
     key: 'end_date',
-    header: 'Fecha de finalización',
+    header: 'End Date',
     render: (item: IWorkExperience) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.end_date}</p>
     ),
@@ -52,7 +52,7 @@ const columns = [
   },
   {
     key: 'position',
-    header: 'Cargo o puesto',
+    header: 'Position',
     render: (item: IWorkExperience) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.position}</p>
     ),
@@ -60,7 +60,7 @@ const columns = [
   },
   {
     key: 'responsibilities',
-    header: 'Responsabilidades',
+    header: 'Responsibilities',
     render: (item: IWorkExperience) => (
       <p className="text-sm text-gray-600 dark:text-gray-300">{item.responsibilities}</p>
     ),
@@ -110,8 +110,8 @@ export default function UserWorkExperienceCard() {
 
   const confirmDelete = (item: IWorkExperience) => {
     openDialog(
-      'Confirmar eliminación',
-      `¿Estás seguro que deseas eliminar el trabajo en ${item.company_name}?`,
+      'Confirm Deletion',
+      `Are you sure you want to delete the job at ${item.company_name}?`,
       () => handleDelete(item),
       'danger'
     );
@@ -124,10 +124,10 @@ export default function UserWorkExperienceCard() {
   const handleDelete = async (item: IWorkExperience) => {
     try {
       const response = await WorkExperienceService.remove(user?.id, item.id);
-      toastify.success(response?.message || 'Registro eliminado');
+      toastify.success(response?.message || 'Record deleted');
       fetchItems();
     } catch (error) {
-      toastify.error('Error al eliminar');
+      toastify.error('Error deleting record');
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -136,13 +136,13 @@ export default function UserWorkExperienceCard() {
 
   const actions = [
     {
-      label: 'Editar',
+      label: 'Edit',
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IWorkExperience) => handleEdit(item),
       variant: 'primary' as const,
     },
     {
-      label: 'Eliminar',
+      label: 'Delete',
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IWorkExperience) => confirmDelete(item),
       variant: 'danger' as const,
@@ -159,7 +159,7 @@ export default function UserWorkExperienceCard() {
         }}
       >
         <Plus className="w-5 h-5" />
-        Agregar
+        Add
       </button>
 
       <div className="relative w-full sm:w-64">
@@ -168,7 +168,7 @@ export default function UserWorkExperienceCard() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-transparent py-2 pl-10 pr-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -181,7 +181,7 @@ export default function UserWorkExperienceCard() {
     <div className="grid grid-cols-12">
       <div className="col-span-12">
         <DataTable
-          title="Experiencia Profesional"
+          title="Work Experience"
           data={items as IWorkExperience[]}
           columns={columns}
           actions={actions}
@@ -214,7 +214,7 @@ export default function UserWorkExperienceCard() {
             onCancel={closeDialog}
             isProcessing={isProcessing}
             variant={dialogConfig.variant}
-            confirmText={dialogConfig.variant === 'danger' ? 'Eliminar' : 'Confirmar'}
+            confirmText={dialogConfig.variant === 'danger' ? 'Delete' : 'Confirm'}
           />
         )}
       </div>

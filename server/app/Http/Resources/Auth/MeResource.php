@@ -18,6 +18,7 @@ class MeResource extends JsonResource
         return [
             'user'=> new UserResource($this->user),
             'permissions' => $this->permissions,
+            'roles' => $this->roles,
         ];
     }
 }

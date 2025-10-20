@@ -78,12 +78,17 @@ const columns = [
   {
     key: "average_rating",
     header: "Calificación",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-1">
-        <Star className="w-4 h-4 text-yellow-500" />
-        <span className="font-medium">{item?.company_info?.average_rating?.toFixed(1) || '0.0'}</span>
-      </div>
-    ),
+    render: (item: IItemResource) => {
+      const rating = item?.company_info?.average_rating;
+      const formattedRating = (rating && typeof rating === 'number') ? rating.toFixed(1) : '0.0';
+      
+      return (
+        <div className="flex items-center gap-1">
+          <Star className="w-4 h-4 text-yellow-500" />
+          <span className="font-medium">{formattedRating}</span>
+        </div>
+      );
+    },
     sortable: true,
   },
   {
@@ -130,6 +135,16 @@ export default function ContractorList() {
     defaultSort: { key: "company_name", direction: "asc" },
     defaultPerPage: 10,
   });
+
+  // 🐛 DEBUG: Log para ver qué datos están llegando
+  console.log('=== CONTRACTOR MAIN COMPONENT DEBUG ===');
+  console.log('👷 Items received:', items);
+  console.log('👷 Items type:', typeof items);
+  console.log('👷 Items is array?:', Array.isArray(items));
+  console.log('👷 Items length:', items?.length);
+  console.log('⏳ Loading state:', loading);
+  console.log('📄 Pagination:', pagination);
+  console.log('=======================================');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<IItemResource | null>(null);

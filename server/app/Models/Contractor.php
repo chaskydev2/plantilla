@@ -133,6 +133,16 @@ class Contractor extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'contractor_categories', 'contractor_user_id', 'category_id', 'user_id');
+    }
+
+    public function professions()
+    {
+        return $this->belongsToMany(Profession::class, 'contractor_professions', 'contractor_user_id', 'profession_id', 'user_id');
+    }
+
     // Scopes
     public function scopeApproved(Builder $query): Builder
     {

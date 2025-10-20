@@ -224,6 +224,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function homeownerProfile()
+    {
+        return $this->hasOne(HomeownerProfile::class, 'user_id');
+    }
+
     // Audit relationships
     public function createdBy()
     {

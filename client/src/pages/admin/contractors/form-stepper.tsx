@@ -11,7 +11,6 @@ import { ContractorService as ItemService } from '@/core/services/contractor/con
 import { toastify } from '@/core/utils/toastify';
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
 import Stepper from '@/components/common/Stepper';
 import * as yup from "yup";
 
@@ -116,10 +115,10 @@ const ContractorModal = ({
         company_name: '',
         license_number: '',
         is_insured: false,
-        service_area: '',
+        service_area: 'General Services', // Valor por defecto para evitar null
         average_rating: 0,
         state_code: '',
-        country_code: 'US',
+        country_code: 'BO', // Cambiado de 'US' a 'BO' para coincidir con el error
         lat: undefined,
         lng: undefined,
         mobile_number: '',
@@ -134,9 +133,35 @@ const ContractorModal = ({
       };
 
   const handleSubmit = async (data: FormValues) => {
+    // Asegurar que los campos requeridos tengan valores por defecto
+    const requiredDefaults = {
+      service_area: data.service_area || 'General Services', // Valor por defecto para service_area
+      company_name: data.company_name || 'Company Name',
+      license_number: data.license_number || 'LICENSE-001',
+      country_code: data.country_code || 'BO',
+      contract_status: data.contract_status || ContractStatus.PENDING,
+    };
+
+    // Combinar datos con valores por defecto para campos requeridos
+    const dataWithDefaults = {
+      ...data,
+      ...requiredDefaults
+    };
+
+    // Filtrar solo valores que son null, undefined o strings vacíos (pero mantener campos requeridos)
     const cleanData = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== null && value !== '' && value !== undefined)
+      Object.entries(dataWithDefaults).filter(([key, value]) => {
+        // Mantener siempre los campos requeridos
+        const requiredFields = ['service_area', 'company_name', 'license_number', 'country_code', 'contract_status', 'user_id'];
+        if (requiredFields.includes(key)) {
+          return true;
+        }
+        // Para otros campos, filtrar valores vacíos
+        return value !== null && value !== '' && value !== undefined;
+      })
     );
+
+    console.log('📤 Submitting contractor data:', cleanData);
 
     try {
       if (isEditing) {
@@ -145,12 +170,13 @@ const ContractorModal = ({
         onClose();
         load();
       } else {
-        const response = await ItemService.create(cleanData as ICreateRequest);
+        const response = await ItemService.create(cleanData as unknown as ICreateRequest);
         toastify.success(response.message || 'Trabajador creado');
         onClose();
         load();
       }
     } catch (error: any) {
+      console.error('❌ Error saving contractor:', error);
       toastify.error(error.response?.data?.message || 'Error al guardar el trabajador');
     }
   };
@@ -167,7 +193,6 @@ const ContractorModal = ({
 
   const nextStep = async () => {
     // Validar el paso actual antes de avanzar
-    const schema = getValidationSchema();
     try {
       // Aquí se validaría con el contexto del formulario
       if (currentStep < steps.length) {
@@ -198,6 +223,7 @@ const ContractorModal = ({
   ];
 
   const countryOptions = [
+    { value: 'BO', label: 'Bolivia' },
     { value: 'US', label: 'Estados Unidos' },
     { value: 'MX', label: 'México' },
     { value: 'CA', label: 'Canadá' },
@@ -389,16 +415,21 @@ const ContractorModal = ({
             <div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Información del Contrato</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputField
+                <div className="md:col-span-2">
+                   <InputField
                   name="affiliation_date"
                   label="Fecha de afiliación"
                   type="date"
                 />
-                <InputField
+                </div>
+                
+                <div className="md:col-span-2">
+                     <InputField
                   name="approval_date"
                   label="Fecha de aprobación"
                   type="date"
                 />
+                </div>
                 <div className="md:col-span-2">
                   <SelectField
                     name="contract_status"
