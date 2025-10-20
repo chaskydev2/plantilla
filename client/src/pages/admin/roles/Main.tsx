@@ -10,8 +10,9 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toastify } from "@/core/utils/toastify";
 import { useNavigate } from "react-router";
 import useAuth from "@/core/hooks/useAuth";
+import { useTranslation } from 'react-i18next';
 
-const columns = [
+const columns = (t: any) => [
   {
     key: 'id',
     header: 'ID',
@@ -22,7 +23,7 @@ const columns = [
   },
   {
     key: 'name',
-    header: 'Nombre',
+    header: t('admin.roles.nameLabel'),
     render: (item: IItemResource) => (
       <div className="font-semibold text-gray-900 dark:text-gray-100">{item.name}</div>
     ),
@@ -32,6 +33,7 @@ const columns = [
 
 export default function RoleList() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const {
     items,
@@ -66,9 +68,9 @@ export default function RoleList() {
   const { hasPermission } = useAuth();
   
   const openDialog = (
-    title: string, 
-    message: string, 
-    onConfirm: () => void, 
+    title: string,
+    message: string,
+    onConfirm: () => void,
     variant: 'primary' | 'danger' = 'primary'
   ) => {
     setDialogConfig({
@@ -91,8 +93,8 @@ export default function RoleList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      'Confirmar eliminación',
-      `¿Estás seguro que deseas eliminar al usuario ${item.name}?`,
+      t('admin.roles.confirmDeleteTitle'),
+      t('admin.roles.confirmDeleteMessage', { name: item.name }),
       () => handleDelete(item),
       'danger'
     );
@@ -115,21 +117,21 @@ export default function RoleList() {
 
   const actions = [
     {
-      label: 'Permisos',
+      label: t('admin.sidebar.permissions'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => navigate(`/admin/roles/${item.id}/permisos`),
       variant: 'primary' as const,
       show: (item: IItemResource) => item.id != null && hasPermission('rol_permiso_editar'),
     },
     {
-      label: 'Editar',
+      label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: 'primary' as const,
       show: (item: IItemResource) => item.id != null && hasPermission('rol_editar'),
     },
     {
-      label: 'Eliminar',
+      label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: 'danger' as const,
@@ -147,7 +149,7 @@ export default function RoleList() {
         }}
       >
         <Plus className="w-5 h-5" />
-        Agregar
+        {t('admin.roles.addRole')}
       </button>
 
       <div className="relative w-full sm:w-64">
@@ -156,7 +158,7 @@ export default function RoleList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar usuarios..."
+          placeholder={t('admin.users.searchPlaceholder')}
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -167,10 +169,10 @@ export default function RoleList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Roles" />
+      <PageBreadcrumb pageTitle={t('admin.roles.title')} />
         <DataTable
           data={items as IItemResource[]}
-          columns={columns}
+          columns={columns(t)}
           actions={actions}
           sort={sort}
           onSortChange={handleSortChange}

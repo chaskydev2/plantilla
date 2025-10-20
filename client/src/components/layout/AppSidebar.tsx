@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
+import { useTranslation } from "react-i18next";
 import Logo from "@/assets/images/CTB-LOGO.png";
 import {
   LayoutDashboard,
@@ -43,197 +44,196 @@ type OpenSubmenu = {
   index: number;
 } | null;
 
-const navItems: MenuItem[] = [
-  {
-    icon: <LayoutDashboard className="w-5 h-5" />,
-    name: "Dashboard",
-    path: "/admin",
-  },
-  {
-    name: "Usuarios",
-    icon: <Users className="w-5 h-5" />,
-    permissions: ["usuario_listar", "rol_listar", "permiso_listar"],
-    subItems: [
-      {
-        name: "Lista de Usuarios",
-        path: "/admin/usuarios",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["usuario_listar"]
-      },
-      {
-        name: "Roles",
-        path: "/admin/roles",
-        icon: <Shield className="w-4 h-4" />,
-        permissions: ["rol_listar"]
-      },
-      {
-        name: "Permisos",
-        path: "/admin/permisos",
-        icon: <Key className="w-4 h-4" />,
-        permissions: ["permiso_listar"]
-      }
-    ],
-  },
-  {
-    name: "Eventos",
-    icon: <Calendar className="w-5 h-5" />,
-    permissions: ["tipo_evento_listar"],
-    subItems: [
-      {
-        name: "Tipos de Eventos",
-        path: "/admin/tipo_eventos",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["tipo_evento_listar"]
-      },
-      {
-        name: "Eventos",
-        path: "/admin/eventos",
-        icon: <Calendar className="w-4 h-4" />,
-        permissions: ["evento_listar"]
-      },
-    ],
-  },
-  
-  {
-    name: "Pagos",
-    icon: <BookOpen className="w-5 h-5" />,
-    permissions: ["payment_listar"],
-    subItems: [
-      {
-        name: "Lista de pagos",
-        path: "/admin/montlypay",
-        icon: <List className="w-4 h-4" />,
-        permissions: ["payment_listar"]
-      },
-      {
-        name: "Reporte de pagos",
-        path: "/admin/montlypayreport",
-        icon: <BarChart2 className="w-4 h-4" />,
-        permissions: ["payment_listar"]
-      },
-    ],
-  },
-  {
-    name: "Profesions",
-    icon: <Briefcase className="w-5 h-5" />,
-    //permissions: ["profesion_listar", "etiqueta_listar"],
-    subItems: [
-      {
-        name: "Lista de Profesiones",
-        path: "/admin/profesiones",
-        icon: <Briefcase className="w-4 h-4" />,
-      //  permissions: ["profesion_listar"]
-      },
-      {
-        name: "Etiquetas",
-        path: "/admin/etiquetas",
-        icon: <Tag className="w-4 h-4" />,
-      //  permissions: ["etiqueta_listar"]
-      },
-    ],
-  },
-  {
-    name: "Requerimientos",
-    icon: <Briefcase className="w-5 h-5" />,
-    //permissions: ["profesion_listar"],
-    subItems: [
-      {
-        name: "Lista de Requerimientos",
-        path: "/admin/atributes",
-        icon: <Briefcase className="w-4 h-4" />,
-      //  permissions: ["profesion_listar"]
-      },
-    ],
-  },
-
-
-];
-
-const webItems: MenuItem[] = [
-  {
-    name: "LANDING PAGE",
-    icon: <Globe className="w-5 h-5" />,
-    permissions: ["historia_listar", "contacto_listar", "principio_listar", "valor_moral_listar", 
-      "directiva_listar", "requisito_listar", "acuerdo_listar", "consulta_listar", "pregunta_frecuente_listar", "red_social_listar", 
-      "banner_listar", "red_social_listar"],
-    subItems: [
-      {
-        name: "Historia",
-        path: "/admin/historias",
-        icon: <History className="w-4 h-4" />,
-        permissions: ["historia_listar"]
-      },
-      {
-        name: "Contacto",
-        path: "/admin/contactos",
-        icon: <Contact className="w-4 h-4" />,
-        permissions: ["contacto_listar"]
-      },
-      {
-        name: "Principios",
-        path: "/admin/principios",
-        icon: <Scale className="w-4 h-4" />,
-        permissions: ["principio_listar"]
-      },
-      {
-        name: "Valores Morales",
-        path: "/admin/valores_morales",
-        icon: <Star className="w-4 h-4" />,
-        permissions: ["valor_moral_listar"]
-      },
-      { 
-        name: "Directiva", 
-        path: "/admin/directiva",
-        icon: <Users className="w-4 h-4" />,
-        permissions: ["directiva_listar"]
-      },
-      { 
-        name: "Requisitos", 
-        path: "/admin/requisitos",
-        icon: <Clipboard className="w-4 h-4" />,
-        permissions: ["requisito_listar"]
-      },
-      { 
-        name: "Acuerdos", 
-        path: "/admin/acuerdos",
-        icon: <FileSignature className="w-4 h-4" />,
-        permissions: ["acuerdo_listar"] 
-      },
-      { 
-        name: "Consultas", 
-        path: "/admin/consultas",
-        icon: <MessageSquare className="w-4 h-4" />,
-        permissions: ["consulta_listar"] 
-      },
-      { 
-        name: "Preguntas Frecuentes", 
-        path: "/admin/preguntas_frecuentes",
-        icon: <HelpCircle className="w-4 h-4" />,
-        permissions: ["pregunta_frecuente_listar"] 
-      },
-      { 
-        name: "Banner", 
-        path: "/admin/banners",
-        icon: <Image className="w-4 h-4" />,
-        permissions: ["banner_listar"]
-      },
-      { 
-        name: "Redes Sociales", 
-        path: "/admin/redes_sociales",
-        icon: <Share2 className="w-4 h-4" />,
-        permissions: ["red_social_listar"]
-      },
-    ],
-  },
-];
-
 const AppSidebar: React.FC = () => {
+  const { t } = useTranslation();
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const { hasAnyPermission } = useAuth();
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const navItems: MenuItem[] = [
+    {
+      icon: <LayoutDashboard className="w-5 h-5" />,
+      name: t("admin.sidebar.dashboard"),
+      path: "/admin",
+    },
+    {
+      name: t("admin.sidebar.users"),
+      icon: <Users className="w-5 h-5" />,
+      permissions: ["usuario_listar", "rol_listar", "permiso_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.usersList"),
+          path: "/admin/usuarios",
+          icon: <List className="w-4 h-4" />,
+          permissions: ["usuario_listar"]
+        },
+        {
+          name: t("admin.sidebar.roles"),
+          path: "/admin/roles",
+          icon: <Shield className="w-4 h-4" />,
+          permissions: ["rol_listar"]
+        },
+        {
+          name: t("admin.sidebar.permissions"),
+          path: "/admin/permisos",
+          icon: <Key className="w-4 h-4" />,
+          permissions: ["permiso_listar"]
+        }
+      ],
+    },
+    {
+      name: t("admin.sidebar.events"),
+      icon: <Calendar className="w-5 h-5" />,
+      permissions: ["tipo_evento_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.eventTypes"),
+          path: "/admin/tipo_eventos",
+          icon: <List className="w-4 h-4" />,
+          permissions: ["tipo_evento_listar"]
+        },
+        {
+          name: t("admin.sidebar.eventsList"),
+          path: "/admin/eventos",
+          icon: <Calendar className="w-4 h-4" />,
+          permissions: ["evento_listar"]
+        },
+      ],
+    },
+    
+    {
+      name: t("admin.sidebar.payments"),
+      icon: <BookOpen className="w-5 h-5" />,
+      permissions: ["payment_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.paymentsList"),
+          path: "/admin/montlypay",
+          icon: <List className="w-4 h-4" />,
+          permissions: ["payment_listar"]
+        },
+        {
+          name: t("admin.sidebar.paymentsReport"),
+          path: "/admin/montlypayreport",
+          icon: <BarChart2 className="w-4 h-4" />,
+          permissions: ["payment_listar"]
+        },
+      ],
+    },
+    {
+      name: t("admin.sidebar.professions"),
+      icon: <Briefcase className="w-5 h-5" />,
+      //permissions: ["profesion_listar", "etiqueta_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.professionsList"),
+          path: "/admin/profesiones",
+          icon: <Briefcase className="w-4 h-4" />,
+        //  permissions: ["profesion_listar"]
+        },
+        {
+          name: t("admin.sidebar.tags"),
+          path: "/admin/etiquetas",
+          icon: <Tag className="w-4 h-4" />,
+        //  permissions: ["etiqueta_listar"]
+        },
+      ],
+    },
+    {
+      name: t("admin.sidebar.requirements"),
+      icon: <Briefcase className="w-5 h-5" />,
+      //permissions: ["profesion_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.requirementsList"),
+          path: "/admin/atributes",
+          icon: <Briefcase className="w-4 h-4" />,
+        //  permissions: ["profesion_listar"]
+        },
+      ],
+    },
+  ];
+
+  const webItems: MenuItem[] = [
+    {
+      name: t("admin.sidebar.landingPage"),
+      icon: <Globe className="w-5 h-5" />,
+      permissions: ["historia_listar", "contacto_listar", "principio_listar", "valor_moral_listar", 
+        "directiva_listar", "requisito_listar", "acuerdo_listar", "consulta_listar", "pregunta_frecuente_listar", "red_social_listar", 
+        "banner_listar", "red_social_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.history"),
+          path: "/admin/historias",
+          icon: <History className="w-4 h-4" />,
+          permissions: ["historia_listar"]
+        },
+        {
+          name: t("admin.sidebar.contact"),
+          path: "/admin/contactos",
+          icon: <Contact className="w-4 h-4" />,
+          permissions: ["contacto_listar"]
+        },
+        {
+          name: t("admin.sidebar.principles"),
+          path: "/admin/principios",
+          icon: <Scale className="w-4 h-4" />,
+          permissions: ["principio_listar"]
+        },
+        {
+          name: t("admin.sidebar.moralValues"),
+          path: "/admin/valores_morales",
+          icon: <Star className="w-4 h-4" />,
+          permissions: ["valor_moral_listar"]
+        },
+        { 
+          name: t("admin.sidebar.directive"), 
+          path: "/admin/directiva",
+          icon: <Users className="w-4 h-4" />,
+          permissions: ["directiva_listar"]
+        },
+        { 
+          name: t("admin.sidebar.requirementsWeb"), 
+          path: "/admin/requisitos",
+          icon: <Clipboard className="w-4 h-4" />,
+          permissions: ["requisito_listar"]
+        },
+        { 
+          name: t("admin.sidebar.agreements"), 
+          path: "/admin/acuerdos",
+          icon: <FileSignature className="w-4 h-4" />,
+          permissions: ["acuerdo_listar"] 
+        },
+        { 
+          name: t("admin.sidebar.consultations"), 
+          path: "/admin/consultas",
+          icon: <MessageSquare className="w-4 h-4" />,
+          permissions: ["consulta_listar"] 
+        },
+        { 
+          name: t("admin.sidebar.faq"), 
+          path: "/admin/preguntas_frecuentes",
+          icon: <HelpCircle className="w-4 h-4" />,
+          permissions: ["pregunta_frecuente_listar"] 
+        },
+        { 
+          name: t("admin.sidebar.banner"), 
+          path: "/admin/banners",
+          icon: <Image className="w-4 h-4" />,
+          permissions: ["banner_listar"]
+        },
+        { 
+          name: t("admin.sidebar.socialNetworks"), 
+          path: "/admin/redes_sociales",
+          icon: <Share2 className="w-4 h-4" />,
+          permissions: ["red_social_listar"]
+        },
+      ],
+    },
+  ];
 
   const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
 

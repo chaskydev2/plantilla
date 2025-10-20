@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { InputField, TextAreaField, SwitchField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
@@ -27,6 +28,7 @@ const EventModal = ({
   initialData = null,
   load,
 }: EventModalProps) => {
+  const { t } = useTranslation();
   const isEditing = !!initialData;
 
   type FormValues = ICreateRequest | IUpdateRequest;
@@ -56,7 +58,7 @@ const EventModal = ({
     if (isEditing) {
       await ItemService.update(initialData!.id, cleanData as IUpdateRequest)
         .then((response) => {
-          toastify.success(response.message || 'Item actualizado');
+          toastify.success(response.message || t('admin.messages.saveSuccess'));
           onClose();
           load();
         })
@@ -65,7 +67,7 @@ const EventModal = ({
     } else {
       await ItemService.create(cleanData as ICreateRequest)
         .then((response) => {
-          toastify.success(response.message || 'Item creado');
+          toastify.success(response.message || t('admin.messages.saveSuccess'));
           onClose();
           load();
         })
@@ -77,7 +79,7 @@ const EventModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Evento' : 'Nuevo Evento'}
+      title={isEditing ? t('admin.events.editEvent') : t('admin.events.addEvent')}
       size="lg"
     >
       <FormProviderWrapper
@@ -91,16 +93,16 @@ const EventModal = ({
           <div className="col-span-1">
             <InputField
               name="name"
-              label="Nombre"
-              placeholder="Ej: Nombre del evento..."
+              label={t('admin.events.name')}
+              placeholder={t('admin.events.namePlaceholder')}
             />
           </div>
 
           <div className="col-span-1">
             <InputField
               name="event_type_id"
-              label="Tipo de evento"
-              placeholder="Ej: Tipo de evento..."
+              label={t('admin.events.type')}
+              placeholder={t('admin.events.typePlaceholder')}
             />
           </div>
 
@@ -108,14 +110,14 @@ const EventModal = ({
             <div>
               <InputField
                 name="start_date"
-                label="Fecha de inicio"
+                label={t('admin.events.startDate')}
                 type="datetime-local"
               />
             </div>
             <div>
               <InputField
                 name="end_date"
-                label="Fecha fin"
+                label={t('admin.events.endDate')}
                 type="datetime-local"
               />
             </div>
@@ -124,8 +126,8 @@ const EventModal = ({
           <div className="col-span-1">
             <TextAreaField
               name="location"
-              label="Ubicación"
-              placeholder="Detalles de la ubicación..."
+              label={t('admin.events.location')}
+              placeholder={t('admin.events.locationPlaceholder')}
               rows={4}
             />
           </div>
@@ -133,7 +135,7 @@ const EventModal = ({
           <div className="col-span-1">
             <SwitchField
               name="generates_fine"
-              label="Genera Multa"
+              label={t('admin.events.generatesFine')}
             />
           </div>
         </div>

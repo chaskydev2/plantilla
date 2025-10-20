@@ -1,0 +1,303 @@
+{
+  "hero": {
+    "topText": "Protecting families in the U.S. and Canada",
+    "title": "Only vetted professionals. Backed by our $250,000 guarantee",
+    "subtitle": "All contractors are background-checked and financially screened—and if they mess up, your project is protected."
+  },
+  "services": {
+    "roofing": "Roofing",
+    "gutters": "Gutters",
+    "siding": "Siding",
+    "windows": "Windows",
+    "painting": "Painting",
+    "drywall": "Drywall",
+    "solar": "Solar",
+    "insulation": "Insulation"
+  },
+  "whatYouFind": {
+    "title": "What you'll find at GU",
+    "licensed": "Licensed and background-checked",
+    "verified": "Financially verified",
+    "protected": "Protected by a guarantee",
+    "upTo": "Up to $250,000"
+  },
+  "videos": {
+    "title": "What is GU",
+    "roofingWarranty": "Roofing Warranty : What Happens When Contractors Fail",
+    "avoidScams": "How to Never Get Scammed By A Contractor again!"
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "step": "Step {{number}}",
+    "search": {
+      "title": "Search",
+      "description": "Enter your location and project type"
+    },
+    "quotes": {
+      "title": "Get Quotes",
+      "description": "Receive quotes from pre-screened contractors"
+    },
+    "select": {
+      "title": "Select",
+      "description": "Choose the best contractor for your project"
+    },
+    "guarantee": {
+      "title": "Get Guaranteed",
+      "description": "Your project is protected up to $250,000"
+    }
+  },
+  "realStories": {
+    "title": "Real Stories, Real Payouts",
+    "subtitle": "See actual claims we've paid to protect homeowners like you.",
+    "story1": {
+      "quote": "I was charged $4K after my contractor shut down. GU took care of it",
+      "name": "Ben & Susan Smith",
+      "location": "Oklahoma, OK",
+      "service": "Roofing",
+      "date": "Jan 2023"
+    },
+    "story2": {
+      "quote": "A contractor destroyed my siding, but GU paid $15K to fix it",
+      "name": "Brandy Oberg",
+      "location": "Minnesota, MN",
+      "service": "Roofing",
+      "date": "Apr 2022"
+    },
+    "story3": {
+      "quote": "A contractor damaged my roof. GU paid $8K to replace it",
+      "name": "Lisa Brown",
+      "location": "New York, NY",
+      "service": "Roofing",
+      "date": "Jun 2024"
+    }
+  },
+  "stats": {
+    "claimsPaid": "Claims Paid",
+    "averageResolution": "Average Resolution",
+    "averageClaim": "Average Claim",
+    "percent100": "100%",
+    "days15to30": "15–30 Days",
+    "amount8000": "$8,000"
+  },
+  "whyGU": {
+    "title": "Why GU?",
+    "gu": {
+      "verifiedOnly": "Verified contractors only",
+      "guarantee": "Backed guarantee up to $250K",
+      "dataRankings": "Data-driven rankings",
+      "payHomeowners": "We pay homeowners",
+      "realSupport": "Real-life support",
+      "highRatings": "Only 4.5 stars and up reviews"
+    },
+    "bbb": {
+      "payToPlay": "Pay to play",
+      "noGuarantee": "Zero financial guarantee",
+      "noAlgorithm": "No algorithm, manual and outdated ranking",
+      "noPayouts": "No payouts",
+      "submitWait": "Submit a complaint and wait",
+      "moneyBuys": "Money buys higher rating"
+    }
+  },
+  "popularServices": {
+    "title": "Popular Services Near You",
+    "subtitle": "We work in the US and Canada with 100% vetted contractors.",
+    "showMore": "Show more"
+  },
+  "testimonials": {
+    "title": "What Our Customers Say",
+    "readMore": "Read more",
+    "testimonial1": {
+      "name": "Adam B.",
+      "date": "Apr 2024",
+      "text": "The entire process was smooth. Most importantly I was always informed of what and when to expect the next step. When questions came up, I got immediate responses from my sales guy."
+    },
+    "testimonial2": {
+      "name": "Ryan Quarless",
+      "date": "May 2025",
+      "text": "I highly recommend Richard & Camel City Roofing if you are looking to have any roofing work done! Richard was very knowledgeable & was quickly responsive to all my questions/concerns."
+    },
+    "testimonial3": {
+      "name": "Chris Munson",
+      "date": "Mar 2025",
+      "text": "GU is the best! They vet the contractors to make sure only the best are allowed. They stand behind the work and are making the roofing space a much better place."
+    },
+    "testimonial4": {
+      "name": "Joseph Wisnaskas",
+      "date": "Feb 2025",
+      "text": "Brehm Roofing recently completed a re-roof of our home and we are very happy with the new roof and installation process. Quick response to questions and professional crew."
+    }
+  },
+  "guaranteeBanner": {
+    "title": "Join homeowners who've chosen the security of our $250,000 guarantee",
+    "subtitle": "We understand the trust you place in contractors when you invite them into your space. That's why we've created the most comprehensive protection program in the industry.",
+    "button": "Find Your Guaranteed Contractor"
+  },
+  "faq": {
+    "title": "Questions about GU",
+    "questions": {
+      "howToUse": {
+        "question": "How do I use GU?",
+        "answer": "Search for your project type and location, compare vetted contractors, and hire with confidence under our protection program."
+      },
+      "howDifferent": {
+        "question": "How are GU contractors different?",
+        "answer": "All contractors on GU are verified, financially screened, and backed by our guarantee to protect homeowners."
+      },
+      "noContractors": {
+        "question": "What if there are no contractors in my area?",
+        "answer": "We are expanding rapidly. If none are listed, leave your info and we will notify you as soon as vetted contractors are available."
+      },
+      "cost": {
+        "question": "How much does it cost?",
+        "answer": "Using GU is free for homeowners. Contractors may have membership fees, but your protection is always included."
+      },
+      "guaranteeCover": {
+        "question": "What does the $250,000 Guarantee cover?",
+        "answer": "It covers eligible losses such as contractor abandonment, shoddy workmanship, or damage caused during the project, up to the specified limit."
+      }
+    }
+  },
+  "navigation": {
+    "services": "Services",
+    "scamAlerts": "Scam Alerts",
+    "priceCheck": "Fair Price Check",
+    "guarantee": "GU Guarantee",
+    "registerGuara": "Register Guara",
+    "howItWorks": "How it Works",
+    "whatCover": "What it Covers",
+    "register": "Register",
+    "login": "Sign In"
+  },
+  "admin": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "usersList": "Users List",
+      "roles": "Roles",
+      "permissions": "Permissions",
+      "events": "Events",
+      "eventTypes": "Event Types",
+      "eventsList": "Events",
+      "payments": "Payments",
+      "paymentsList": "Payments List",
+      "paymentsReport": "Payments Report",
+      "professions": "Professions",
+      "professionsList": "Professions List",
+      "tags": "Tags",
+      "requirements": "Requirements",
+      "requirementsList": "Requirements List",
+      "landingPage": "LANDING PAGE",
+      "history": "History",
+      "contact": "Contact",
+      "principles": "Principles",
+      "moralValues": "Moral Values",
+      "directive": "Directive",
+      "requirementsWeb": "Requirements",
+      "agreements": "Agreements",
+      "consultations": "Consultations",
+      "faq": "FAQ",
+      "banner": "Banner",
+      "socialNetworks": "Social Networks"
+    },
+    "common": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "restore": "Restore",
+      "view": "View",
+      "search": "Search",
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close",
+      "loading": "Loading...",
+      "noData": "No data available",
+      "actions": "Actions",
+      "filters": "Filters",
+      "all": "All",
+      "filterBy": "Filter by",
+      "confirmDelete": "Confirm deletion",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "activeWorkers": "Active Workers",
+      "online": "Online",
+      "newWorkers": "NEW WORKERS",
+      "newHomeowners": "NEW HOMEOWNERS",
+      "activeJobs": "ACTIVE JOBS",
+      "completedJobs": "COMPLETED JOBS",
+      "userRegistrations": "User Registrations",
+      "homeowners": "Homeowners",
+      "workers": "Workers",
+      "totalUsers": "Total Users",
+      "comparedToLastMonth": "compared to last month",
+      "thisMonth": "this month"
+    },
+    "users": {
+      "title": "Users",
+      "addUser": "Add User",
+      "editUser": "Edit User",
+      "searchPlaceholder": "Search users...",
+      "viewProfile": "View profile",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "newPassword": "New password (optional)",
+      "roles": "Roles",
+      "editProfile": "Edit profile",
+      "firstNamePlaceholder": "Ex: John Doe",
+      "lastNamePlaceholder": "Ex: Smith Johnson",
+      "emailPlaceholder": "Ex: user@example.com",
+      "passwordPlaceholder": "Minimum 5 characters",
+      "newPasswordPlaceholder": "Leave empty to keep current",
+      "confirmPasswordPlaceholder": "Repeat the password",
+      "selectRoles": "Select roles",
+      "filterByRole": "Filter by role"
+    },
+    "messages": {
+      "confirmDelete": "Are you sure you want to delete this item?",
+      "confirmRestore": "Are you sure you want to restore this item?",
+      "deleteSuccess": "Item deleted successfully",
+      "restoreSuccess": "Item restored successfully",
+      "saveSuccess": "Saved successfully",
+      "errorOccurred": "An error occurred"
+    }
+  ,
+    "roles": {
+      "title": "Roles",
+      "addRole": "Add Role",
+      "editRole": "Edit Role",
+      "nameLabel": "Role name",
+      "namePlaceholder": "Enter role name",
+      "confirmDeleteTitle": "Confirm deletion",
+      "confirmDeleteMessage": "Are you sure you want to delete role {{name}}?"
+    },
+    "permissions": {
+      "title": "Permissions",
+      "searchPlaceholder": "Search...",
+      "syncButton": "Sync permissions",
+      "noPermissions": "No permissions available"
+    },
+    "events": {
+      "title": "Events",
+      "addEvent": "Add Event",
+      "editEvent": "Edit Event",
+      "name": "Event Name",
+      "type": "Event Type",
+      "dates": "Dates",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "location": "Location",
+      "generatesFine": "Generates Fine",
+      "noType": "No type assigned",
+      "noLocation": "Not specified",
+      "namePlaceholder": "Ex: Event name...",
+      "typePlaceholder": "Ex: Event type...",
+      "locationPlaceholder": "Location details...",
+      "confirmDeleteMessage": "Are you sure you want to delete the event {{name}}?"
+    }
+  }
+}

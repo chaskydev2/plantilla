@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { Menu, X, ChevronDown, ChevronUp, LogIn, UserPlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
+import LanguageSelector from "./LanguageSelector";
 
 
 const Header = () => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -33,15 +36,15 @@ const Header = () => {
   const shouldBeTransparent = isHomePage && !scrolled && !isMenuOpen;
 
   const menuItems = [
-    { name: "Services", path: "/services"},
-    { name: "Scam alerts", path: "/scam-alerts" },
-    { name: "Fair price check", path: "/fair-price-check" },
-    { name: "GU Guarantee", path: "/gu-guarantee" },
+    { name: t("navigation.services"), path: "/services"},
+    { name: t("navigation.scamAlerts"), path: "/scam-alerts" },
+    { name: t("navigation.priceCheck"), path: "/fair-price-check" },
+    { name: t("navigation.guarantee"), path: "/gu-guarantee" },
     {
-      name: "Register Guara",
+      name: t("navigation.registerGuara"),
       submenu: [
-        { name: "How it works", path: "/register-guara" },
-        { name: "What’s covered", path: "/register-guara" },
+        { name: t("navigation.howItWorks"), path: "/register-guara" },
+        { name: t("navigation.whatCover"), path: "/register-guara" },
       ],
     },
   ];
@@ -55,8 +58,8 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 items-center py-4 relative">
-          <div className="flex items-center justify-self-start">
+        <div className="flex items-center justify-between py-4 relative">
+          <div className="flex items-center flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
               <img
                 src={NewLogoUrl}
@@ -70,7 +73,7 @@ const Header = () => {
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6 xl:gap-8 justify-self-center whitespace-nowrap">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8 flex-grow justify-center whitespace-nowrap max-w-4xl">
             {menuItems.map((item) => (
               <div
                 key={item.name}
@@ -82,10 +85,10 @@ const Header = () => {
                   <Link
                     to={item.submenu ? '#' : item.path}
                     className={`
-                      px-4 py-2 transition-all duration-300 relative flex items-center
+                      px-2 py-2 transition-all duration-300 relative flex items-center text-sm
                       ${shouldBeTransparent ? "text-white hover:text-gray-200" : "text-[#1A1B16] hover:text-[#1A1B16]"}
-                      after:content-[''] after:absolute after:bottom-0 after:left-4
-                      after:w-[calc(100%-2rem)] after:h-0.5
+                      after:content-[''] after:absolute after:bottom-0 after:left-2
+                      after:w-[calc(100%-1rem)] after:h-0.5
                       after:transition-all after:duration-300 after:transform
                       ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
                         ? `after:scale-x-100 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"}`
@@ -146,12 +149,15 @@ const Header = () => {
           </nav>
 
           {/* Right actions (desktop) */}
-          <div className="hidden md:flex items-center justify-self-end gap-3">
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+            {/* Language Selector */}
+            <LanguageSelector />
+            
             {/* Register Button - Distinguished */}
             <Link
               to="/formulario_solicitud"
               className={`
-                px-6 py-3 rounded-lg flex items-center font-bold
+                px-4 py-2 rounded-lg flex items-center font-bold text-sm
                 transition-all duration-300 transform hover:scale-105
                 shadow-md hover:shadow-lg border-2 relative overflow-hidden
                 ${shouldBeTransparent 
@@ -161,12 +167,10 @@ const Header = () => {
                 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent
                 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700
               `}
-            >
-              <UserPlus size={18} className="mr-2" />
-              Register
-            </Link>
-
-            {/* Login Button - Regular */}
+              >
+              <UserPlus size={16} className="mr-2" />
+              {t("navigation.register")}
+            </Link>            {/* Login Button - Regular */}
             <Link
               to="/login"
               className={`
@@ -177,13 +181,13 @@ const Header = () => {
                   : "bg-white text-[#1A1B16] hover:bg-white/90 shadow-sm"
                 }
               `}
-            >
+              >
               <LogIn size={16} className="mr-2" />
-              Ingresar
+              {t("navigation.login")}
             </Link>
           </div>
 
-          <div className="md:hidden flex items-center justify-self-end">
+          <div className="md:hidden flex items-center gap-2 flex-shrink-0">
             <Link
               to="/formulario_solicitud"
               className={`mr-3 p-2 rounded-full bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white shadow-md ${shouldBeTransparent ? "ring-2 ring-white/20" : ""}`}
@@ -303,7 +307,7 @@ const Header = () => {
               `}
             >
               <UserPlus size={18} className="mr-3" />
-              Register Account
+              {t("navigation.register")}
             </Link>
             
             {/* Mobile Login Button - Regular */}
@@ -317,7 +321,7 @@ const Header = () => {
               `}
             >
               <LogIn size={16} className="mr-2" />
-              Ingresar al sistema
+              {t("navigation.login")}
             </Link>
           </div>
         </nav>

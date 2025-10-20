@@ -1,6 +1,7 @@
 import { InputField, PasswordField, SwitchField, MultiSelectField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
+import { useTranslation } from 'react-i18next';
 import type { 
   IUserCreateRequest as ICreateRequest, 
   IUserUpdateRequest as IUpdateRequest, 
@@ -29,6 +30,7 @@ const UserModal = ({
   load,
   roles = []
 }: UserModalProps) => {
+  const { t } = useTranslation();
   const isEditing = !!initialData;
 
   type FormValues = ICreateRequest | IUpdateRequest;
@@ -91,7 +93,7 @@ const UserModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}
+      title={isEditing ? t("admin.users.editUser") : t("admin.users.addUser")}
       size="lg"
     >
       <FormProviderWrapper
@@ -105,25 +107,25 @@ const UserModal = ({
           <div className="md:col-span-1">
             <InputField
               name="first_name"
-              label="Nombre completo"
-              placeholder="Ej: Juan Pérez"
+              label={t("admin.users.firstName")}
+              placeholder={t("admin.users.firstNamePlaceholder")}
             />
           </div>
           
           <div className="md:col-span-1">
             <InputField
               name="last_name"
-              label="Apellido completo"
-              placeholder="Ej: Salazar Gómez"
+              label={t("admin.users.lastName")}
+              placeholder={t("admin.users.lastNamePlaceholder")}
             />
           </div>
 
           <div className="md:col-span-2">
             <InputField
               name="email"
-              label="Correo electrónico"
+              label={t("admin.users.email")}
               type="email"
-              placeholder="Ej: usuario@ejemplo.com"
+              placeholder={t("admin.users.emailPlaceholder")}
               disabled={isEditing}
             />
           </div>
@@ -131,8 +133,8 @@ const UserModal = ({
           <div className="md:col-span-1">
             <PasswordField
               name="password"
-              label={isEditing ? 'Nueva contraseña (opcional)' : 'Contraseña'}
-              placeholder={isEditing ? 'Dejar vacío para no cambiar' : 'Mínimo 5 caracteres'}
+              label={isEditing ? t("admin.users.newPassword") : t("admin.users.password")}
+              placeholder={isEditing ? t("admin.users.newPasswordPlaceholder") : t("admin.users.passwordPlaceholder")}
             />
           </div>
 
@@ -140,20 +142,20 @@ const UserModal = ({
             <div className="md:col-span-1">
               <PasswordField
                 name="confirmPassword"
-                label="Confirmar contraseña"
-                placeholder="Repite la contraseña"
+                label={t("admin.users.confirmPassword")}
+                placeholder={t("admin.users.confirmPasswordPlaceholder")}
               />
             </div>
           )}
 
           <div className="md:col-span-2">
             <MultiSelectField
-              label='Seleccionar roles'
+              label={t("admin.users.selectRoles")}
               name="role_ids"
               options={roles}
               valueKey="id"
               labelKey="name"
-              placeholder="Selecciona roles para el usuario"
+              placeholder={t("admin.users.selectRoles")}
               helperText="Puedes seleccionar múltiples roles"
             />
           </div>
@@ -161,7 +163,7 @@ const UserModal = ({
           <div className="md:col-span-2">
             <SwitchField
               name="edit_profile"
-              label="Aprobar edición de perfil"
+              label={t("admin.users.editProfile")}
             />
           </div>
         </div>

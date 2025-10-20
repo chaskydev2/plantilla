@@ -401,7 +401,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
         <div aria-label="Select a service" className="relative flex">
           <Plus aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
           <input
-            placeholder="What can we do for you?"
+            placeholder="¿En qué podemos ayudarte?"
             aria-label="Select a service"
             ref={inputRef}
             value={queryService}
@@ -432,7 +432,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
             }}
             type="text"
             aria-label="Enter your ZIP code or city"
-            placeholder="City, ZIP"
+            placeholder="Ciudad, código postal"
             value={queryLocation}
             onChange={(e) => {
               setQueryLocation(e.target.value);
@@ -446,7 +446,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
           to="/findpro"
           className="inline-flex items-center bg-[#1A1B16] hover:bg-[#2A2B26] text-white font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1A1B16] focus:ring-offset-white"
         >
-          <span>Find a Pro</span>
+          <span>Buscar un profesional</span>
           <Search className="ml-2 size-4 text-white" />
         </Link>
       </motion.div>
