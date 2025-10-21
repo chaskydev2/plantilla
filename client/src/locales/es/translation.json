@@ -71,6 +71,29 @@
       "date": "Jun 2024"
     }
   },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Estamos aquí para ayudarte. Ponte en contacto con nosotros para cualquier consulta.",
+    "address": "Dirección",
+    "phone": "Teléfono - Celular",
+    "email": "Email",
+    "sendMessage": "Envíanos un mensaje",
+    "businessHours": "Horario de atención",
+    "errorLoading": "Error al cargar los datos de contacto",
+    "sentSuccess": "Mensaje enviado correctamente",
+    "sentError": "Hubo un error al enviar tu mensaje",
+    "form": {
+      "name": "Nombre",
+      "email": "Email",
+      "subject": "Asunto",
+      "content": "Contenido",
+      "namePlaceholder": "Tu nombre",
+      "emailPlaceholder": "Tu email",
+      "subjectPlaceholder": "Asunto de tu mensaje",
+      "contentPlaceholder": "Tu mensaje",
+      "submit": "Enviar mensaje"
+    }
+  },
   "stats": {
     "claimsPaid": "Reclamaciones pagadas",
     "averageResolution": "Resolución promedio",
@@ -186,6 +209,8 @@
       "tags": "Etiquetas",
       "requirements": "Requerimientos",
       "requirementsList": "Lista de Requerimientos",
+      "attributes": "Atributos",
+      "attributesList": "Lista de Atributos",
       "landingPage": "LANDING PAGE",
       "history": "Historia",
       "contact": "Contacto",
@@ -200,6 +225,9 @@
       "socialNetworks": "Redes Sociales"
     },
     "common": {
+      "id": "ID",
+      "name": "Nombre",
+      "description": "Descripción",
       "add": "Agregar",
       "edit": "Editar",
       "delete": "Eliminar",
@@ -216,8 +244,11 @@
       "all": "Todos",
       "filterBy": "Filtrar por",
       "confirmDelete": "Confirmar eliminación",
+      "confirmDeleteWithName": "¿Estás seguro de que deseas eliminar {{name}}?",
+      "confirmText": "Confirmar",
       "yes": "Sí",
-      "no": "No"
+      "no": "No",
+      "unknown": "Desconocido"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -233,6 +264,23 @@
       "totalUsers": "Usuarios Totales",
       "comparedToLastMonth": "comparado con el mes pasado",
       "thisMonth": "este mes"
+    },
+    "principles": {
+      "mission": "Misión",
+      "vision": "Visión",
+      "ourFather": "Nuestro Padre Nuestro",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el principio {{mission}}?",
+      "deleteSuccess": "Principio eliminado exitosamente",
+      "deleteError": "Error al eliminar el principio",
+      "searchPlaceholder": "Buscar principios..."
+    },
+    "moralValues": {
+      "title": "Título",
+      "description": "Descripción",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el valor moral \"{{title}}\"?",
+      "deleteSuccess": "Valor moral eliminado exitosamente",
+      "deleteError": "Error al eliminar el valor moral",
+      "searchPlaceholder": "Buscar valores morales..."
     },
     "users": {
       "title": "Usuarios",
@@ -298,6 +346,124 @@
       "typePlaceholder": "Ej: Tipo de evento...",
       "locationPlaceholder": "Detalles de la ubicación...",
       "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el evento {{name}}?"
+    },
+    "monthlypay": {
+      "paymentMethods": {
+        "cash": "Pago en efectivo",
+        "qr": "Pago por QR"
+      },
+      "types": {
+        "monthly": "Pago de Mensualidad",
+        "fine": "Multa",
+        "course": "Pago de Curso",
+        "finePayment": "Pago de Multa",
+        "certification": "Pago De Certificacion",
+        "planVisa": "Pago de Visacion de Planos",
+        "other": "Otros Pago"
+      },
+      "amount": "Importe",
+      "paymentType": "Tipo de pago",
+      "paymentMethod": "Metodo de pago",
+      "month": "Mes",
+      "observation": "Observacion",
+      "printVoucher": "Imprimir comprobante",
+      "searchPlaceholder": "Buscar payments...",
+      "report": {
+        "title": "Reporte de Pagos",
+        "allYears": "Todos los años",
+        "allMonths": "Todos los meses",
+        "allTypes": "Todos los tipos",
+        "allMethods": "Todos los métodos",
+        "allAffiliates": "Todos los afiliados",
+        "affiliates": "Afiliados",
+        "year": "Año",
+        "month": "Mes",
+        "selectAffiliate": "Seleccione afiliado",
+        "clearFilters": "Limpiar filtros",
+        "processing": "Procesando...",
+        "search": "Buscar"
+      }
+    },
+    "professions": {
+      "noDescription": "Sin descripción",
+      "createdDate": "Fecha de Creación",
+      "confirmDeleteMessage": "¿Estás seguro de que deseas eliminar la profesión \"{{name}}\"?",
+      "deleteSuccess": "Profesión eliminada exitosamente",
+      "deleteError": "Error al eliminar profesión",
+      "createNew": "Crear Nueva Profesión",
+      "addProfession": "Agregar Profesión",
+      "searchPlaceholder": "Buscar profesiones..."
+    },
+    "tags": {
+      "slug": "Slug",
+      "createdDate": "Fecha de Creación",
+      "confirmDeleteMessage": "¿Estás seguro de que deseas eliminar la etiqueta \"{{name}}\"?",
+      "deleteSuccess": "Etiqueta eliminada exitosamente",
+      "deleteError": "Error al eliminar la etiqueta",
+      "addTag": "Agregar Etiqueta",
+      "searchPlaceholder": "Buscar etiquetas..."
+    },
+    "contacts": {
+      "address": "Dirección",
+      "mobileNumber": "Número de celular",
+      "phoneNumber": "Número de teléfono",
+      "email": "Correo electrónico",
+      "businessHours": "Horario de atención",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el contacto {{email}}?",
+      "deleteSuccess": "Contacto eliminado exitosamente",
+      "deleteError": "Error al eliminar el contacto",
+      "searchPlaceholder": "Buscar contactos..."
+    },
+    "requirements": {
+      "title": "Título",
+      "description": "Descripción",
+      "type": "Tipo de requisito",
+      "order": "Orden",
+      "filterByType": "Filtrar por tipo de requisito",
+      "types": {
+        "inscription": "Inscripción",
+        "renovation": "Renovación",
+        "updateInfo": "Actualización de Información"
+      },
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el requisito {{title}}?",
+      "deleteSuccess": "Requisito eliminado",
+      "deleteError": "Error al eliminar el requisito",
+      "addRequirement": "Agregar Requisito",
+      "searchPlaceholder": "Buscar requisitos..."
+    },
+    "attributes": {
+      "requiredFor": "Requerido para",
+      "requiredForOptions": {
+        "homeowner": "Propietario",
+        "contractor": "Contratista",
+        "both": "Ambos"
+      },
+      "noDescription": "Sin descripción",
+      "createdDate": "Fecha de Creación",
+      "confirmDeleteMessage": "¿Estás seguro de que deseas eliminar el atributo \"{{name}}\"?",
+      "deleteSuccess": "Atributo eliminado exitosamente",
+      "deleteError": "Error al eliminar atributo",
+      "createNew": "Crear Nuevo Atributo",
+      "addAttribute": "Agregar Atributo",
+      "searchPlaceholder": "Buscar atributos..."
+    },
+    "histories": {
+      "title": "Título",
+      "content": "Contenido",
+      "banner1": "Banner 1",
+      "banner2": "Banner 2",
+      "banner3": "Banner 3",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar la historia {{title}}?",
+      "deleteSuccess": "Historia eliminada exitosamente",
+      "deleteError": "Error al eliminar la historia",
+      "searchPlaceholder": "Buscar historias..."
+    },
+    "table": {
+      "selectAll": "Seleccionar todos",
+      "selectAllAria": "Seleccionar todos los elementos",
+      "selectItem": "Seleccionar elemento",
+      "selectItemAria": "Seleccionar este elemento",
+      "show": "Mostrar:"
     }
   }
 }

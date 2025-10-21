@@ -71,6 +71,29 @@
       "date": "Jun 2024"
     }
   },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "We're here to help. Reach out to us for any questions.",
+    "address": "Address",
+    "phone": "Phone - Mobile",
+    "email": "Email",
+    "sendMessage": "Send us a message",
+    "businessHours": "Business Hours",
+    "errorLoading": "Error loading contact data",
+    "sentSuccess": "Message sent successfully",
+    "sentError": "There was an error sending your message",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "content": "Content",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "Your email",
+      "subjectPlaceholder": "Subject of your message",
+      "contentPlaceholder": "Your message",
+      "submit": "Send message"
+    }
+  },
   "stats": {
     "claimsPaid": "Claims Paid",
     "averageResolution": "Average Resolution",
@@ -186,6 +209,8 @@
       "tags": "Tags",
       "requirements": "Requirements",
       "requirementsList": "Requirements List",
+      "attributes": "Attributes",
+      "attributesList": "Attributes List",
       "landingPage": "LANDING PAGE",
       "history": "History",
       "contact": "Contact",
@@ -200,6 +225,9 @@
       "socialNetworks": "Social Networks"
     },
     "common": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
       "add": "Add",
       "edit": "Edit",
       "delete": "Delete",
@@ -216,8 +244,11 @@
       "all": "All",
       "filterBy": "Filter by",
       "confirmDelete": "Confirm deletion",
+      "confirmDeleteWithName": "Are you sure you want to delete {{name}}?",
+      "confirmText": "Confirm",
       "yes": "Yes",
-      "no": "No"
+      "no": "No",
+      "unknown": "Unknown"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -233,6 +264,23 @@
       "totalUsers": "Total Users",
       "comparedToLastMonth": "compared to last month",
       "thisMonth": "this month"
+    },
+    "principles": {
+      "mission": "Mission",
+      "vision": "Vision",
+      "ourFather": "Our Father",
+      "confirmDeleteMessage": "Are you sure you want to delete the principle {{mission}}?",
+      "deleteSuccess": "Principle deleted successfully",
+      "deleteError": "Error deleting principle",
+      "searchPlaceholder": "Search principles..."
+    },
+    "moralValues": {
+      "title": "Title",
+      "description": "Description",
+      "confirmDeleteMessage": "Are you sure you want to delete the moral value \"{{title}}\"?",
+      "deleteSuccess": "Moral value deleted successfully",
+      "deleteError": "Error deleting moral value",
+      "searchPlaceholder": "Search moral values..."
     },
     "users": {
       "title": "Users",
@@ -298,6 +346,124 @@
       "typePlaceholder": "Ex: Event type...",
       "locationPlaceholder": "Location details...",
       "confirmDeleteMessage": "Are you sure you want to delete the event {{name}}?"
+    },
+    "monthlypay": {
+      "paymentMethods": {
+        "cash": "Cash",
+        "qr": "QR Payment"
+      },
+      "types": {
+        "monthly": "Monthly Payment",
+        "fine": "Fine",
+        "course": "Course Payment",
+        "finePayment": "Fine Payment",
+        "certification": "Certification Payment",
+        "planVisa": "Plan Visa",
+        "other": "Other"
+      },
+      "amount": "Amount",
+      "paymentType": "Payment Type",
+      "paymentMethod": "Payment Method",
+      "month": "Month",
+      "observation": "Observation",
+      "printVoucher": "Print Voucher",
+      "searchPlaceholder": "Search payments...",
+      "report": {
+        "title": "Payment Report",
+        "allYears": "All years",
+        "allMonths": "All months",
+        "allTypes": "All types",
+        "allMethods": "All methods",
+        "allAffiliates": "All affiliates",
+        "affiliates": "Affiliates",
+        "year": "Year",
+        "month": "Month",
+        "selectAffiliate": "Select affiliate",
+        "clearFilters": "Clear filters",
+        "processing": "Processing...",
+        "search": "Search"
+      }
+    },
+    "professions": {
+      "noDescription": "No description",
+      "createdDate": "Created Date",
+      "confirmDeleteMessage": "Are you sure you want to delete the profession \"{{name}}\"?",
+      "deleteSuccess": "Profession deleted successfully",
+      "deleteError": "Error deleting profession",
+      "createNew": "Create New Profession",
+      "addProfession": "Add Profession",
+      "searchPlaceholder": "Search professions..."
+    },
+    "tags": {
+      "slug": "Slug",
+      "createdDate": "Created Date",
+      "confirmDeleteMessage": "Are you sure you want to delete the tag \"{{name}}\"?",
+      "deleteSuccess": "Tag deleted successfully",
+      "deleteError": "Error deleting tag",
+      "addTag": "Add Tag",
+      "searchPlaceholder": "Search tags..."
+    },
+    "contacts": {
+      "address": "Address",
+      "mobileNumber": "Mobile Number",
+      "phoneNumber": "Phone Number",
+      "email": "Email",
+      "businessHours": "Business Hours",
+      "confirmDeleteMessage": "Are you sure you want to delete the contact {{email}}?",
+      "deleteSuccess": "Contact deleted successfully",
+      "deleteError": "Error deleting contact",
+      "searchPlaceholder": "Search contacts..."
+    },
+    "requirements": {
+      "title": "Title",
+      "description": "Description",
+      "type": "Requirement type",
+      "order": "Order",
+      "filterByType": "Filter by requirement type",
+      "types": {
+        "inscription": "Registration",
+        "renovation": "Renewal",
+        "updateInfo": "Information Update"
+      },
+      "confirmDeleteMessage": "Are you sure you want to delete the requirement {{title}}?",
+      "deleteSuccess": "Requirement deleted",
+      "deleteError": "Error deleting requirement",
+      "addRequirement": "Add Requirement",
+      "searchPlaceholder": "Search requirements..."
+    },
+    "attributes": {
+      "requiredFor": "Required For",
+      "requiredForOptions": {
+        "homeowner": "Homeowner",
+        "contractor": "Contractor",
+        "both": "Both"
+      },
+      "noDescription": "No description",
+      "createdDate": "Created Date",
+      "confirmDeleteMessage": "Are you sure you want to delete the attribute \"{{name}}\"?",
+      "deleteSuccess": "Attribute deleted successfully",
+      "deleteError": "Error deleting attribute",
+      "createNew": "Create New Attribute",
+      "addAttribute": "Add Attribute",
+      "searchPlaceholder": "Search attributes..."
+    },
+    "histories": {
+      "title": "Title",
+      "content": "Content",
+      "banner1": "Banner 1",
+      "banner2": "Banner 2",
+      "banner3": "Banner 3",
+      "confirmDeleteMessage": "Are you sure you want to delete the history {{title}}?",
+      "deleteSuccess": "History deleted successfully",
+      "deleteError": "Error deleting history",
+      "searchPlaceholder": "Search histories..."
+    },
+    "table": {
+      "selectAll": "Select all",
+      "selectAllAria": "Select all items",
+      "selectItem": "Select item",
+      "selectItemAria": "Select this item",
+      "show": "Show:"
     }
   }
 }

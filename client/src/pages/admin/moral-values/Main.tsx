@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { MoralValueService as ItemService } from "@/core/services/moral-value/moral-value.service";
 import type { IMoralValue as IItemResource } from "@/core/types/IMoralValue";
@@ -11,36 +12,39 @@ import WithPermission from "@/components/common/WithPermission";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "title",
-    header: "Titulo",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.title}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "description",
-    header: "Descripcion",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.description}</div>
-    ),
-    sortable: true,
-  },
-];
+// columns moved inside component to allow translations
 
 export default function MoralValueList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "title",
+      header: t("admin.moralValues.title"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.title}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "description",
+      header: t("admin.moralValues.description"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.description}</div>
+      ),
+      sortable: true,
+    },
+  ];
   const {
     items,
     loading,
@@ -98,8 +102,8 @@ export default function MoralValueList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el valor moral ${item.title}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.moralValues.confirmDeleteMessage", { title: item.title }),
       () => handleDelete(item),
       "danger"
     );
@@ -108,7 +112,7 @@ export default function MoralValueList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t("admin.moralValues.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar el valor moral:", error);
@@ -120,7 +124,7 @@ export default function MoralValueList() {
 
   const actions = [
     {
-      label: "Editar",
+  label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -128,7 +132,7 @@ export default function MoralValueList() {
         item.id && hasPermission("valor_moral_editar"),
     },
     {
-      label: "Eliminar",
+  label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -149,7 +153,7 @@ export default function MoralValueList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         </WithPermission>
       </div>
@@ -159,7 +163,7 @@ export default function MoralValueList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -170,7 +174,7 @@ export default function MoralValueList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Valores morales" />
+  <PageBreadcrumb pageTitle={t("admin.sidebar.moralValues")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -205,7 +209,7 @@ export default function MoralValueList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")
           }
         />
       )}

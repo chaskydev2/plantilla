@@ -3,6 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { EventTypeService as ItemService } from "@/core/services/event-type/event-type.service";
 import type { IEventType as IItemResource } from "@/core/types/IEventType";
 import { Search, Plus, Trash2, Edit } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -11,7 +12,7 @@ import WithPermission from "@/components/common/WithPermission";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
+let columns = [
   {
     key: "id",
     header: "ID",
@@ -41,6 +42,15 @@ const columns = [
 ];
 
 export default function EventTypeList() {
+  const { t } = useTranslation();
+
+  // translate column headers
+  columns = columns.map((col) => {
+    if (col.key === 'id') return { ...col, header: t('admin.common.id') };
+    if (col.key === 'name') return { ...col, header: t('admin.common.name') };
+    if (col.key === 'description') return { ...col, header: t('admin.common.description') };
+    return col;
+  });
   const {
     items,
     loading,
@@ -98,8 +108,8 @@ export default function EventTypeList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar al tipo de evento ${item.name}?`,
+      t('admin.common.confirmDelete'),
+      t('admin.common.confirmDeleteWithName', { name: item.name }),
       () => handleDelete(item),
       "danger"
     );
@@ -108,7 +118,7 @@ export default function EventTypeList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t('admin.messages.deleteSuccess'));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar tipo de evento:", error);
@@ -120,7 +130,7 @@ export default function EventTypeList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -128,7 +138,7 @@ export default function EventTypeList() {
         item.id && hasPermission("tipo_evento_editar"),
     },
     {
-      label: "Eliminar",
+      label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -140,7 +150,7 @@ export default function EventTypeList() {
   const renderToolbar = () => (
     <div className="flex flex-col gap-4 w-full sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-2">
-        <WithPermission permissions={["tipo_evento_crear"]}>
+            <WithPermission permissions={["tipo_evento_crear"]}>
           <button
             className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
             onClick={() => {
@@ -149,7 +159,7 @@ export default function EventTypeList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t('admin.common.add')}
           </button>
         </WithPermission>
       </div>
@@ -159,7 +169,7 @@ export default function EventTypeList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t('admin.common.search')}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -170,7 +180,7 @@ export default function EventTypeList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Tipo de eventos" />
+  <PageBreadcrumb pageTitle={t('admin.sidebar.eventTypes')} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -204,7 +214,7 @@ export default function EventTypeList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"}
+          confirmText={dialogConfig.variant === "danger" ? t('admin.common.delete') : t('admin.common.restore')}
         />
       )}
     </div>

@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { AttributeService as ItemService } from "@/core/services/attribute/attribute.service";
 import type { IAttribute as IItemResource } from "@/core/types/IAttribute";
-import { REQUIRED_FOR_OPTIONS } from "@/core/types/IAttribute";
 import { Search, Plus, Trash2, Edit, Settings, Eye } from "lucide-react";
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
@@ -13,107 +13,110 @@ import WithPermission from "@/components/common/WithPermission";
 // import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold text-gray-700 dark:text-gray-300">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Name",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
-            <Settings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-          </div>
-        </div>
-        <div>
-          <div className="font-bold text-gray-900 dark:text-gray-100">{item.name}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">/{item.slug}</div>
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "required_for",
-    header: "Required For",
-    render: (item: IItemResource) => {
-      const getRequiredForBadge = (requiredFor: string) => {
-        switch (requiredFor) {
-          case 'homeowner':
-            return (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                {REQUIRED_FOR_OPTIONS.homeowner}
-              </span>
-            );
-          case 'contractor':
-            return (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-                {REQUIRED_FOR_OPTIONS.contractor}
-              </span>
-            );
-          case 'both':
-            return (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                {REQUIRED_FOR_OPTIONS.both}
-              </span>
-            );
-          default:
-            return (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-                Unknown
-              </span>
-            );
-        }
-      };
-
-      return (
-        <div className="flex items-center">
-          {getRequiredForBadge(item.required_for)}
-        </div>
-      );
-    },
-    sortable: true,
-  },
-  {
-    key: "description",
-    header: "Description",
-    render: (item: IItemResource) => (
-      <div className="max-w-xs">
-        <div className="text-gray-700 dark:text-gray-300 truncate" title={item.description || undefined}>
-          {item.description || (
-            <span className="text-gray-400 italic">No description</span>
-          )}
-        </div>
-      </div>
-    ),
-    sortable: false,
-  },
-  {
-    key: "created_at",
-    header: "Created Date",
-    render: (item: IItemResource) => (
-      <div className="text-sm text-gray-600 dark:text-gray-400">
-        {new Date(item.timestamps.created_at).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        })}
-      </div>
-    ),
-    sortable: true,
-  },
-];
+// columns and filters will be created inside component to allow translated labels
 
 export default function AttributeList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold text-gray-700 dark:text-gray-300">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t("admin.common.name"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+              <Settings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            </div>
+          </div>
+          <div>
+            <div className="font-bold text-gray-900 dark:text-gray-100">{item.name}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">/{item.slug}</div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "required_for",
+      header: t("admin.attributes.requiredFor"),
+      render: (item: IItemResource) => {
+        const getRequiredForBadge = (requiredFor: string) => {
+          switch (requiredFor) {
+            case 'homeowner':
+              return (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                  {t("admin.attributes.requiredForOptions.homeowner")}
+                </span>
+              );
+            case 'contractor':
+              return (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                  {t("admin.attributes.requiredForOptions.contractor")}
+                </span>
+              );
+            case 'both':
+              return (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                  {t("admin.attributes.requiredForOptions.both")}
+                </span>
+              );
+            default:
+              return (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+                  {t("admin.common.unknown")}
+                </span>
+              );
+          }
+        };
+
+        return (
+          <div className="flex items-center">
+            {getRequiredForBadge(item.required_for)}
+          </div>
+        );
+      },
+      sortable: true,
+    },
+    {
+      key: "description",
+      header: t("admin.common.description"),
+      render: (item: IItemResource) => (
+        <div className="max-w-xs">
+          <div className="text-gray-700 dark:text-gray-300 truncate" title={item.description || undefined}>
+            {item.description || (
+              <span className="text-gray-400 italic">{t("admin.attributes.noDescription")}</span>
+            )}
+          </div>
+        </div>
+      ),
+      sortable: false,
+    },
+    {
+      key: "created_at",
+      header: t("admin.attributes.createdDate"),
+      render: (item: IItemResource) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {new Date(item.timestamps.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </div>
+      ),
+      sortable: true,
+    },
+  ];
   const {
     items,
     loading,
@@ -186,8 +189,8 @@ export default function AttributeList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirm Deletion",
-      `Are you sure you want to delete the attribute "${item.name}"?`,
+      t("admin.common.confirmDelete"),
+      t("admin.attributes.confirmDeleteMessage", { name: item.name }),
       () => handleDelete(item),
       "danger"
     );
@@ -200,11 +203,11 @@ export default function AttributeList() {
       const response = await ItemService.remove(item.id);
       
       if (response.success) {
-        toastify.success(response.message || "Attribute deleted successfully");
+        toastify.success(response.message || t("admin.attributes.deleteSuccess"));
         fetchItems();
       } else {
         // El servicio retornó success: false, mostrar el mensaje de error
-        toastify.error(response.message || "Error deleting attribute");
+        toastify.error(response.message || t("admin.attributes.deleteError"));
       }
     } catch (error: any) {
       console.error("Error deleting attribute:", error);
@@ -213,7 +216,7 @@ export default function AttributeList() {
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
                           error.message || 
-                          "Error deleting attribute";
+                          t("admin.attributes.deleteError");
       
       toastify.error(errorMessage);
     } finally {
@@ -224,7 +227,7 @@ export default function AttributeList() {
 
   const actions = [
     {
-      label: "View",
+      label: t("admin.common.view"),
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleView(item),
       variant: "secondary" as const,
@@ -232,7 +235,7 @@ export default function AttributeList() {
         !!item.id, // TODO: Restore && hasPermission("attribute_ver"),
     },
     {
-      label: "Edit",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -240,7 +243,7 @@ export default function AttributeList() {
         !!item.id, // TODO: Restore && hasPermission("attribute_editar"),
     },
     {
-      label: "Delete",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -260,7 +263,7 @@ export default function AttributeList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Create New Attribute
+            {t("admin.attributes.createNew")}
           </button>
         <WithPermission permissions={[]}> {/* TODO: Restore permissions={["attribute_crear"]} */}
           
@@ -276,7 +279,7 @@ export default function AttributeList() {
             }}
           >
             <Settings className="w-5 h-5" />
-            Add Attribute
+            {t("admin.attributes.addAttribute")}
           </button>
         </WithPermission>
       </div>
@@ -286,7 +289,7 @@ export default function AttributeList() {
         </div>
         <input
           type="text"
-          placeholder="Search attributes..."
+          placeholder={t("admin.attributes.searchPlaceholder")}
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600 rounded-xl"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -297,7 +300,7 @@ export default function AttributeList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Attributes" />
+      <PageBreadcrumb pageTitle={t("admin.sidebar.attributes")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -346,7 +349,7 @@ export default function AttributeList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Delete" : "Confirm"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.confirmText")
           }
         />
       )}

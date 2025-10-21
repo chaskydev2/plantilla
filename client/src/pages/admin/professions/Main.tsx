@@ -3,6 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { ProfessionService as ItemService } from "@/core/services/profession/profession.service";
 import type { IProfession as IItemResource } from "@/core/types/IProfession";
 import { Search, Plus, Trash2, Edit, Briefcase, Eye } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -12,66 +13,71 @@ import WithPermission from "@/components/common/WithPermission";
 // import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold text-gray-700 dark:text-gray-300">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Name",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-            <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          </div>
-        </div>
-        <div>
-          <div className="font-bold text-gray-900 dark:text-gray-100">{item.name}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">/{item.slug}</div>
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "description",
-    header: "Description",
-    render: (item: IItemResource) => (
-      <div className="max-w-xs">
-        <div className="text-gray-700 dark:text-gray-300 truncate" title={item.description}>
-          {item.description || (
-            <span className="text-gray-400 italic">No description</span>
-          )}
-        </div>
-      </div>
-    ),
-    sortable: false,
-  },
-  {
-    key: "created_at",
-    header: "Created Date",
-    render: (item: IItemResource) => (
-      <div className="text-sm text-gray-600 dark:text-gray-400">
-        {new Date(item.timestamps.created_at).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        })}
-      </div>
-    ),
-    sortable: true,
-  },
-];
+// columns will be created inside component to allow translated labels
 
 export default function ProfessionList() {
+  const { t } = useTranslation();
+
+  // Define columns with translated headers
+  const columns = [
+    {
+      key: "id",
+      header: t('admin.common.id'),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold text-gray-700 dark:text-gray-300">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t('admin.common.name'),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+              <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            </div>
+          </div>
+          <div>
+            <div className="font-bold text-gray-900 dark:text-gray-100">{item.name}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">/{item.slug}</div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "description",
+      header: t('admin.common.description'),
+      render: (item: IItemResource) => (
+        <div className="max-w-xs">
+          <div className="text-gray-700 dark:text-gray-300 truncate" title={item.description}>
+            {item.description || (
+              <span className="text-gray-400 italic">{t('admin.professions.noDescription')}</span>
+            )}
+          </div>
+        </div>
+      ),
+      sortable: false,
+    },
+    {
+      key: "created_at",
+      header: t('admin.professions.createdDate'),
+      render: (item: IItemResource) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {new Date(item.timestamps.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </div>
+      ),
+      sortable: true,
+    },
+  ];
+
   const {
     items,
     loading,
@@ -144,8 +150,8 @@ export default function ProfessionList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirm Deletion",
-      `Are you sure you want to delete the profession "${item.name}"?`,
+      t('admin.common.confirmDelete'),
+      t('admin.professions.confirmDeleteMessage', { name: item.name }),
       () => handleDelete(item),
       "danger"
     );
@@ -158,11 +164,11 @@ export default function ProfessionList() {
       const response = await ItemService.remove(item.id);
       
       if (response.success) {
-        toastify.success(response.message || "Profession deleted successfully");
+        toastify.success(response.message || t('admin.professions.deleteSuccess'));
         fetchItems();
       } else {
         // El servicio retornó success: false, mostrar el mensaje de error
-        toastify.error(response.message || "Error deleting profession");
+        toastify.error(response.message || t('admin.professions.deleteError'));
       }
     } catch (error: any) {
       console.error("Error deleting profession:", error);
@@ -182,7 +188,7 @@ export default function ProfessionList() {
 
   const actions = [
     {
-      label: "View",
+      label: t('admin.common.view'),
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleView(item),
       variant: "secondary" as const,
@@ -190,7 +196,7 @@ export default function ProfessionList() {
         !!item.id, // TODO: Restore && hasPermission("profesion_ver"),
     },
     {
-      label: "Edit",
+      label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -198,7 +204,7 @@ export default function ProfessionList() {
         !!item.id, // TODO: Restore && hasPermission("profesion_editar"),
     },
     {
-      label: "Delete",
+      label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -218,7 +224,7 @@ export default function ProfessionList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Create New Profession
+            {t('admin.professions.createNew')}
           </button>
         <WithPermission permissions={[]}> {/* TODO: Restore permissions={["profesion_crear"]} */}
           
@@ -234,7 +240,7 @@ export default function ProfessionList() {
             }}
           >
             <Briefcase className="w-5 h-5" />
-            Add Profession
+            {t('admin.professions.addProfession')}
           </button>
         </WithPermission>
       </div>
@@ -244,7 +250,7 @@ export default function ProfessionList() {
         </div>
         <input
           type="text"
-          placeholder="Search professions..."
+          placeholder={t('admin.professions.searchPlaceholder')}
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600 rounded-xl"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -255,7 +261,7 @@ export default function ProfessionList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Professions" />
+      <PageBreadcrumb pageTitle={t('admin.sidebar.professions')} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -304,7 +310,7 @@ export default function ProfessionList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Confirmar"
+            dialogConfig.variant === "danger" ? t('admin.common.delete') : t('admin.common.confirmText')
           }
         />
       )}
