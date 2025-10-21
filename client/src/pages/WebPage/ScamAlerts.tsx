@@ -29,7 +29,7 @@ const ScamAlerts: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-8">
+    <div className="min-h-screen bg-gray-50 pb-8">
       <ShareToast showToast={showToast} setShowToast={setShowToast} />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,11 +47,7 @@ const ScamAlerts: React.FC = () => {
 const Breadcrumb: React.FC = () => (
   <div className="max-w-4xl mx-auto mb-6">
     <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
-      <Link to="/" className="hover:text-[#F5D238] transition-colors duration-200">
-        Gu pages
-      </Link>
-      <ChevronRight className="h-6 w-6" />
-      <span className="text-gray-900 font-medium">Scam Alerts</span>
+      
     </nav>
     <h2 className="text-2xl font-bold text-gray-900">Scam alerts</h2>
   </div>

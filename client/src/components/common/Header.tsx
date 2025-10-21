@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
-import { Menu, X, ChevronDown, ChevronUp, LogIn, UserPlus, ChevronRight, Home } from "lucide-react";
+import { Menu, X, ChevronDown, LogIn, UserPlus, Home } from "lucide-react";
 import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
 import UserDropdown from "../header/UserDropdown";
 import NotificationDropdown from "../header/NotificationDropdown";
 import useAuth from "@/core/hooks/useAuth";
+import LanguageSelector from "./LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -32,47 +35,16 @@ const Header = () => {
   const isHomePage = location.pathname === "/";
   const shouldBeTransparent = isHomePage && !scrolled && !isMenuOpen;
 
-  const generateBreadcrumbs = () => {
-    const pathSegments = location.pathname.split('/').filter(Boolean);
-    const breadcrumbs: Array<{ label: string; path: string; icon?: typeof Home; isLast?: boolean }> = [
-      { label: 'Home', path: '/', icon: Home }
-    ];
-
-    let currentPath = '';
-    pathSegments.forEach((segment, index) => {
-      currentPath += `/${segment}`;
-      let label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/[-_]/g, ' ');
-
-      switch(segment.toLowerCase()) {
-        case 'services': label = 'Services'; break;
-        case 'scam-alerts': label = 'Scam Alerts'; break;
-        case 'fair-price-check': label = 'Fair Price Check'; break;
-        case 'gu-guarantee': label = 'GU Guarantee'; break;
-        case 'register-guara': label = 'Register Guara'; break;
-        case 'formulario_solicitud': label = 'Registration Form'; break;
-        case 'login': label = 'Login'; break;
-        case 'about': label = 'About Us'; break;
-        case 'contact': label = 'Contact'; break;
-      }
-
-      breadcrumbs.push({ label, path: currentPath, isLast: index === pathSegments.length - 1 });
-    });
-
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = generateBreadcrumbs();
-
   const menuItems = [
-    { name: "Services", path: "/services"},
-    { name: "Scam Alerts", path: "/scam-alerts" },
-    { name: "Fair Price Check", path: "/fair-price-check" },
-    { name: "GU Guarantee", path: "/gu-guarantee" },
+    { name: t("navigation.services"), path: "/services" },
+    { name: t("navigation.scamAlerts"), path: "/scam-alerts" },
+    { name: t("navigation.priceCheck"), path: "/fair-price-check" },
+    { name: t("navigation.guarantee"), path: "/gu-guarantee" },
     {
-      name: "Register Guara",
+      name: t("navigation.registerGuara"),
       submenu: [
-        { name: "How it works", path: "/register-guara" },
-        { name: "What’s covered", path: "/register-guara" },
+        { name: t("navigation.howItWorks"), path: "/register-guara" },
+        { name: t("navigation.whatCover"), path: "/register-guara" },
       ],
     },
   ];
@@ -82,27 +54,31 @@ const Header = () => {
       <header
         className={`fixed w-full z-50 transition-all duration-300 ${
           shouldBeTransparent
-            ? "bg-transparent text-white"
-            : "bg-[#F5D238] text-[#1A1B16] shadow-md"
+            ? "bg-transparent text-white backdrop-blur-sm"
+            : "bg-[#F5D238] text-[#1A1B16] shadow-lg"
         }`}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 items-center py-4 relative">
-            {/* Logo */}
-            <div className="flex items-center justify-self-start">
-              <Link to="/" className="flex items-center space-x-2">
+          <div className="flex items-center justify-between py-4">
+            
+            {/* Logo Section */}
+            <div className="flex items-center flex-shrink-0">
+              <Link to="/" className="flex items-center space-x-2 group">
                 <img
                   src={NewLogoUrl}
-                  alt="Logo"
-                  className="h-10 w-auto mr-3 object-contain transition-all duration-300"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; e.currentTarget.src = "/vite.svg"; }}
+                  alt="GU Logo"
+                  className="h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
+                  onError={(e) => { 
+                    (e.currentTarget as HTMLImageElement).onerror = null; 
+                    e.currentTarget.src = "/vite.svg"; 
+                  }}
                 />
-                <span className={`text-lg hidden xs:block font-bold ${shouldBeTransparent ? "text-white" : "text-[#1A1B16]"}`}>GU</span>
+  
               </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6 xl:gap-8 justify-self-center whitespace-nowrap">
+            <nav className="hidden lg:flex items-center gap-8 flex-grow justify-center">
               {menuItems.map((item) => (
                 <div
                   key={item.name}
@@ -110,58 +86,56 @@ const Header = () => {
                   onMouseEnter={() => setHoveredItem(item.name)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
-                  <div className="flex items-center">
-                    <Link
-                      to={item.submenu ? '#' : item.path}
-                      className={`
-                        px-4 py-2 transition-all duration-300 relative flex items-center
-                        ${shouldBeTransparent ? "text-white hover:text-gray-200" : "text-[#1A1B16] hover:text-[#1A1B16]"}
-                        after:content-[''] after:absolute after:bottom-0 after:left-4
-                        after:w-[calc(100%-2rem)] after:h-0.5 after:transition-all after:duration-300 after:transform
-                        ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
-                          ? `after:scale-x-100 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"}`
-                          : `after:scale-x-0 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} hover:after:scale-x-100`
-                        }
-                      `}
-                    >
-                      {item.name}
-                      {item.submenu && (
-                        <ChevronDown
-                          size={16}
-                          className={`
-                            ml-1 transition-transform duration-300
-                            ${hoveredItem === item.name ? "rotate-180" : ""}
-                            ${shouldBeTransparent ? "text-white group-hover:text-gray-200" : "text-[#1A1B16] group-hover:text-[#1A1B16]"}
-                          `}
-                        />
-                      )}
-                    </Link>
-                  </div>
+                  <Link
+                    to={item.submenu ? "#" : item.path}
+                    className={`
+                      px-4 py-2 transition-all duration-300 relative flex items-center font-medium
+                      ${shouldBeTransparent 
+                        ? "text-white hover:text-yellow-200" 
+                        : "text-[#1A1B16] hover:text-[#1A1B16]"
+                      }
+                      after:content-[''] after:absolute after:bottom-0 after:left-0
+                      after:w-full after:h-0.5 after:transition-all after:duration-300 after:transform
+                      ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
+                        ? `after:scale-x-100 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"}`
+                        : `after:scale-x-0 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} hover:after:scale-x-100`
+                      }
+                    `}
+                  >
+                    {item.name}
+                    {item.submenu && (
+                      <ChevronDown
+                        size={16}
+                        className={`ml-2 transition-transform duration-300 ${
+                          hoveredItem === item.name ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </Link>
 
-                  {/* Submenu Desktop */}
+                  {/* Desktop Submenu */}
                   {item.submenu && (
                     <div
                       className={`
-                        absolute left-0 mt-2 w-60 origin-top-right
-                        rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-10
-                        divide-y divide-gray-100 focus:outline-none
+                        absolute left-0 mt-3 w-64 origin-top
+                        rounded-xl shadow-2xl bg-white ring-1 ring-gray-200
                         transition-all duration-300 transform
                         ${hoveredItem === item.name
                           ? "opacity-100 translate-y-0 visible scale-100"
-                          : "opacity-0 -translate-y-2 invisible scale-95"
+                          : "opacity-0 -translate-y-3 invisible scale-95"
                         }
                       `}
                     >
-                      <div className="py-2">
+                      <div className="py-3">
                         {item.submenu.map((subItem) => (
                           <Link
                             key={subItem.name}
                             to={subItem.path}
                             className={`
-                              block px-5 py-3 text-sm font-medium transition-all duration-200 rounded-lg mx-2 my-1
+                              block px-6 py-3 text-sm font-medium transition-all duration-200
                               ${location.pathname === subItem.path
-                                ? "bg-yellow-500 text-white font-semibold"
-                                : "text-gray-700 hover:bg-yellow-100 hover:text-yellow-600"
+                                ? "bg-[#F5D238] text-[#1A1B16] font-semibold"
+                                : "text-gray-700 hover:bg-gray-50 hover:text-[#1A1B16] hover:pl-8"
                               }
                             `}
                           >
@@ -175,252 +149,213 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Right Actions Desktop */}
-            <div className="hidden md:flex items-center justify-self-end gap-3">
+            {/* Desktop Right Actions */}
+            <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
+              {/* Language Selector */}
+              <LanguageSelector />
+              
               {isAuthenticated ? (
-                // Authenticated user: Show notifications and user dropdown
+                /* Authenticated User Actions */
                 <>
                   <NotificationDropdown />
                   <UserDropdown />
                 </>
               ) : (
-                // Not authenticated: Show register and login buttons
+                /* Non-authenticated User Actions */
                 <>
+                  {/* Register Button - Primary CTA */}
                   <Link
                     to="/formulario_solicitud"
                     className={`
-                      px-6 py-3 rounded-lg flex items-center font-bold transition-all duration-300 transform hover:scale-105
-                      shadow-md hover:shadow-lg border-2 relative overflow-hidden
+                      px-6 py-3 rounded-lg flex items-center font-bold text-sm
+                      transition-all duration-300 transform hover:scale-105
+                      shadow-lg hover:shadow-xl border-2 relative overflow-hidden
                       ${shouldBeTransparent 
-                        ? "bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white border-white/20 hover:from-[#1A1B16] hover:to-black" 
+                        ? "bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white border-white/30 hover:from-black hover:to-[#1A1B16]" 
                         : "bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white border-[#1A1B16] hover:from-black hover:to-[#1A1B16]"
                       }
-                      before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent
+                      before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent
                       before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700
                     `}
                   >
                     <UserPlus size={18} className="mr-2" />
-                    Register
+                    {t("navigation.register")}
                   </Link>
 
+                  {/* Login Button - Secondary */}
                   <Link
                     to="/login"
                     className={`
-                      px-4 py-2 rounded-md flex items-center transition-colors duration-200
+                      px-5 py-3 rounded-lg flex items-center font-medium text-sm
+                      transition-all duration-200 shadow-md hover:shadow-lg
                       ${shouldBeTransparent 
-                        ? "bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f]" 
-                        : "bg-white text-[#1A1B16] hover:bg-white/90 shadow-sm"
+                        ? "bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20" 
+                        : "bg-white text-[#1A1B16] border border-gray-200 hover:bg-gray-50"
                       }
                     `}
                   >
                     <LogIn size={16} className="mr-2" />
-                    Login
+                    {t("navigation.login")}
                   </Link>
                 </>
               )}
             </div>
 
-            {/* Mobile Menu Toggle */}
-            <div className="md:hidden flex items-center justify-self-end">
-              {isAuthenticated ? (
-                // Authenticated user mobile: Show compact notifications and menu
-                <>
-                  <div className="mr-3 scale-75">
-                    <NotificationDropdown />
-                  </div>
-                  <button onClick={toggleMenu} className="focus:outline-none">
-                    {isMenuOpen ? (
-                      <X size={24} className={shouldBeTransparent ? "text-white" : "text-gray-800"} />
-                    ) : (
-                      <Menu size={24} className={shouldBeTransparent ? "text-white" : "text-gray-800"} />
-                    )}
-                  </button>
-                </>
-              ) : (
-                // Not authenticated mobile: Show register, login and menu buttons
+            {/* Mobile Actions */}
+            <div className="lg:hidden flex items-center gap-3">
+              {!isAuthenticated && (
                 <>
                   <Link
                     to="/formulario_solicitud"
-                    className={`mr-3 p-2 rounded-full bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white shadow-md ${shouldBeTransparent ? "ring-2 ring-white/20" : ""}`}
+                    className={`p-2.5 rounded-full bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white shadow-lg transition-transform hover:scale-105 ${
+                      shouldBeTransparent ? "ring-2 ring-white/30" : ""
+                    }`}
                   >
-                    <UserPlus size={18} />
+                    <UserPlus size={20} />
                   </Link>
                   <Link
                     to="/login"
-                    className={`mr-4 p-2 rounded-full ${shouldBeTransparent ? "text-white" : "text-[#1A1B16]"}`}
+                    className={`p-2.5 rounded-full transition-colors ${
+                      shouldBeTransparent ? "text-white hover:bg-white/10" : "text-[#1A1B16] hover:bg-black/10"
+                    }`}
                   >
                     <LogIn size={20} />
                   </Link>
-                  <button onClick={toggleMenu} className="focus:outline-none">
-                    {isMenuOpen ? (
-                      <X size={24} className={shouldBeTransparent ? "text-white" : "text-gray-800"} />
-                    ) : (
-                      <Menu size={24} className={shouldBeTransparent ? "text-white" : "text-gray-800"} />
-                    )}
-                  </button>
                 </>
               )}
+              
+              {isAuthenticated && (
+                <>
+                  <NotificationDropdown />
+                  <UserDropdown />
+                </>
+              )}
+
+              <button
+                onClick={toggleMenu}
+                className={`p-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  shouldBeTransparent 
+                    ? "text-white hover:bg-white/10 focus:ring-white" 
+                    : "text-[#1A1B16] hover:bg-black/10 focus:ring-[#1A1B16]"
+                }`}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <nav className="md:hidden bg-white shadow-lg">
-            <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
-              {menuItems.map((item) => (
-                <div key={item.name}>
-                  {item.submenu ? (
-                    <>
-                      <button
-                        onClick={() => toggleSubmenu(item.name)}
+          <div className="lg:hidden bg-white border-t border-gray-200 shadow-xl">
+            <div className="container mx-auto px-4 py-6">
+              <nav className="space-y-4">
+                {menuItems.map((item) => (
+                  <div key={item.name}>
+                    <div className="flex items-center justify-between">
+                      <Link
+                        to={item.submenu ? "#" : item.path}
+                        onClick={() => !item.submenu && toggleMenu()}
                         className={`
-                          flex justify-between w-full px-3 py-2 rounded-md text-base font-medium 
-                          transition-colors duration-200
+                          flex-1 px-4 py-3 text-left font-medium transition-colors rounded-lg
                           ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
-                            ? "bg-yellow-500 text-white"
-                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            ? "bg-[#F5D238] text-[#1A1B16]"
+                            : "text-gray-700 hover:bg-gray-100"
                           }
                         `}
                       >
                         {item.name}
-                        {openSubmenu === item.name ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </button>
-                      <div className={`overflow-hidden transition-all duration-300 ${openSubmenu === item.name ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-                        <div className="pl-4 space-y-1 mt-1">
-                          {item.submenu.map((subItem) => (
-                            <Link
-                              key={subItem.name}
-                              to={subItem.path}
-                              onClick={toggleMenu}
-                              className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
-                                ${location.pathname === subItem.path ? "bg-yellow-500 text-white" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`}
-                            >
-                              {subItem.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <Link
-                      to={item.path}
-                      onClick={toggleMenu}
-                      className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200
-                        ${location.pathname === item.path ? "bg-yellow-500 text-white" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`}
-                    >
-                      {item.name}
-                    </Link>
-                  )}
-                </div>
-              ))}
+                      </Link>
+                      {item.submenu && (
+                        <button
+                          onClick={() => toggleSubmenu(item.name)}
+                          className="p-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <ChevronDown
+                            size={20}
+                            className={`transition-transform duration-200 ${
+                              openSubmenu === item.name ? "rotate-180" : ""
+                            }`}
+                          />
+                        </button>
+                      )}
+                    </div>
 
-              {isAuthenticated ? (
-                // Authenticated mobile: Show user info and logout
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="px-3 py-2 mb-4">
-                    <UserDropdown />
+                    {/* Mobile Submenu */}
+                    {item.submenu && openSubmenu === item.name && (
+                      <div className="mt-2 ml-4 space-y-2">
+                        {item.submenu.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            to={subItem.path}
+                            onClick={toggleMenu}
+                            className={`
+                              block px-4 py-2 text-sm rounded-lg transition-colors
+                              ${location.pathname === subItem.path
+                                ? "bg-[#F5D238] text-[#1A1B16] font-medium"
+                                : "text-gray-600 hover:bg-gray-100"
+                              }
+                            `}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ) : (
-                // Not authenticated mobile: Show register and login
-                <>
-                  {/* Mobile Register */}
+                ))}
+              </nav>
+
+              {/* Mobile Auth Actions */}
+              {!isAuthenticated && (
+                <div className="mt-6 space-y-3 pt-6 border-t border-gray-200">
                   <Link
                     to="/formulario_solicitud"
                     onClick={toggleMenu}
-                    className="flex items-center px-3 py-3 rounded-md text-base font-bold transition-all duration-300 transform hover:scale-102 bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white shadow-lg border border-gray-600 mx-2 mb-2"
+                    className="flex items-center justify-center w-full px-6 py-4 bg-gradient-to-r from-[#1A1B16] to-gray-800 text-white rounded-lg font-bold shadow-lg transition-transform hover:scale-105"
                   >
-                    <UserPlus size={18} className="mr-3" />
-                    Register Account
+                    <UserPlus size={20} className="mr-3" />
+                    {t("navigation.register")}
                   </Link>
-
-                  {/* Mobile Login */}
+                  
                   <Link
                     to="/login"
                     onClick={toggleMenu}
-                    className="flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 bg-yellow-500 text-[#1A1B16] hover:bg-yellow-400"
+                    className="flex items-center justify-center w-full px-6 py-3 bg-[#F5D238] text-[#1A1B16] rounded-lg font-medium shadow-md transition-colors hover:bg-[#e0c02f]"
                   >
-                    <LogIn size={16} className="mr-2" />
-                    Login
+                    <LogIn size={18} className="mr-3" />
+                    {t("navigation.login")}
                   </Link>
-                </>
+                </div>
               )}
             </div>
-          </nav>
+          </div>
         )}
       </header>
 
-      {/* Breadcrumb Submenu - Enhanced Design */}
-      {!isHomePage && (
-        <nav 
-          className={`fixed w-full z-40 transition-all duration-300 shadow-sm ${
-            shouldBeTransparent 
-              ? "bg-gradient-to-r from-black/30 via-black/25 to-black/30 backdrop-blur-md border-white/20" 
-              : "bg-gradient-to-r from-[#F5D238] via-[#F8D547] to-[#F5D238] border-[#E6C732]"
-          } border-b`}
-          style={{ top: '77px' }}
-        >
+      {/* Breadcrumb Navigation */}
+      {!isHomePage && !shouldBeTransparent && (
+        <div className="pt-20 bg-gray-50 border-b border-gray-200">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <ol className="flex items-center space-x-1 py-3">
-              {breadcrumbs.map((crumb, index) => (
-                <li key={crumb.path} className="flex items-center">
-                  {index === 0 ? (
-                    <Link 
-                      to={crumb.path} 
-                      className={`
-                        flex items-center px-3 py-2 rounded-lg transition-all duration-200 group
-                        ${shouldBeTransparent 
-                          ? "text-white/90 hover:text-white hover:bg-white/10" 
-                          : "text-[#1A1B16]/80 hover:text-[#1A1B16] hover:bg-white/30"
-                        }
-                      `}
-                    >
-                      <Home className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                      <span className="hidden sm:inline font-medium text-sm">{crumb.label}</span>
-                    </Link>
-                  ) : (
-                    <>
-                      <div className="flex items-center mx-1">
-                        <ChevronRight 
-                          className={`w-4 h-4 ${
-                            shouldBeTransparent ? "text-white/60" : "text-[#1A1B16]/60"
-                          }`} 
-                        />
-                      </div>
-                      {index === breadcrumbs.length - 1 ? (
-                        <span 
-                          className={`
-                            px-3 py-2 rounded-lg font-semibold text-sm
-                            ${shouldBeTransparent 
-                              ? "text-white bg-white/15 backdrop-blur-sm" 
-                              : "text-[#1A1B16] bg-white/50 shadow-sm"
-                            }
-                          `}
-                        >
-                          {crumb.label}
-                        </span>
-                      ) : (
-                        <Link
-                          to={crumb.path}
-                          className={`
-                            px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium
-                            ${shouldBeTransparent 
-                              ? "text-white/80 hover:text-white hover:bg-white/10" 
-                              : "text-[#1A1B16]/70 hover:text-[#1A1B16] hover:bg-white/30"
-                            }
-                          `}
-                        >
-                          {crumb.label}
-                        </Link>
-                      )}
-                    </>
-                  )}
-                </li>
-              ))}
-            </ol>
+            <nav className="flex items-center py-4 text-sm">
+              <Link
+                to="/"
+                className="flex items-center text-gray-500 hover:text-[#1A1B16] transition-colors"
+              >
+                <Home size={16} className="mr-1" />
+                Home
+              </Link>
+              {location.pathname !== "/" && (
+                <>
+                  <span className="mx-2 text-gray-400">/</span>
+                  <span className="text-[#1A1B16] font-medium">
+                    {location.pathname.split('/').filter(Boolean).pop()?.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </span>
+                </>
+              )}
+            </nav>
           </div>
-        </nav>
+        </div>
       )}
     </>
   );

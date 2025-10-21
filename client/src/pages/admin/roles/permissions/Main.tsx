@@ -8,8 +8,9 @@ import { PermissonService as ItemService } from "@/core/services/permission/perm
 import { RolPermissionService } from "@/core/services/rol-permission/rol-permission.service";
 import type { IPermissionResponse as IItemResource } from "@/core/types/IPermission";
 import { useResource } from "@/core/hooks/useResource";
+import { useTranslation } from 'react-i18next';
 
-const columns = [
+const columns = (t: any) => [
   {
     key: 'id',
     header: 'ID',
@@ -20,7 +21,7 @@ const columns = [
   },
   {
     key: 'name',
-    header: 'Nombre',
+    header: t('admin.roles.nameLabel'),
     render: (item: IItemResource) => (
       <div className="font-semibold text-gray-900 dark:text-gray-100">{item.name}</div>
     ),
@@ -30,6 +31,7 @@ const columns = [
 
 export default function PermissionList() {
   const { id } = useParams();
+  const { t } = useTranslation();
   const [selectedPermissions, setSelectedPermissions] = useState<IItemResource[]>([]);
 
   const {
@@ -78,7 +80,7 @@ export default function PermissionList() {
     await RolPermissionService.sync(id, request)
       .then(response => {
         fetchItems();
-        toastify.success(response.message || 'Item creado');
+        toastify.success(response.message || t('admin.messages.saveSuccess'));
       })
       .catch(error => toastify.error(error.message));
   }
@@ -110,10 +112,10 @@ export default function PermissionList() {
 
   return (
     <>
-      <PageBreadcrumb pageTitle="Permisos" />
+      <PageBreadcrumb pageTitle={t('admin.permissions.title')} />
       <DataTable
         data={items as IItemResource[]}
-        columns={columns}
+        columns={columns(t)}
         sort={sort}
         onSortChange={handleSortChange}
         onFilterChange={handleFilterChange}

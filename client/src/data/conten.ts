@@ -63,8 +63,8 @@ export const popularServices = [
 
 
 export const bannerContent = {
-topText: "Protecting families in the U.S. and Canada",
-title: "Only vetted professionals. Backed by our $250,000 guarantee",
+topText: "Protegiendo a las familias en EE. UU. y Canadá",
+title: "Solo profesionales verificados. Respaldados por nuestra garantía de $250,000",
 subtitle:
-"All contractors are background-checked and financially screened—and if they mess up, your project is protected.",
+"Todos los contratistas pasan verificaciones de antecedentes y controles financieros — y si fallan, tu proyecto queda protegido.",
 };

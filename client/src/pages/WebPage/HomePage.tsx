@@ -21,11 +21,13 @@ import {
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import SearchBar from "./HomePage/SearchBar";
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [servicesModalOpen, setServicesModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsLoading(false);
@@ -34,35 +36,35 @@ const HomePage = () => {
   // Popular services data reused in carousel and modal
   const popularServices = [
     {
-      title: "Roofing",
+      title: t('services.roofing'),
       img: "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Gutters",
+      title: t('services.gutters'),
       img: "https://images.unsplash.com/photo-1560785496-3c9d27877182?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Siding",
+      title: t('services.siding'),
       img: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Windows",
+      title: t('services.windows'),
       img: "https://images.unsplash.com/photo-1584516025402-5ce32f67b86e?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Painting",
+      title: t('services.painting'),
       img: "https://images.unsplash.com/photo-1593282192539-9bdb07f6aa1f?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Drywall",
+      title: t('services.drywall'),
       img: "https://images.unsplash.com/photo-1617695271857-0cf6e8404a89?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Solar",
+      title: t('services.solar'),
       img: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Insulation",
+      title: t('services.insulation'),
       img: "https://images.unsplash.com/photo-1600191729101-f54d9fba6032?q=80&w=1400&auto=format&fit=crop",
     },
   ];
@@ -80,17 +82,16 @@ const HomePage = () => {
   }, [servicesModalOpen]);
 
   const bannerContent = {
-    topText: "Protecting families in the U.S. and Canada",
-    title: "Only vetted professionals. Backed by our $250,000 guarantee",
-    subtitle:
-      "All contractors are background-checked and financially screened—and if they mess up, your project is protected.",
+    topText: t('hero.topText'),
+    title: t('hero.title'),
+    subtitle: t('hero.subtitle'),
   };
 
   // removed: getAnnouncements
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-screen overflow-hidden bg-primary text-[#1A1B16]">
+    <section className="relative min-h-screen overflow-hidden bg-primary text-[#1A1B16] pt-20 md:pt-24">
         <div className="relative h-full flex items-center justify-center text-center py-16">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <motion.div
@@ -144,7 +145,7 @@ const HomePage = () => {
       {/* Every contractor on GU - forced brand colors */}
       <section className=" py-16 !bg-[#1A1B16] text-white" id="gusection">
         <div className="container mx-auto px-6 md:px-12">
-          <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">What you'll find at GU</h2>
+          <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">{t('whatYouFind.title')}</h2>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
             {/* Item 1 */}
@@ -152,7 +153,7 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
                 <HardHat className="size-8 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Licensed and background-checked</h3>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">{t('whatYouFind.licensed')}</h3>
             </div>
 
             {/* Item 2 */}
@@ -160,7 +161,7 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
                 <LineChart className="size-8 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Financially verified</h3>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">{t('whatYouFind.verified')}</h3>
             </div>
 
             {/* Item 3 */}
@@ -168,8 +169,8 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
                 <ShieldCheck className="size-8 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Protected by a guarantee</h3>
-              <p className="mt-2 text-sm text-gray-300">Up to $250,000</p>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">{t('whatYouFind.protected')}</h3>
+              <p className="mt-2 text-sm text-gray-300">{t('whatYouFind.upTo')}</p>
             </div>
           </div>
         </div>
@@ -180,7 +181,7 @@ const HomePage = () => {
           {/* What is GU.com - video section */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">Que es GU</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">{t('videos.title')}</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Video 1 */}
@@ -189,7 +190,7 @@ const HomePage = () => {
                     <iframe
                       className="absolute inset-0 w-full h-full"
                       src="https://www.youtube.com/embed/6yYl2ucx2Ng"
-                      title="Roofing Warranty : What Happens When Contractors Fail"
+                      title={t('videos.roofingWarranty')}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       referrerPolicy="strict-origin-when-cross-origin"
@@ -204,7 +205,7 @@ const HomePage = () => {
                     <iframe
                       className="absolute inset-0 w-full h-full"
                       src="https://www.youtube.com/embed/n1G1kvt8R1g"
-                      title="How to Never Get Scammed By A Contractor again!"
+                      title={t('videos.avoidScams')}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       referrerPolicy="strict-origin-when-cross-origin"
@@ -219,7 +220,7 @@ const HomePage = () => {
           {/* How it works */}
           <section className="py-16 bg-[#EEF2F7]">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">How it works</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">{t('howItWorks.title')}</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Step 1 */}
@@ -228,27 +229,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 1
+                        {t('howItWorks.step', { number: 1 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <Search className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Search</h3>
-                        <p className="text-gray-600">Enter your location and project type</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.search.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.search.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 1
+                        {t('howItWorks.step', { number: 1 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <Search className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Search</h3>
-                        <p className="text-gray-600">Enter your location and project type</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.search.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.search.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -260,27 +261,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 2
+                        {t('howItWorks.step', { number: 2 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <FileText className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Quotes</h3>
-                        <p className="text-gray-600">Receive quotes from pre-screened contractors</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.quotes.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.quotes.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 2
+                        {t('howItWorks.step', { number: 2 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <FileText className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Quotes</h3>
-                        <p className="text-gray-600">Receive quotes from pre-screened contractors</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.quotes.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.quotes.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -292,27 +293,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 3
+                        {t('howItWorks.step', { number: 3 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <HardHat className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Select</h3>
-                        <p className="text-gray-600">Choose the best contractor for your project</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.select.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.select.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 3
+                        {t('howItWorks.step', { number: 3 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <HardHat className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Select</h3>
-                        <p className="text-gray-600">Choose the best contractor for your project</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.select.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.select.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -324,27 +325,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 4
+                        {t('howItWorks.step', { number: 4 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <ShieldCheck className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Guaranteed</h3>
-                        <p className="text-gray-600">Your project is protected up to $250,000</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.guarantee.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.guarantee.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 4
+                        {t('howItWorks.step', { number: 4 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <ShieldCheck className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Guaranteed</h3>
-                        <p className="text-gray-600">Your project is protected up to $250,000</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.guarantee.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.guarantee.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -628,10 +629,10 @@ const HomePage = () => {
           <section className="py-16 bg-[#F8FAFC]">
             <div className="container mx-auto px-6 md:px-12">
               <div className="text-center mb-1">
-                <h2 className="text-3xl md:text-5xl font-bold text-[#1A1B16]">Popular Services Near You</h2>
+                <h2 className="text-3xl md:text-5xl font-bold text-[#1A1B16]">{t('popularServices.title')}</h2>
               </div>
               <p className="text-center text-gray-600 mt-1 mb-10">
-                We work in the US and Canada with 100% vetted contractors.
+                {t('popularServices.subtitle')}
               </p>
 
               {/* Carousel */}
@@ -691,7 +692,7 @@ const HomePage = () => {
                   onClick={() => setServicesModalOpen(true)}
                   className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-[#1A1B16] hover:bg-gray-50 shadow-sm"
                 >
-                  Show more
+                  {t('popularServices.showMore')}
                 </button>
               </div>
             </div>

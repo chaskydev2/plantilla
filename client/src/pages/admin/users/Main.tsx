@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { UserService as ItemService } from "@/core/services/user/user.service";
 import type { IUserResponse as IItemResource } from "@/core/types/IUser";
@@ -14,76 +15,6 @@ import useAuth from "@/core/hooks/useAuth";
 import { useNavigate } from "react-router";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div>
-          <div className="font-bold">{item.id}</div>
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Name",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.name}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "email",
-    header: "Email",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.email}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "role",
-    header: "Roles",
-    render: (item: IItemResource) => {
-      // Handle multiple roles
-      const roles = (item as any).roles || [];
-      if (roles.length === 0) {
-        return <span className="badge badge-secondary">No role</span>;
-      }
-      return (
-        <div className="flex flex-wrap gap-1">
-          {roles.map((role: any, index: number) => (
-            <span key={index} className="badge badge-primary text-xs">
-              {role.name}
-            </span>
-          ))}
-        </div>
-      );
-    },
-  },
-  {
-    key: "status",
-    header: "Status",
-    render: (item: IItemResource) => (
-      <span className="badge badge-success">
-        {item.deleted_id == null ? "Active" : "Inactive"}
-      </span>
-    ),
-  },
-  {
-    key: "edit_profile",
-    header: "Profile Updated",
-    render: (item: IItemResource) =>
-      item.edit_profile ? (
-        <span className="badge badge-success">Updated</span>
-      ) : (
-        <span className="badge badge-warning">Pending</span>
-      ),
-  },
-];
-
 type FilterOption = {
   value: string;
   label: string;
@@ -97,6 +28,77 @@ type FilterConfig = {
 };
 
 export default function UserList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: "ID",
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="font-bold">{item.id}</div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t("admin.users.firstName"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.name}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "email",
+      header: t("admin.users.email"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.email}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "role",
+      header: t("admin.users.roles"),
+      render: (item: IItemResource) => {
+        // Manejar múltiples roles
+        const roles = (item as any).roles || [];
+        if (roles.length === 0) {
+          return <span className="badge badge-secondary">Sin rol</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1">
+            {roles.map((role: any, index: number) => (
+              <span key={index} className="badge badge-primary text-xs">
+                {role.name}
+              </span>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      key: "status",
+      header: "Estado",
+      render: (item: IItemResource) => (
+        <span className="badge badge-success">
+          {item.deleted_id == null ? "Activo" : "Inactivo"}
+        </span>
+      ),
+    },
+    {
+      key: "edit_profile",
+      header: t("admin.users.editProfile"),
+      render: (item: IItemResource) =>
+        item.edit_profile ? (
+          <span className="badge badge-success">Actualizado</span>
+        ) : (
+          <span className="badge badge-warning">Pendiente</span>
+        ),
+    },
+  ];
   const {
     items,
     loading,
@@ -248,7 +250,7 @@ export default function UserList() {
 
   const actions = [
     {
-      label: "View Profile",
+      label: t("admin.users.viewProfile"),
       icon: <EyeIcon className="w-4 h-4" />,
       onClick: (item: IItemResource) => navigate(`/admin/usuarios/${item.id}`),
       variant: "primary" as const,
@@ -256,7 +258,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_ver"),
     },
     {
-      label: "Edit",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -264,7 +266,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_editar"),
     },
     {
-      label: "Delete",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -272,7 +274,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_eliminar"),
     },
     {
-      label: "Restore",
+      label: t("admin.common.restore"),
       icon: <RotateCw className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmRestore(item),
       variant: "primary" as const,
@@ -293,7 +295,7 @@ export default function UserList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Add User
+            {t("admin.common.add")}
           </button>
         </WithPermission>
         
@@ -304,7 +306,7 @@ export default function UserList() {
         </div>
         <input
           type="text"
-          placeholder="Search users..."
+          placeholder={t("admin.users.searchPlaceholder")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -315,7 +317,7 @@ export default function UserList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Users" />
+      <PageBreadcrumb pageTitle={t("admin.users.title")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}

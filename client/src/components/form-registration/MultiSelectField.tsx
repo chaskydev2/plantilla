@@ -32,6 +32,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   className = "",
   style = {},
   ariaLabel,
+  disabled = false,
 }) => {
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -132,16 +133,18 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
         type="button"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        whileHover={{ scale: 1.005 }}
-        whileTap={{ scale: 0.995 }}
+        whileHover={disabled ? {} : { scale: 1.005 }}
+        whileTap={disabled ? {} : { scale: 0.995 }}
         className={cn(
-          "w-full min-h-[56px] cursor-pointer flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left shadow-sm focus:outline-none",
+          "w-full min-h-[56px] flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left shadow-sm focus:outline-none",
+          disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           className
         )}
         style={{ borderColor: "var(--color-primary)", background: "white", ...style }}
-        onClick={() => setIsOpen((o) => !o)}
+        onClick={() => !disabled && setIsOpen((o) => !o)}
         aria-controls={`ms-${id}-listbox`}
         aria-label={ariaLabel || placeholder}
+        aria-disabled={disabled}
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="flex-1 min-w-0">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { EventService as ItemService } from "@/core/services/event/event.service";
 import type { IEvent as IItemResource } from "@/core/types/IEvent";
@@ -12,69 +13,71 @@ import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 import { formatDateTime } from "@/core/utils/dateUtils";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Nombre del Evento",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.name}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "event_type_id",
-    header: "Tipo de Evento",
-    render: (item: IItemResource) => (
-      <div className="capitalize">{item.event_type_id}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "dates",
-    header: "Fechas",
-    render: (item: IItemResource) => (
-      <div className="flex flex-col">
-        <span className="text-sm">
-          <strong>Inicio:</strong> {formatDateTime(item.start_date)}
-        </span>
-        <span className="text-sm">
-          <strong>Fin:</strong> {formatDateTime(item.end_date)}
-        </span>
-      </div>
-    ),
-  },
-  {
-    key: "location",
-    header: "Ubicación",
-    render: (item: IItemResource) => (
-      <div>{item.location || 'No especificada'}</div>
-    ),
-  },
-  {
-    key: "generates_fine",
-    header: "Genera Multa",
-    render: (item: IItemResource) => (
-      <span className={`badge ${
-        item.generates_fine ? 'badge-danger' : 'badge-secondary'
-      }`}>
-        {item.generates_fine ? 'Sí' : 'No'}
-      </span>
-    ),
-    sortable: true,
-  }
-];
-
 export default function EventList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: "ID",
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t('admin.events.name'),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.name}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "event_type_id",
+      header: t('admin.events.type'),
+      render: (item: IItemResource) => (
+        <div className="capitalize">{item.event_type_id || t('admin.events.noType')}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "dates",
+      header: t('admin.events.dates'),
+      render: (item: IItemResource) => (
+        <div className="flex flex-col">
+          <span className="text-sm">
+            <strong>{t('admin.events.startDate')}:</strong> {formatDateTime(item.start_date)}
+          </span>
+          <span className="text-sm">
+            <strong>{t('admin.events.endDate')}:</strong> {formatDateTime(item.end_date)}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: "location",
+      header: t('admin.events.location'),
+      render: (item: IItemResource) => (
+        <div>{item.location || t('admin.events.noLocation')}</div>
+      ),
+    },
+    {
+      key: "generates_fine",
+      header: t('admin.events.generatesFine'),
+      render: (item: IItemResource) => (
+        <span className={`badge ${
+          item.generates_fine ? 'badge-danger' : 'badge-secondary'
+        }`}>
+          {item.generates_fine ? t('admin.common.yes') : t('admin.common.no')}
+        </span>
+      ),
+      sortable: true,
+    }
+  ];
+  
   const {
     items,
     loading,
@@ -132,8 +135,8 @@ export default function EventList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el evento ${item.name}?`,
+      t('admin.common.confirmDelete'),
+      t('admin.events.confirmDeleteMessage', { name: item.name }),
       () => handleDelete(item),
       "danger"
     );
@@ -142,7 +145,7 @@ export default function EventList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t('admin.messages.deleteSuccess'));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar el evento:", error);
@@ -154,7 +157,7 @@ export default function EventList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -162,7 +165,7 @@ export default function EventList() {
         item.id && hasPermission("evento_editar"),
     },
     {
-      label: "Eliminar",
+      label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -183,7 +186,7 @@ export default function EventList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t('admin.common.add')}
           </button>
         </WithPermission>
       </div>
@@ -193,7 +196,7 @@ export default function EventList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t('admin.common.search')}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -204,7 +207,7 @@ export default function EventList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Eventos" />
+      <PageBreadcrumb pageTitle={t('admin.events.title')} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -238,7 +241,7 @@ export default function EventList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"}
+          confirmText={dialogConfig.variant === "danger" ? t('admin.common.delete') : t('admin.common.restore')}
         />
       )}
     </div>

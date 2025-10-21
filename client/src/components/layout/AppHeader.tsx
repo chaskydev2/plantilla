@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { useSidebar } from "../../core/context/SidebarContext";
 import { ThemeToggleButton } from "../common/ThemeToggleButton";
 import UserDropdown from "../header/UserDropdown";
+import LanguageSelector from "../common/LanguageSelector";
 import { Globe } from "lucide-react";
 
 const AppHeader: React.FC = () => {
@@ -123,6 +124,8 @@ const AppHeader: React.FC = () => {
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
+            {/* <!-- Language Selector --> */}
+            <LanguageSelector />
             <Link
               to="/"
               className="flex items-center justify-center w-10 h-10 text-gray-400 rounded-lg hover:bg-gray-800"

@@ -1,0 +1,303 @@
+{
+  "hero": {
+    "topText": "Protegiendo a las familias en EE. UU. y Canadá",
+    "title": "Solo profesionales verificados. Respaldados por nuestra garantía de $250,000",
+    "subtitle": "Todos los contratistas pasan verificaciones de antecedentes y controles financieros — y si fallan, tu proyecto queda protegido."
+  },
+  "services": {
+    "roofing": "Techos",
+    "gutters": "Canaletas",
+    "siding": "Revestimiento",
+    "windows": "Ventanas",
+    "painting": "Pintura",
+    "drywall": "Tablaroca",
+    "solar": "Paneles solares",
+    "insulation": "Aislamiento"
+  },
+  "whatYouFind": {
+    "title": "Qué encontrarás en GU",
+    "licensed": "Licenciados y verificados",
+    "verified": "Verificados financieramente",
+    "protected": "Protegido por una garantía",
+    "upTo": "Hasta $250,000"
+  },
+  "videos": {
+    "title": "Qué es GU",
+    "roofingWarranty": "Garantía de techos: qué ocurre cuando los contratistas fallan",
+    "avoidScams": "Cómo no ser estafado por un contratista otra vez"
+  },
+  "howItWorks": {
+    "title": "Cómo funciona",
+    "step": "Paso {{number}}",
+    "search": {
+      "title": "Buscar",
+      "description": "Ingresa tu ubicación y tipo de proyecto"
+    },
+    "quotes": {
+      "title": "Recibir presupuestos",
+      "description": "Recibe presupuestos de contratistas preseleccionados"
+    },
+    "select": {
+      "title": "Seleccionar",
+      "description": "Elige el mejor contratista para tu proyecto"
+    },
+    "guarantee": {
+      "title": "Obtener garantía",
+      "description": "Tu proyecto está protegido hasta $250,000"
+    }
+  },
+  "realStories": {
+    "title": "Historias reales, indemnizaciones reales",
+    "subtitle": "Ve las reclamaciones reales que hemos pagado para proteger a propietarios como tú.",
+    "story1": {
+      "quote": "Me cobraron $4,000 después de que mi contratista se cerró. GU se hizo cargo",
+      "name": "Ben y Susan Smith",
+      "location": "Oklahoma, OK",
+      "service": "Techos",
+      "date": "Ene 2023"
+    },
+    "story2": {
+      "quote": "Un contratista destruyó mi revestimiento, pero GU pagó $15,000 para arreglarlo",
+      "name": "Brandy Oberg",
+      "location": "Minnesota, MN",
+      "service": "Techos",
+      "date": "Abr 2022"
+    },
+    "story3": {
+      "quote": "Un contratista dañó mi techo. GU pagó $8,000 para reemplazarlo",
+      "name": "Lisa Brown",
+      "location": "Nueva York, NY",
+      "service": "Techos",
+      "date": "Jun 2024"
+    }
+  },
+  "stats": {
+    "claimsPaid": "Reclamaciones pagadas",
+    "averageResolution": "Resolución promedio",
+    "averageClaim": "Reclamación promedio",
+    "percent100": "100%",
+    "days15to30": "15–30 días",
+    "amount8000": "$8,000"
+  },
+  "whyGU": {
+    "title": "¿Por qué GU?",
+    "gu": {
+      "verifiedOnly": "Solo contratistas verificados",
+      "guarantee": "Garantía respaldada hasta $250,000",
+      "dataRankings": "Clasificaciones basadas en datos",
+      "payHomeowners": "Pagamos a los propietarios",
+      "realSupport": "Soporte real",
+      "highRatings": "Solo reseñas de 4.5 estrellas o más"
+    },
+    "bbb": {
+      "payToPlay": "Paga para aparecer",
+      "noGuarantee": "Sin garantía financiera",
+      "noAlgorithm": "Sin algoritmo, ranking manual y desactualizado",
+      "noPayouts": "Sin pagos",
+      "submitWait": "Presenta una queja y espera",
+      "moneyBuys": "El dinero compra mejor calificación"
+    }
+  },
+  "popularServices": {
+    "title": "Servicios populares cerca de ti",
+    "subtitle": "Trabajamos en EE. UU. y Canadá con contratistas 100% verificados.",
+    "showMore": "Mostrar más"
+  },
+  "testimonials": {
+    "title": "Lo que dicen nuestros clientes",
+    "readMore": "Leer más",
+    "testimonial1": {
+      "name": "Adam B.",
+      "date": "Abr 2024",
+      "text": "Todo el proceso fue fluido. Lo más importante es que siempre estuve informado de qué y cuándo esperar el siguiente paso. Cuando surgieron preguntas, obtuve respuestas inmediatas de mi vendedor."
+    },
+    "testimonial2": {
+      "name": "Ryan Quarless",
+      "date": "May 2025",
+      "text": "Recomiendo altamente a Richard y Camel City Roofing si buscan trabajo de techos. Richard fue muy conocedor y respondió rápidamente a todas mis preguntas/inquietudes."
+    },
+    "testimonial3": {
+      "name": "Chris Munson",
+      "date": "Mar 2025",
+      "text": "¡GU es lo mejor! Verifican a los contratistas para asegurar que solo se permitan los mejores. Respaldan el trabajo y están mejorando el espacio de techos."
+    },
+    "testimonial4": {
+      "name": "Joseph Wisnaskas",
+      "date": "Feb 2025",
+      "text": "Brehm Roofing recientemente completó un nuevo techo en nuestra casa y estamos muy contentos con el nuevo techo y el proceso de instalación. Respuesta rápida a preguntas y equipo profesional."
+    }
+  },
+  "guaranteeBanner": {
+    "title": "Únete a los propietarios que han elegido la seguridad de nuestra garantía de $250,000",
+    "subtitle": "Entendemos la confianza que depositas en los contratistas cuando los invitas a tu espacio. Por eso hemos creado el programa de protección más completo de la industria.",
+    "button": "Encuentra tu contratista garantizado"
+  },
+  "faq": {
+    "title": "Preguntas sobre GU",
+    "questions": {
+      "howToUse": {
+        "question": "¿Cómo uso GU?",
+        "answer": "Busca tu tipo de proyecto y ubicación, compara contratistas verificados y contrata con confianza bajo nuestro programa de protección."
+      },
+      "howDifferent": {
+        "question": "¿En qué se diferencian los contratistas de GU?",
+        "answer": "Todos los contratistas en GU están verificados, evaluados financieramente y respaldados por nuestra garantía para proteger a los propietarios."
+      },
+      "noContractors": {
+        "question": "¿Qué pasa si no hay contratistas en mi área?",
+        "answer": "Nos estamos expandiendo rápidamente. Si no hay ninguno listado, deja tu información y te notificaremos tan pronto como haya contratistas verificados disponibles."
+      },
+      "cost": {
+        "question": "¿Cuánto cuesta?",
+        "answer": "Usar GU es gratis para los propietarios. Los contratistas pueden tener tarifas de membresía, pero tu protección siempre está incluida."
+      },
+      "guaranteeCover": {
+        "question": "¿Qué cubre la garantía de $250,000?",
+        "answer": "Cubre pérdidas elegibles como abandono del contratista, trabajo deficiente o daños causados durante el proyecto, hasta el límite especificado."
+      }
+    }
+  },
+  "navigation": {
+    "services": "Servicios",
+    "scamAlerts": "Alertas de estafas",
+    "priceCheck": "Revisión de precios",
+    "guarantee": "Garantía GU",
+    "registerGuara": "Registrar Guara",
+    "howItWorks": "Cómo funciona",
+    "whatCover": "Qué cubre",
+    "register": "Registrarse",
+    "login": "Ingresar"
+  },
+  "admin": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Usuarios",
+      "usersList": "Lista de Usuarios",
+      "roles": "Roles",
+      "permissions": "Permisos",
+      "events": "Eventos",
+      "eventTypes": "Tipos de Eventos",
+      "eventsList": "Eventos",
+      "payments": "Pagos",
+      "paymentsList": "Lista de pagos",
+      "paymentsReport": "Reporte de pagos",
+      "professions": "Profesiones",
+      "professionsList": "Lista de Profesiones",
+      "tags": "Etiquetas",
+      "requirements": "Requerimientos",
+      "requirementsList": "Lista de Requerimientos",
+      "landingPage": "LANDING PAGE",
+      "history": "Historia",
+      "contact": "Contacto",
+      "principles": "Principios",
+      "moralValues": "Valores Morales",
+      "directive": "Directiva",
+      "requirementsWeb": "Requisitos",
+      "agreements": "Acuerdos",
+      "consultations": "Consultas",
+      "faq": "Preguntas Frecuentes",
+      "banner": "Banner",
+      "socialNetworks": "Redes Sociales"
+    },
+    "common": {
+      "add": "Agregar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "restore": "Restaurar",
+      "view": "Ver",
+      "search": "Buscar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "loading": "Cargando...",
+      "noData": "No hay datos disponibles",
+      "actions": "Acciones",
+      "filters": "Filtros",
+      "all": "Todos",
+      "filterBy": "Filtrar por",
+      "confirmDelete": "Confirmar eliminación",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "activeWorkers": "Trabajadores Activos",
+      "online": "En línea",
+      "newWorkers": "NUEVOS TRABAJADORES",
+      "newHomeowners": "NUEVOS PROPIETARIOS",
+      "activeJobs": "TRABAJOS ACTIVOS",
+      "completedJobs": "TRABAJOS COMPLETADOS",
+      "userRegistrations": "Registros de Usuarios",
+      "homeowners": "Propietarios",
+      "workers": "Trabajadores",
+      "totalUsers": "Usuarios Totales",
+      "comparedToLastMonth": "comparado con el mes pasado",
+      "thisMonth": "este mes"
+    },
+    "users": {
+      "title": "Usuarios",
+      "addUser": "Agregar Usuario",
+      "editUser": "Editar Usuario",
+      "searchPlaceholder": "Buscar usuarios...",
+      "viewProfile": "Ver perfil",
+      "firstName": "Nombre completo",
+      "lastName": "Apellido completo",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "newPassword": "Nueva contraseña (opcional)",
+      "roles": "Roles",
+      "editProfile": "Editar perfil",
+      "firstNamePlaceholder": "Ej: Juan Pérez",
+      "lastNamePlaceholder": "Ej: Salazar Gómez",
+      "emailPlaceholder": "Ej: usuario@ejemplo.com",
+      "passwordPlaceholder": "Mínimo 5 caracteres",
+      "newPasswordPlaceholder": "Dejar vacío para no cambiar",
+      "confirmPasswordPlaceholder": "Repite la contraseña",
+      "selectRoles": "Seleccionar roles",
+      "filterByRole": "Filtrar por rol"
+    },
+    "messages": {
+      "confirmDelete": "¿Estás seguro de que deseas eliminar este elemento?",
+      "confirmRestore": "¿Estás seguro de que deseas restaurar este elemento?",
+      "deleteSuccess": "Elemento eliminado exitosamente",
+      "restoreSuccess": "Elemento restaurado exitosamente",
+      "saveSuccess": "Guardado exitosamente",
+      "errorOccurred": "Ocurrió un error"
+    }
+  ,
+    "roles": {
+      "title": "Roles",
+      "addRole": "Agregar Rol",
+      "editRole": "Editar Rol",
+      "nameLabel": "Nombre rol",
+      "namePlaceholder": "Ingrese el nombre del rol",
+      "confirmDeleteTitle": "Confirmar eliminación",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el rol {{name}}?"
+    },
+    "permissions": {
+      "title": "Permisos",
+      "searchPlaceholder": "Buscar...",
+      "syncButton": "Actualizar permisos",
+      "noPermissions": "No hay permisos disponibles"
+    },
+    "events": {
+      "title": "Eventos",
+      "addEvent": "Agregar Evento",
+      "editEvent": "Editar Evento",
+      "name": "Nombre del Evento",
+      "type": "Tipo de Evento",
+      "dates": "Fechas",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Fin",
+      "location": "Ubicación",
+      "generatesFine": "Genera Multa",
+      "noType": "Sin tipo asignado",
+      "noLocation": "No especificada",
+      "namePlaceholder": "Ej: Nombre del evento...",
+      "typePlaceholder": "Ej: Tipo de evento...",
+      "locationPlaceholder": "Detalles de la ubicación...",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el evento {{name}}?"
+    }
+  }
+}

@@ -9,14 +9,8 @@ import ShareToast from '@/components/ShareToast';
 // =========================================
 const Breadcrumb: React.FC = () => (
   <div className="max-w-4xl mx-auto mb-6">
-    <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
-      <Link to="/" className="hover:text-[#F5D238] transition-colors duration-200">
-        Gu pages
-      </Link>
-      <ChevronRight className="h-6 w-6" />
-      <span className="text-gray-900 font-medium">Registration</span>
-    </nav>
-    <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
+    
+   
   </div>
 );
 
@@ -50,7 +44,7 @@ const CertificationRequestForm_SignupStepper: React.FC = () => {
   } = useRegistrationForm();
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-8"  style={{
+    <div className="min-h-screen bg-gray-50 pb-8"  style={{
             background: "var(--color-primary)",
           }}
         >

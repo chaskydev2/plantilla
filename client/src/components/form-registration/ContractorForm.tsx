@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { FormData, FormValidationErrors } from "./types";
-import { fieldCls, labelCls, borderPrimary, helpMuted, rolesData } from "./utils";
+import { fieldCls, labelCls, borderPrimary, helpMuted } from "./utils";
 import ErrorText from "./ErrorText";
 import PasswordInput from "./PasswordInput";
 import MultiSelectField from "./MultiSelectField";
+import { ProfessionService } from "@/core/services/profession/profession.service";
+import type { IProfession } from "@/core/types/IProfession";
 
 interface ContractorFormProps {
   formData: Extract<FormData, { userType: "contractor" }>;
@@ -31,6 +33,34 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
   handlePrev,
   handleSubmit,
 }) => {
+  const [professionsData, setProfessionsData] = useState<IProfession[]>([]);
+  const [loadingProfessions, setLoadingProfessions] = useState(true);
+
+  // Cargar profesiones cuando el componente se monta
+  useEffect(() => {
+    const loadProfessions = async () => {
+      try {
+        const response = await ProfessionService.getAll();
+        if (response.success && response.data) {
+          setProfessionsData(response.data);
+        }
+      } catch (error) {
+        console.error('Error loading professions:', error);
+      } finally {
+        setLoadingProfessions(false);
+      }
+    };
+
+    loadProfessions();
+  }, []);
+
+  // Transformar las profesiones al formato esperado por MultiSelectField
+  const professionsOptions = professionsData.map(profession => ({
+    id: profession.id,
+    name: profession.name,
+    value: profession.id,
+    label: profession.name
+  }));
   return (
     <div>
       {step === 0 && (
@@ -142,13 +172,25 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
               name="role_ids"
               value={formData.role_ids || []}
               onChange={handleMultiSelectChange}
-              options={rolesData?.data?.roles || []}
-              placeholder="Choose your roles"
+              options={professionsOptions}
+              placeholder={loadingProfessions ? "Loading professions..." : "Choose your roles"}
               maxSelections={2}
               className={fieldCls}
               style={{ borderColor: "var(--color-primary)" }}
               ariaLabel="Professional roles"
+              disabled={loadingProfessions}
             />
+            {loadingProfessions && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2 mt-2"
+                style={{ color: "var(--color-primary)", opacity: 0.7 }}
+              >
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+                <span className="text-sm">Loading professions...</span>
+              </motion.div>
+            )}
             <ErrorText msg={submitted ? errors.role_ids : undefined} />
           </div>
 

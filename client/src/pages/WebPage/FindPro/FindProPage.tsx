@@ -540,13 +540,13 @@ export default function FindProPage() {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-32 pb-8">
+    <div className="min-h-screen bg-gray-50 pb-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb />
         
         <div className="mx-auto max-w-6xl">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6">          
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">          
             {/* View Toggle */}
             <div className="flex items-center bg-gray-50 rounded-lg p-1 shadow-inner">
               <button
