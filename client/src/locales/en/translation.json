@@ -253,6 +253,9 @@
     "dashboard": {
       "title": "Dashboard",
       "activeWorkers": "Active Workers",
+      "platformEarnings": "Platform Earnings",
+      "currentWeek": "Current Week",
+      "previousWeek": "Previous Week",
       "online": "Online",
       "newWorkers": "NEW WORKERS",
       "newHomeowners": "NEW HOMEOWNERS",
@@ -274,13 +277,30 @@
       "deleteError": "Error deleting principle",
       "searchPlaceholder": "Search principles..."
     },
-    "moralValues": {
-      "title": "Title",
-      "description": "Description",
-      "confirmDeleteMessage": "Are you sure you want to delete the moral value \"{{title}}\"?",
-      "deleteSuccess": "Moral value deleted successfully",
-      "deleteError": "Error deleting moral value",
-      "searchPlaceholder": "Search moral values..."
+    "agreements": {
+      "institutionPhoto": "Institution Photo",
+      "confirmDeleteMessage": "Are you sure you want to delete the agreement {{name}}?",
+      "deleteSuccess": "Agreement deleted successfully",
+      "deleteError": "Error deleting agreement",
+      "searchPlaceholder": "Search agreements..."
+    },
+    "consultations": {
+      "email": "Email",
+      "subject": "Subject",
+      "content": "Content",
+      "confirmDeleteMessage": "Are you sure you want to delete the consultation {{name}}?",
+      "deleteSuccess": "Consultation deleted successfully",
+      "deleteError": "Error deleting consultation",
+      "searchPlaceholder": "Search consultations..."
+    },
+    "faqs": {
+      "question": "Questions",
+      "answer": "Answer",
+      "order": "Order",
+      "confirmDeleteMessage": "Are you sure you want to delete the FAQ {{name}}?",
+      "deleteSuccess": "FAQ deleted successfully",
+      "deleteError": "Error deleting FAQ",
+      "searchPlaceholder": "Search FAQs..."
     },
     "users": {
       "title": "Users",
@@ -457,6 +477,16 @@
       "deleteSuccess": "History deleted successfully",
       "deleteError": "Error deleting history",
       "searchPlaceholder": "Search histories..."
+    },
+    "banners": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "banner1": "Banner 1",
+      "noImage": "No image",
+      "confirmDeleteMessage": "Are you sure you want to delete the banner {{name}}?",
+      "deleteSuccess": "Banner deleted successfully",
+      "deleteError": "Error deleting banner",
+      "searchPlaceholder": "Search banners..."
     },
     "table": {
       "selectAll": "Select all",

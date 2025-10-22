@@ -108,15 +108,15 @@ export default function Dashboard() {
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm text-gray-300">Platform Earnings</p>
+                  <p className="text-sm text-gray-300">{t("admin.dashboard.platformEarnings")}</p>
                   <div className="flex items-baseline space-x-2">
                     <span className="text-2xl font-bold">{stats.earnings.current}</span>
                   </div>
                 </div>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Current Week</span>
-                <span>Previous Week</span>
+                <span>{t("admin.dashboard.currentWeek")}</span>
+                <span>{t("admin.dashboard.previousWeek")}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-400">
                 <span>{stats.earnings.current}</span>

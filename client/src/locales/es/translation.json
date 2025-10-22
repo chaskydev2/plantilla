@@ -253,6 +253,9 @@
     "dashboard": {
       "title": "Dashboard",
       "activeWorkers": "Trabajadores Activos",
+      "platformEarnings": "Ingresos de la plataforma",
+      "currentWeek": "Semana actual",
+      "previousWeek": "Semana anterior",
       "online": "En línea",
       "newWorkers": "NUEVOS TRABAJADORES",
       "newHomeowners": "NUEVOS PROPIETARIOS",
@@ -274,13 +277,30 @@
       "deleteError": "Error al eliminar el principio",
       "searchPlaceholder": "Buscar principios..."
     },
-    "moralValues": {
-      "title": "Título",
-      "description": "Descripción",
-      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el valor moral \"{{title}}\"?",
-      "deleteSuccess": "Valor moral eliminado exitosamente",
-      "deleteError": "Error al eliminar el valor moral",
-      "searchPlaceholder": "Buscar valores morales..."
+    "agreements": {
+      "institutionPhoto": "Foto de la institución",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el acuerdo {{name}}?",
+      "deleteSuccess": "Acuerdo eliminado exitosamente",
+      "deleteError": "Error al eliminar el acuerdo",
+      "searchPlaceholder": "Buscar acuerdos..."
+    },
+    "consultations": {
+      "email": "Correo electrónico",
+      "subject": "Asunto",
+      "content": "Contenido",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar la consulta {{name}}?",
+      "deleteSuccess": "Consulta eliminada exitosamente",
+      "deleteError": "Error al eliminar la consulta",
+      "searchPlaceholder": "Buscar consultas..."
+    },
+    "faqs": {
+      "question": "Preguntas",
+      "answer": "Respuesta",
+      "order": "Orden",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar la pregunta frecuente {{name}}?",
+      "deleteSuccess": "Pregunta frecuente eliminada exitosamente",
+      "deleteError": "Error al eliminar la pregunta frecuente",
+      "searchPlaceholder": "Buscar preguntas frecuentes..."
     },
     "users": {
       "title": "Usuarios",
@@ -457,6 +477,16 @@
       "deleteSuccess": "Historia eliminada exitosamente",
       "deleteError": "Error al eliminar la historia",
       "searchPlaceholder": "Buscar historias..."
+    },
+    "banners": {
+      "title": "Titulo",
+      "subtitle": "Subtitulo",
+      "banner1": "Banner 1",
+      "noImage": "Sin imagen",
+      "confirmDeleteMessage": "¿Estás seguro que deseas eliminar el banner {{name}}?",
+      "deleteSuccess": "Banner eliminado exitosamente",
+      "deleteError": "Error al eliminar el banner",
+      "searchPlaceholder": "Buscar banners..."
     },
     "table": {
       "selectAll": "Seleccionar todos",
