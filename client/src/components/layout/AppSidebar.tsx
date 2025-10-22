@@ -30,7 +30,8 @@ import {
   FolderOpen,
   Home,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Building2
 } from "lucide-react";
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
@@ -61,7 +62,7 @@ const AppSidebar: React.FC = () => {
 
   const navItems: MenuItem[] = [
     {
-      icon: <LayoutDashboard className="w-5 h-5" />,
+      icon: hasRole("contractor") ? <Building2 className="w-5 h-5" /> : <LayoutDashboard className="w-5 h-5" />,
       name: t("admin.sidebar.dashboard"),
       path: "/admin",
     },
