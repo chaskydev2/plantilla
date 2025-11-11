@@ -5,6 +5,7 @@ import { UserService } from "@/core/services/user/user.service";
 import { SelectField } from "@/components/form-field";
 import { PaymentService as ItemService } from "@/core/services/payment/payment.service";
 import type { IUserResponse } from "@/core/types/IUser";
+import { useTranslation } from 'react-i18next';
 
 type ReportFilters = {
   user_id?: number | "";
@@ -15,6 +16,7 @@ type ReportFilters = {
 };
 
 export default function PaymentReportForm() {
+  const { t } = useTranslation();
   const methods = useForm<ReportFilters>({
     defaultValues: {
       user_id: "",
@@ -70,7 +72,7 @@ export default function PaymentReportForm() {
   }, []);
 
   const yearOptions = [
-    { value: "", label: "Todos los años" },
+    { value: "", label: t('admin.monthlypay.report.allYears') },
     ...Array.from({ length: 30 }, (_, i) => ({
       value: currentYear - i,
       label: String(currentYear - i),
@@ -78,7 +80,7 @@ export default function PaymentReportForm() {
   ];
 
   const monthOptions = [
-    { value: "", label: "Todos los meses" },
+    { value: "", label: t('admin.monthlypay.report.allMonths') },
     ...Array.from({ length: 12 }, (_, i) => ({
       value: i + 1,
       label: new Date(2000, i, 1).toLocaleString("default", { month: "long" }),
@@ -86,24 +88,24 @@ export default function PaymentReportForm() {
   ];
 
   const paymentTypeOptions = [
-    { value: "", label: "Todos los tipos" },
-    { value: "1", label: "Mensualidad" },
-    { value: "2", label: "Multa" },
-    { value: "3", label: "Curso" },
-    { value: "4", label: "Certificación" },
-    { value: "5", label: "Visación" },
-    { value: "6", label: "Otros" },
+    { value: "", label: t('admin.monthlypay.report.allTypes') },
+    { value: "1", label: t('admin.monthlypay.types.monthly') },
+    { value: "2", label: t('admin.monthlypay.types.fine') },
+    { value: "3", label: t('admin.monthlypay.types.course') },
+    { value: "4", label: t('admin.monthlypay.types.certification') },
+    { value: "5", label: t('admin.monthlypay.types.planVisa') },
+    { value: "6", label: t('admin.monthlypay.types.other') },
   ];
 
   const paymentMethodOptions = [
-    { value: "", label: "Todos los métodos" },
-    { value: "cash", label: "Efectivo" },
-    { value: "qr", label: "QR" },
+    { value: "", label: t('admin.monthlypay.report.allMethods') },
+    { value: "cash", label: t('admin.monthlypay.paymentMethods.cash') },
+    { value: "qr", label: t('admin.monthlypay.paymentMethods.qr') },
   ];
 
   // Agregar opción "Todos" para usuarios
   const userOptions = [
-    { value: "", label: "Todos los afiliados" },
+    { value: "", label: t('admin.monthlypay.report.allAffiliates') },
     ...users.map(user => ({
       value: user.id,
       label: user.name,
@@ -115,7 +117,7 @@ export default function PaymentReportForm() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100">
           <BarChart2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          Reporte de Pagos
+          {t('admin.monthlypay.report.title')}
         </h2>
       </div>
 
@@ -123,32 +125,32 @@ export default function PaymentReportForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <SelectField
-              label="Afiliados"
+              label={t('admin.monthlypay.report.affiliates')}
               name="user_id"
               options={userOptions}
-              placeholder="Seleccione afiliado"
+              placeholder={t('admin.monthlypay.report.selectAffiliate')}
             />
 
             <SelectField 
-              label="Año" 
+              label={t('admin.monthlypay.report.year')} 
               name="year" 
               options={yearOptions} 
             />
 
             <SelectField 
-              label="Mes" 
+              label={t('admin.monthlypay.report.month')} 
               name="month" 
               options={monthOptions} 
             />
 
             <SelectField
-              label="Tipo de Pago"
+              label={t('admin.monthlypay.paymentType')}
               name="payment_type"
               options={paymentTypeOptions}
             />
 
             <SelectField
-              label="Método de Pago"
+              label={t('admin.monthlypay.paymentMethod')}
               name="payment_method"
               options={paymentMethodOptions}
             />
@@ -162,7 +164,7 @@ export default function PaymentReportForm() {
                 className="flex items-center px-4 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
               >
                 <X className="w-4 h-4 mr-2" />
-                Limpiar filtros
+                {t('admin.monthlypay.report.clearFilters')}
               </button>
             )}
 
@@ -174,12 +176,12 @@ export default function PaymentReportForm() {
               {isLoading ? (
                 <>
                   <Filter className="w-4 h-4 mr-2 animate-spin" />
-                  Procesando...
+                  {t('admin.monthlypay.report.processing')}
                 </>
               ) : (
                 <>
                   <Search className="w-4 h-4 mr-2" />
-                  Buscar
+                  {t('admin.monthlypay.report.search')}
                 </>
               )}
             </button>

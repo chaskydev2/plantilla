@@ -94,6 +94,8 @@ Route::prefix('/v1')
             Route::put('profile/{id}/personal_information', [ProfileController::class, 'updatePersonalInformation']);
 
             Route::post('users/{id}/restore', [UserController::class, 'restore']);
+            // Permanently remove a user
+            Route::delete('users/{id}/force', [UserController::class, 'forceDelete']);
 
             Route::get('users/all', [UserController::class, 'all']);
 

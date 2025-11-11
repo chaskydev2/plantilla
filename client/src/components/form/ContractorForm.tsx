@@ -166,7 +166,6 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
               maxSelections={2}
               className={fieldCls}
               style={{ borderColor: "var(--color-primary)" }}
-              disabled={loadingProfessions}
             />
             {loadingProfessions && (
               <motion.div 

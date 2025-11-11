@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import { useTranslation } from 'react-i18next';
 import { BannerService as ItemService } from '@/core/services/banner/banner.service';
 import type { IBanner as IItemResource } from "@/core/types/IBanner";
 import { Search, Plus, Trash2, Edit } from "lucide-react";
@@ -10,50 +11,53 @@ import { toastify } from "@/core/utils/toastify";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "title",
-    header: "Titulo",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.title}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "subtitle",
-    header: "Subtitulo",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.subtitle}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "image",
-    header: "Banner 1",
-    render: (item: IItemResource) =>
-      item.image ? (
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-10 h-10 object-cover rounded-md"
-        />
-      ) : (
-        <span className="text-gray-400">Sin imagen</span>
-      ),
-  },
-];
+// columns defined inside component to allow translations
 
 export default function BannerList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "title",
+      header: t("admin.banners.title"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.title}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "subtitle",
+      header: t("admin.banners.subtitle"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.subtitle}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "image",
+      header: t("admin.banners.banner1"),
+      render: (item: IItemResource) =>
+        item.image ? (
+          <img
+            src={item.image}
+            alt={item.title}
+            className="w-10 h-10 object-cover rounded-md"
+          />
+        ) : (
+          <span className="text-gray-400">{t("admin.banners.noImage")}</span>
+        ),
+    },
+  ];
   const {
     items,
     loading,
@@ -111,8 +115,8 @@ export default function BannerList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el banner ${item.title}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.banners.confirmDeleteMessage", { name: item.title }),
       () => handleDelete(item),
       "danger"
     );
@@ -120,8 +124,8 @@ export default function BannerList() {
 
   const handleDelete = async (item: IItemResource) => {
     try {
-      const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+  const response = await ItemService.remove(item.id);
+  toastify.success(response?.message || t("admin.banners.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar el banner:", error);
@@ -133,14 +137,14 @@ export default function BannerList() {
 
 const actions = [
   {
-    label: "Editar",
+    label: t("admin.common.edit"),
     icon: <Edit className="w-4 h-4" />,
     onClick: (item: IItemResource) => handleEdit(item),
     variant: "primary" as const,
     show: () => hasPermission("historia_editar"),
   },
   {
-    label: "Eliminar",
+    label: t("admin.common.delete"),
     icon: <Trash2 className="w-4 h-4" />,
     onClick: (item: IItemResource) => confirmDelete(item),
     variant: "danger" as const,
@@ -161,7 +165,7 @@ const actions = [
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         }
       </div>
@@ -171,7 +175,7 @@ const actions = [
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -182,7 +186,7 @@ const actions = [
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Banner" />
+  <PageBreadcrumb pageTitle={t("admin.sidebar.banner")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -217,7 +221,7 @@ const actions = [
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")
           }
         />
       )}

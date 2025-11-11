@@ -109,11 +109,15 @@ export default function App() {
 
           </Route>
 
-          {/* Dashboard Layout */}
+          {/* Dashboard Layout - Organized by User Roles */}
           <Route element={<PrivateRoute />}>
             <Route element={<AppLayoutAdmin />}>
+              
+              {/* SHARED ROUTES - Accessible by ALL authenticated users */}
               <Route path="/admin" element={<HomeAdmin />} />
               <Route path="/admin/perfil" element={<UserProfiles />} />
+
+              {/* ADMIN ONLY ROUTES - System Administration */}
               <Route path="/admin/usuarios" element={<UserPage />} />
               <Route path="/admin/usuarios/:id" element={<UserShowPage />} />
               <Route path="/admin/roles" element={<RolPage />} />
@@ -125,6 +129,12 @@ export default function App() {
               <Route path="/admin/cursos" element={<CoursePage />} />
               <Route path="/admin/montlypay" element={<PaymentPage />} />
               <Route path="/admin/montlypayreport" element={<PaymentReport />} />
+              <Route path="/admin/profesiones" element={<ProfessionPage />} />
+              <Route path="/admin/etiquetas" element={<TagPage />} />
+              <Route path="/admin/atributes" element={<AtributesPage />} />
+              <Route path="/admin/categories" element={<CategoryPage />} />
+              
+              {/* ADMIN ONLY - Website Content Management */}
               <Route path="/admin/historias" element={<HistoryAdminPage />} />
               <Route path="/admin/contactos" element={<ContactAdminPage />} />
               <Route path="/admin/principios" element={<BeginningPage />} />
@@ -135,14 +145,37 @@ export default function App() {
               <Route path="/admin/preguntas_frecuentes" element={<FaqPage />} />
               <Route path="/admin/banners" element={<BannerPage />} />
               <Route path="/admin/redes_sociales" element={<SocialNetworkPage />} />
-              <Route path="/admin/profesiones" element={<ProfessionPage />} />
-              <Route path="/admin/etiquetas" element={<TagPage />} />
-              <Route path="/admin/trabajadores" element={<ContractorPage />} />
-              
-              <Route path="/admin/atributes" element={<AtributesPage />} />
 
-              <Route path="/admin/categories" element={<CategoryPage />} />
+              {/* ADMIN ONLY - User Management */}
+              <Route path="/admin/trabajadores" element={<ContractorPage />} />
               <Route path="/admin/homeowners" element={<HomeownerPage />} />
+
+              {/* CONTRACTOR SPECIFIC ROUTES */}
+              <Route path="/contractor/perfil" element={<UserProfiles />} />
+              <Route path="/contractor/projects" element={<UserProfiles />} />
+              <Route path="/contractor/customers" element={<UserProfiles />} />
+
+
+              {/* Note: Add contractor-specific routes here when components are created */}
+              {/* <Route path="/admin/contractor/proyectos" element={<ContractorProjectsPage />} /> */}
+              {/* <Route path="/admin/contractor/clientes" element={<ContractorClientsPage />} /> */}
+              {/* <Route path="/admin/contractor/calendario" element={<ContractorCalendarPage />} /> */}
+              {/* <Route path="/admin/contractor/cotizaciones" element={<ContractorQuotesPage />} /> */}
+              {/* <Route path="/admin/contractor/trabajos" element={<ContractorJobsPage />} /> */}
+              {/* <Route path="/admin/contractor/servicios" element={<ContractorServicesPage />} /> */}
+
+              {/* HOMEOWNER SPECIFIC ROUTES */}
+              {/* Note: Add homeowner-specific routes here when components are created */}
+              {/* <Route path="/admin/homeowner/perfil" element={<HomeownerProfile />} /> */}
+              {/* <Route path="/admin/homeowner/solicitudes" element={<HomeownerRequestsPage />} /> */}
+              {/* <Route path="/admin/homeowner/contratistas" element={<HomeownerContractorsPage />} /> */}
+              {/* <Route path="/admin/homeowner/historial" element={<HomeownerJobHistoryPage />} /> */}
+              {/* <Route path="/admin/homeowner/valoraciones" element={<HomeownerReviewsPage />} /> */}
+              {/* <Route path="/admin/homeowner/pagos" element={<HomeownerPaymentsPage />} /> */}
+              {/* <Route path="/admin/homeowner/favoritos" element={<HomeownerFavoritesPage />} /> */}
+              
+
+
             </Route>
           </Route>
 

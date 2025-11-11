@@ -32,6 +32,12 @@ export const remove = async (id: any): Promise<IApiResponse> => {
   return response.data;
 }
 
+export const forceRemove = async (id: any): Promise<IApiResponse> => {
+  // Assumption: backend supports a force delete endpoint for permanent removal
+  const response = await axios.delete(`/v1/users/${id}/force`);
+  return response.data;
+}
+
 export const restore = async (id: any): Promise<IApiResponse> => {
   const response = await axios.post(`/v1/users/${id}/restore`);
   return response.data;
@@ -43,6 +49,7 @@ export const UserService = {
   update,
   get,
   remove,
+  forceRemove,
   restore,
   getAll
 }

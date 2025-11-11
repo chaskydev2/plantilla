@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import type { ITableColumn, ITableProps } from '@/core/types/ITable';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const DataTable = <T,>({
   data = [],
@@ -27,6 +28,7 @@ const DataTable = <T,>({
 }: ITableProps<T>) => {
   const [selectedItems, setSelectedItems] = useState<T[]>(initialSelectedItems);
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (showCheckboxes && initialSelectedItems)
@@ -83,7 +85,7 @@ const DataTable = <T,>({
                 </div>
                 <input
                   type="text"
-                  placeholder="Buscar..."
+                  placeholder={t('admin.common.search')}
                   className="input input-bordered w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500"
                   value={searchQuery}
                   onChange={handleSearch}
@@ -120,13 +122,13 @@ const DataTable = <T,>({
               {showCheckboxes && (
                 <th className="px-4 py-3 w-12">
                   <div className="flex justify-center items-center">
-                    <label className="sr-only">Seleccionar todos</label>
+                    <label className="sr-only">{t('admin.table.selectAll')}</label>
                     <input
                       type="checkbox"
                       className="checkbox checkbox-success"
                       checked={selectedItems.length === data.length && data.length > 0}
                       onChange={handleSelectAll}
-                      aria-label="Seleccionar todos los elementos"
+                      aria-label={t('admin.table.selectAllAria')}
                     />
                   </div>
                 </th>
@@ -161,7 +163,7 @@ const DataTable = <T,>({
               ))}
               {actions.length > 0 && (
                 <th className="text-left px-4 py-3">
-                  Acciones
+                  {t('admin.common.actions')}
                 </th>
               )}
             </tr>
@@ -191,7 +193,7 @@ const DataTable = <T,>({
                   }
                   className="text-center py-8 text-gray-500 dark:text-gray-400"
                 >
-                  No se encontraron registros
+                  {t('admin.common.noData')}
                 </td>
               </tr>
             ) : (
@@ -211,13 +213,13 @@ const DataTable = <T,>({
                     {showCheckboxes && (
                       <td className="px-4 py-3 w-12">
                         <div className="flex justify-center items-center">
-                          <label className="sr-only">Seleccionar este elemento</label>
+                          <label className="sr-only">{t('admin.table.selectItem')}</label>
                           <input
                             type="checkbox"
                             className="checkbox checkbox-success"
                             checked={isItemSelected(item)}
                             onChange={(e) => handleSelectItem(item, e.target.checked)}
-                            aria-label={`Seleccionar elemento ${item[rowIdentifier] || index}`}
+                            aria-label={t('admin.table.selectItemAria')}
                           />
                         </div>
                       </td>
@@ -276,7 +278,7 @@ const DataTable = <T,>({
               {onLimitChange && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Mostrar:
+                    {t('admin.table.show')}
                   </span>
                   <select
                     className="select select-bordered select-sm 

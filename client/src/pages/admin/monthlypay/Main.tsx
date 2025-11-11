@@ -6,6 +6,7 @@ import type {
   IPaymentResponse,
 } from "@/core/types/IPayment";
 import { Search, Plus, Trash2, Edit, PrinterIcon } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -15,115 +16,120 @@ import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 import { UserService } from "@/core/services/user/user.service";
 
-const paymentMethods = [
-  { id: "cash", name: "Pago en efectivo" },
-  { id: "qr", name: "Pago por QR" },
-];
-
-const paymentType = [
-  { id: "1", name: "Pago de Mensualidad" },
-  { id: "2", name: "Multar" },
-  { id: "3", name: "Pago de Curso" },
-  { id: "4", name: "Pago de Multa" },
-  { id: "5", name: "Pago De Certificacion" },
-  { id: "6", name: "Pago de Visacion de Planos" },
-  { id: "7", name: "Otros Pago" },
-];
-
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div>
-          <div className="font-bold">{item.id}</div>
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "user",
-    header: "Nombre",
-    render: (item: IItemResource) => (
-      <div className="flex flex-col gap-1">
-        <div className="font-bold text-gray-900 dark:text-gray-100">
-          {item.user.name}
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "amount",
-    header: "Importe",
-    render: (item: IItemResource) => (
-      <div className="flex flex-col gap-1">
-        <div className="font-bold text-gray-900 dark:text-gray-100">
-          {item.amount} bs.
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "payment_type",
-    header: "Tipo de pago",
-    render: (item: IItemResource) => {
-      const type = paymentType.find((p) => p.id === item.payment_type);
-      return (
-        <div className="flex flex-col gap-1">
-          <div className="font-bold text-gray-900 dark:text-gray-100">
-            {type?.name ?? "Desconocido"}
-          </div>
-        </div>
-      );
-    },
-    sortable: true,
-  },
-  {
-    key: "payment_method",
-    header: "Metodo de pago",
-    render: (item: IItemResource) => {
-      const type = paymentMethods.find((p) => p.id === item.payment_method);
-      return (
-        <div className="flex flex-col gap-1">
-          <div className="font-bold text-gray-900 dark:text-gray-100">
-            {type?.name ?? "Desconocido"}
-          </div>
-        </div>
-      );
-    },
-    sortable: true,
-  },
-  {
-    key: "date",
-    header: "Mes",
-    render: (item: IItemResource) => (
-      <div className="flex flex-col gap-1">
-        <div className="font-bold text-gray-900 dark:text-gray-100">
-          {item.payment_month} - {item.payment_year}
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "observation",
-    header: "Observacion",
-    render: (item: IItemResource) => (
-      <div className="flex flex-col gap-1">
-        <div className="font-bold text-gray-900 dark:text-gray-100">
-          {item.observation}
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-];
+// columns will be created inside component to allow translated labels and local lookups
 
 export default function paymentList() {
+  const { t } = useTranslation();
+
+  // translated arrays for payment methods and types
+  const paymentMethods = [
+    { id: 'cash', name: t('admin.monthlypay.paymentMethods.cash') },
+    { id: 'qr', name: t('admin.monthlypay.paymentMethods.qr') },
+  ];
+
+  const paymentType = [
+    { id: '1', name: t('admin.monthlypay.types.monthly') },
+    { id: '2', name: t('admin.monthlypay.types.fine') },
+    { id: '3', name: t('admin.monthlypay.types.course') },
+    { id: '4', name: t('admin.monthlypay.types.finePayment') },
+    { id: '5', name: t('admin.monthlypay.types.certification') },
+    { id: '6', name: t('admin.monthlypay.types.planVisa') },
+    { id: '7', name: t('admin.monthlypay.types.other') },
+  ];
+
+  // translate column headers
+  const columns = [
+    {
+      key: 'id',
+      header: t('admin.common.id'),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="font-bold">{item.id}</div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'user',
+      header: t('admin.common.name'),
+      render: (item: IItemResource) => (
+        <div className="flex flex-col gap-1">
+          <div className="font-bold text-gray-900 dark:text-gray-100">
+            {item.user.name}
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'amount',
+      header: t('admin.monthlypay.amount'),
+      render: (item: IItemResource) => (
+        <div className="flex flex-col gap-1">
+          <div className="font-bold text-gray-900 dark:text-gray-100">
+            {item.amount} bs.
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'payment_type',
+      header: t('admin.monthlypay.paymentType'),
+      render: (item: IItemResource) => {
+        const type = paymentType.find((p) => p.id === item.payment_type);
+        return (
+          <div className="flex flex-col gap-1">
+            <div className="font-bold text-gray-900 dark:text-gray-100">
+              {type?.name ?? t('admin.common.unknown')}
+            </div>
+          </div>
+        );
+      },
+      sortable: true,
+    },
+    {
+      key: 'payment_method',
+      header: t('admin.monthlypay.paymentMethod'),
+      render: (item: IItemResource) => {
+        const type = paymentMethods.find((p) => p.id === item.payment_method);
+        return (
+          <div className="flex flex-col gap-1">
+            <div className="font-bold text-gray-900 dark:text-gray-100">
+              {type?.name ?? t('admin.common.unknown')}
+            </div>
+          </div>
+        );
+      },
+      sortable: true,
+    },
+    {
+      key: 'date',
+      header: t('admin.monthlypay.month'),
+      render: (item: IItemResource) => (
+        <div className="flex flex-col gap-1">
+          <div className="font-bold text-gray-900 dark:text-gray-100">
+            {item.payment_month} - {item.payment_year}
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'observation',
+      header: t('admin.monthlypay.observation'),
+      render: (item: IItemResource) => (
+        <div className="flex flex-col gap-1">
+          <div className="font-bold text-gray-900 dark:text-gray-100">
+            {item.observation}
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+  ];
   const {
     items,
     loading,
@@ -191,10 +197,10 @@ export default function paymentList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el Pago de ${item.user.name}?`,
+      t('admin.common.confirmDelete'),
+      t('admin.common.confirmDeleteWithName', { name: item.user.name }),
       () => handleDelete(item),
-      "danger"
+      'danger'
     );
   };
 
@@ -215,7 +221,7 @@ export default function paymentList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t('admin.messages.deleteSuccess'));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar payment:", error);
@@ -227,21 +233,21 @@ export default function paymentList() {
 
   const actions = [
     {
-      label: "Imprimir comprobante",
+      label: t('admin.monthlypay.printVoucher'),
       icon: <PrinterIcon className="w-4 h-4" />,
       onClick: (item: IItemResource) => handlePrint(item),
       variant: "primary" as const,
       show: () => hasPermission("payment_ver"),
     },
     {
-      label: "Editar",
+      label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
       show: () => hasPermission("payment_editar"),
     },
     {
-      label: "Eliminar",
+      label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -252,7 +258,7 @@ export default function paymentList() {
   const renderToolbar = () => (
     <div className="flex flex-col gap-4 w-full sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-2">
-        <WithPermission permissions={["payment_crear"]}>
+            <WithPermission permissions={["payment_crear"]}>
           <button
             className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
             onClick={() => {
@@ -261,7 +267,7 @@ export default function paymentList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t('admin.common.add')}
           </button>
         </WithPermission>
       </div>
@@ -271,7 +277,7 @@ export default function paymentList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar payments..."
+          placeholder={t('admin.monthlypay.searchPlaceholder')}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-green-500 focus:border-green-600 focus:ring-1 focus:ring-green-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -282,11 +288,11 @@ export default function paymentList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Pagos" />
+      <PageBreadcrumb pageTitle={t('admin.sidebar.payments')} />
       <DataTable
         title=""
         data={items as IItemResource[]}
-        columns={columns}
+  columns={columns}
         actions={actions}
         sort={sort}
         onSortChange={handleSortChange}
@@ -319,7 +325,7 @@ export default function paymentList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === 'danger' ? t('admin.common.delete') : t('admin.common.restore')
           }
         />
       )}

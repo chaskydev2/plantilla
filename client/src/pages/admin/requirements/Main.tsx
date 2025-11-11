@@ -3,6 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { RequirementService as ItemService } from '@/core/services/requirement/requirement.service';
 import type { IRequirement as IItemResource } from "@/core/types/IRequirement";
 import { Search, Plus, Trash2, Edit } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -10,64 +11,74 @@ import { toastify } from "@/core/utils/toastify";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item?.id || '-'}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "title",
-    header: "Titulo",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item?.title || '-'}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "Description",
-    header: "Descripcion",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item?.description || '-'}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "Type",
-    header: "tipo de requisito",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item?.type === 'inscription' ? 'Inscripción' : item?.type === 'renovation' ? 'Renovación' : 'Actualización de Información'}</div>
-    ),
-    sortable: true,
-  },
-    {
-    key: "Order",
-    header: "orden",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item?.order || '-'}</div>
-    ),
-    sortable: true,
-  },
-];
-
-const tableFilters = [
-  {
-    key: 'type',
-    label: 'Filtrar por tipo de requisito',
-    options: [
-      { value: 'inscription', label: 'Inscripción' },
-      { value: 'renovation', label: 'Renovación' },
-      { value: 'updateinfo', label: 'Actualización de Información' },
-    ],
-  },
-];
+// columns and filters will be created inside component to allow translated labels
 
 export default function RequirementList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item?.id || '-'}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "title",
+      header: t("admin.requirements.title"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item?.title || '-'}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "Description",
+      header: t("admin.requirements.description"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item?.description || '-'}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "Type",
+      header: t("admin.requirements.type"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">
+          {item?.type === 'inscription' 
+            ? t("admin.requirements.types.inscription")
+            : item?.type === 'renovation' 
+            ? t("admin.requirements.types.renovation")
+            : t("admin.requirements.types.updateInfo")
+          }
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "Order",
+      header: t("admin.requirements.order"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item?.order || '-'}</div>
+      ),
+      sortable: true,
+    },
+  ];
+
+  const tableFilters = [
+    {
+      key: 'type',
+      label: t("admin.requirements.filterByType"),
+      options: [
+        { value: 'inscription', label: t("admin.requirements.types.inscription") },
+        { value: 'renovation', label: t("admin.requirements.types.renovation") },
+        { value: 'updateinfo', label: t("admin.requirements.types.updateInfo") },
+      ],
+    },
+  ];
   const {
     items,
     loading,
@@ -131,8 +142,8 @@ export default function RequirementList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el requisito ${item.title}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.requirements.confirmDeleteMessage", { title: item.title }),
       () => handleDelete(item),
       "danger"
     );
@@ -141,7 +152,7 @@ export default function RequirementList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t("admin.requirements.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar el requisito:", error);
@@ -153,7 +164,7 @@ export default function RequirementList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -161,7 +172,7 @@ export default function RequirementList() {
         item.id && hasPermission("requisito_editar"),
     },
     {
-      label: "Eliminar",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -183,7 +194,7 @@ export default function RequirementList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         }
       </div>
@@ -193,7 +204,7 @@ export default function RequirementList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -204,7 +215,7 @@ export default function RequirementList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Requisitos" />
+      <PageBreadcrumb pageTitle={t("admin.sidebar.requirements")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -240,7 +251,7 @@ export default function RequirementList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")
           }
         />
       )}

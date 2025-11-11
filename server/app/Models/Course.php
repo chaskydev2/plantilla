@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
 
 class Course extends Model
 {
@@ -23,12 +25,27 @@ class Course extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'start_date' => 'date',
+        'end_date' => 'date',
         'has_certificate' => 'boolean',
         'attendance_tracking' => 'boolean',
         'cost' => 'decimal:2'
     ];
+
+    // Mutators para manejar fechas ISO 8601
+    protected function startDate(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    protected function endDate(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
 
     public function instructor(): BelongsTo
     {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+  import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 import  Logo from "@/assets/images/LOGO GUD.svg?url";
@@ -27,11 +27,7 @@ import {
   BarChart2,
   Briefcase,
   Tag,
-  FolderOpen,
-  Home,
-  CheckCircle,
-  AlertTriangle,
-  Building2
+  // removed unused icons: FolderOpen, Home, CheckCircle, AlertTriangle
 } from "lucide-react";
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
@@ -62,7 +58,7 @@ const AppSidebar: React.FC = () => {
 
   const navItems: MenuItem[] = [
     {
-      icon: hasRole("contractor") ? <Building2 className="w-5 h-5" /> : <LayoutDashboard className="w-5 h-5" />,
+      icon: <LayoutDashboard className="w-5 h-5" />,
       name: t("admin.sidebar.dashboard"),
       path: "/admin",
     },

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
 
 class WorkExperience extends Model
 {
@@ -19,12 +21,27 @@ class WorkExperience extends Model
         'responsibilities',
     ];
 
-    protected $dates = [
-        'start_date',
-        'end_date',
-        'created_at',
-        'updated_at'
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
+
+    // Mutators para manejar fechas ISO 8601
+    protected function startDate(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    protected function endDate(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
 
     public function user()
     {

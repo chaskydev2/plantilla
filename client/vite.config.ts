@@ -14,6 +14,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     },
   },
+  // Serve the built app from /app/ (Laravel serves index at public/app)
   base: '/',
   build: {
     outDir: '../server/public/app',

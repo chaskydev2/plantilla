@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
 
 class AcademicTraining extends Model
 {
@@ -19,12 +21,27 @@ class AcademicTraining extends Model
         'degree_date',
     ];
 
-    protected $dates = [
-        'graduation_date',
-        'degree_date',
-        'created_at',
-        'updated_at'
+    protected $casts = [
+        'graduation_date' => 'date',
+        'degree_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
+
+    // Mutators para manejar fechas ISO 8601
+    protected function graduationDate(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    protected function degreeDate(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
 
     public function user()
     {

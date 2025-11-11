@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
-import { ChevronRight } from "lucide-react";
 import { FormHeader, FormCard, useRegistrationForm } from "../../components/registration-form";
 import ShareToast from '@/components/ShareToast';
 

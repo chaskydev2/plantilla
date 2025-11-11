@@ -32,12 +32,34 @@ export default function UserProfiles() {
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
       <PageBreadcrumb pageTitle="Perfil" />
       <div className="flex flex-col gap-5">
-        <UserMetaCard user={profile} load={initializeProfile} isLoading={loading} />
-        <UserInfoCard user={profile} load={initializeProfile} isLoading={loading} />
-        <UserAcademicTraining />
-        <UserWorkExperience />
-        <UserTechnicalSkill />
-        <UserWorkReference />
+        {/* 12 Column Grid Layout for UserMetaCard and UserInfoCard */}
+        <div className="grid grid-cols-12 gap-5">
+          <div className="col-span-12 lg:col-span-12">
+            <UserMetaCard user={profile} load={initializeProfile} isLoading={loading} />
+          </div>
+          <div className="col-span-12 lg:col-span-12">
+            <UserInfoCard user={profile} load={initializeProfile} isLoading={loading} />
+          </div>
+        </div>
+        
+        {/* 12 Column Grid Layout for Additional Components */}
+        <div className="grid grid-cols-12 gap-5">
+          <div className="col-span-12 lg:col-span-6">
+            <UserAcademicTraining />
+          </div>
+          <div className="col-span-12 lg:col-span-6">
+            <UserWorkExperience />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-12 gap-5">
+          <div className="col-span-12 lg:col-span-6">
+            <UserTechnicalSkill />
+          </div>
+          <div className="col-span-12 lg:col-span-6">
+            <UserWorkReference />
+          </div>
+        </div>
       </div>
     </div>
   );

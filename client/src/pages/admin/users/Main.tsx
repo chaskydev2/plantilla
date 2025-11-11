@@ -248,6 +248,22 @@ export default function UserList() {
     }
   };
 
+  const handlePermanentDelete = async (item: IItemResource) => {
+    setIsProcessing(true);
+    try {
+      const response = await ItemService.forceRemove(item.id);
+      // Log the full response so we can inspect what the service returns
+      console.log('Debug - forceRemove response for user', item.id, response);
+      toastify.success(response?.message || "User permanently deleted");
+      fetchItems();
+    } catch (error) {
+      console.error("Error permanently deleting user:", error);
+    } finally {
+      setIsProcessing(false);
+      closeDialog();
+    }
+  };
+
   const actions = [
     {
       label: t("admin.users.viewProfile"),
@@ -280,6 +296,20 @@ export default function UserList() {
       variant: "primary" as const,
       show: (item: IItemResource) =>
         item.deleted_id != null && hasPermission("usuario_restaurar"),
+    },
+    {
+      label: "Delete Permanently",
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (item: IItemResource) => {
+        openDialog(
+          "Confirm Permanent Deletion",
+          `This will permanently delete user ${item.name}. This action cannot be undone. Continue?`,
+          () => handlePermanentDelete(item),
+          "danger"
+        );
+      },
+      variant: "danger" as const,
+      show: (item: IItemResource) => item.deleted_id != null && hasPermission("usuario_eliminar" as any),
     },
   ];
 

@@ -1,6 +1,7 @@
 import { Mail, Phone, Clock, Send, Smartphone } from 'lucide-react';
 import { motion } from "framer-motion";
 import TitlePage from '@/components/common/TitlePage';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import type { IContact } from '@/core/types/IContact';
 import { createApiService } from '@/core/services/api.service';
@@ -13,6 +14,7 @@ const fadeInUp = {
 };
 
 const ContactPage = () => {
+  const { t } = useTranslation();
   const [faqs, setFaqs] = useState<IFaq[]>([]);
   const [contacts, setContacts] = useState<IContact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +33,7 @@ const ContactPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
+  setIsLoading(true);
         const [faqResponse, contactResponse] = await Promise.all([
           FaqService.get('all'),
           ContactService.get('all')
@@ -39,7 +41,7 @@ const ContactPage = () => {
         setFaqs(faqResponse.data || []);
         setContacts(contactResponse.data || []);
       } catch (err) {
-        setError('Error al cargar los datos de contacto');
+  setError(t('contact.errorLoading'));
       } finally {
         setIsLoading(false);
       }
@@ -57,10 +59,10 @@ const ContactPage = () => {
     try {
       console.log('Formulario enviado:', formData);
       await NewsletterService.create('send', formData);
-      toastify.success('Mensaje enviado correctamente');
+  toastify.success(t('contact.sentSuccess'));
       setFormData({ name: '', email: '', subject: '', content: '' });
     } catch (err) {
-      toastify.error('Hubo un error al enviar tu mensaje');
+  toastify.error(t('contact.sentError'));
     }
   };
 
@@ -72,8 +74,8 @@ const ContactPage = () => {
   return (
     <div className="pt-18 pb-16 bg-white">
       <TitlePage
-        title="Contacto"
-        subtitle="Estamos aquí para ayudarte. Ponte en contacto con nosotros para cualquier consulta."
+        title={t('contact.title')}
+        subtitle={t('contact.subtitle')}
       />
 
       <motion.div
@@ -89,17 +91,17 @@ const ContactPage = () => {
         >
           <ContactCard
             icon={<Phone size={24} />}
-            title="Dirección"
+            title={t('contact.address')}
             details={mainContact.address ? [mainContact.address] : []}
           />
           <ContactCard
             icon={<Smartphone size={24} />}
-            title="Teléfono - Celular"
+            title={t('contact.phone')}
             details={mainContact.mobile_number ? [mainContact.phone_number, mainContact.mobile_number] : []}
           />
           <ContactCard
             icon={<Mail size={24} />}
-            title="Email"
+            title={t('contact.email')}
             details={mainContact.email ? [mainContact.email] : []}
           />
         </motion.div>
@@ -111,32 +113,32 @@ const ContactPage = () => {
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="card-body p-8">
-              <h2 className="text-2xl font-semibold mb-6 text-cyan-800">Envíanos un mensaje</h2>
+              <h2 className="text-2xl font-semibold mb-6 text-cyan-800">{t('contact.sendMessage')}</h2>
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div className="form-control">
-                    <label className="label" htmlFor="name">
-                      <span className="label-text text-cyan-800 font-semibold">Nombre</span>
+                      <label className="label" htmlFor="name">
+                      <span className="label-text text-cyan-800 font-semibold">{t('contact.form.name')}</span>
                     </label>
                     <input
                       type="text"
                       id="name"
                       className="input input-bordered bg-white w-full"
-                      placeholder="Tu nombre"
+                      placeholder={t('contact.form.namePlaceholder')}
                       value={formData.name}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
                   <div className="form-control">
-                    <label className="label" htmlFor="email">
-                      <span className="label-text text-cyan-800 font-semibold">Email</span>
+                      <label className="label" htmlFor="email">
+                      <span className="label-text text-cyan-800 font-semibold">{t('contact.form.email')}</span>
                     </label>
                     <input
                       type="email"
                       id="email"
                       className="input input-bordered bg-white w-full"
-                      placeholder="Tu email"
+                      placeholder={t('contact.form.emailPlaceholder')}
                       value={formData.email}
                       onChange={handleInputChange}
                       required
@@ -145,13 +147,13 @@ const ContactPage = () => {
                 </div>
                 <div className="form-control mb-6">
                   <label className="label" htmlFor="subject">
-                    <span className="label-text text-cyan-800 font-semibold">Asunto</span>
+                    <span className="label-text text-cyan-800 font-semibold">{t('contact.form.subject')}</span>
                   </label>
                   <input
                     type="text"
                     id="subject"
                     className="input input-bordered bg-white w-full"
-                    placeholder="Asunto de tu mensaje"
+                    placeholder={t('contact.form.subjectPlaceholder')}
                     value={formData.subject}
                     onChange={handleInputChange}
                     required
@@ -159,13 +161,13 @@ const ContactPage = () => {
                 </div>
                 <div className="form-control mb-6">
                   <label className="label" htmlFor="content">
-                    <span className="label-text text-cyan-800 font-semibold">Contenido</span>
+                    <span className="label-text text-cyan-800 font-semibold">{t('contact.form.content')}</span>
                   </label>
                   <textarea
                     id="content"
                     rows={6}
                     className="textarea textarea-bordered bg-white w-full"
-                    placeholder="Tu mensaje"
+                    placeholder={t('contact.form.contentPlaceholder')}
                     value={formData.content}
                     onChange={handleInputChange}
                     required
@@ -177,7 +179,7 @@ const ContactPage = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Enviar mensaje
+                  {t('contact.form.submit')}
                   <Send size={18} />
                 </motion.button>
               </form>
@@ -209,7 +211,7 @@ const ContactPage = () => {
             >
               <h3 className="flex items-center text-xl font-semibold mb-4 text-cyan-800">
                 <Clock size={20} className="mr-2 text-cyan-700" />
-                Horario de atención
+                {t('contact.businessHours')}
               </h3>
               {mainContact.business_hours ? (
                 <div className="space-y-2 text-cyan-900 whitespace-pre-line">

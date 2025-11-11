@@ -153,4 +153,64 @@ class UserController extends Controller
             'message' => 'Usuario Restablecido Satisfactoriamente'
         ])->setStatusCode(Response::HTTP_OK);
     }
+
+    /**
+     * Permanently delete a user (force delete).
+     */
+    public function forceDelete($id): JsonResponse
+    {
+        // Reuse the delete permission — change to a more restrictive permission if desired
+        Gate::authorize('usuario_eliminar');
+        $user = User::withTrashed()->findOrFail($id);
+
+        \DB::transaction(function () use ($user) {
+            // Detach many-to-many relations (professions via contractor_professions)
+            try {
+                if (method_exists($user, 'professions')) {
+                    $user->professions()->detach();
+                }
+            } catch (\Throwable $e) {
+                // ignore if pivot table doesn't exist
+            }
+
+            // Delete related one-to-many models (these are permanently removed since they don't use SoftDeletes)
+            try { $user->academicTrainings()->delete(); } catch (\Throwable $e) {}
+            try { $user->workExperiences()->delete(); } catch (\Throwable $e) {}
+            try { $user->technicalSkills()->delete(); } catch (\Throwable $e) {}
+            try { $user->workReferences()->delete(); } catch (\Throwable $e) {}
+
+            // Delete homeowner profile if exists
+            try { $user->homeownerProfile()->delete(); } catch (\Throwable $e) {}
+
+            // If contractor profile exists, detach its pivots and delete it
+            try {
+                $contractor = $user->contractor;
+                if ($contractor) {
+                    if (method_exists($contractor, 'categories')) {
+                        $contractor->categories()->detach();
+                    }
+                    if (method_exists($contractor, 'professions')) {
+                        $contractor->professions()->detach();
+                    }
+                    $contractor->delete();
+                }
+            } catch (\Throwable $e) {
+                // ignore errors related to missing tables/relations
+            }
+
+            // Remove roles/permissions assignments
+            try { $user->syncRoles([]); } catch (\Throwable $e) {}
+
+            // Delete API/Passport tokens if present
+            try { if (method_exists($user, 'tokens')) { $user->tokens()->delete(); } } catch (\Throwable $e) {}
+
+            // Finally, force delete the user record
+            $user->forceDelete();
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Usuario eliminado permanentemente'
+        ])->setStatusCode(Response::HTTP_OK);
+    }
 }
