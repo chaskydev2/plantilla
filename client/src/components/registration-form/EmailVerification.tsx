@@ -84,23 +84,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
             <ArrowLeft className="w-4 h-4" />
             Back
           </motion.button>
-          
-          <motion.button
-            type="submit"
-            disabled={loading || verificationCode.length !== 6}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex-1 px-4 py-3 rounded-xl border font-bold transition-all duration-200"
-            style={{
-              background: loading || verificationCode.length !== 6 ? "#ccc" : "var(--color-secondary)",
-              color: loading || verificationCode.length !== 6 ? "#666" : "var(--color-primary)",
-              ...borderPrimary,
-              opacity: loading || verificationCode.length !== 6 ? 0.6 : 1,
-              cursor: loading || verificationCode.length !== 6 ? "not-allowed" : "pointer"
-            }}
-          >
-            {loading ? "Verifying..." : "Verify & Register"}
-          </motion.button>
+      
         </div>
       </form>
 

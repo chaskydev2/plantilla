@@ -52,6 +52,9 @@ class UpdateProfessionRequest extends FormRequest
                 'max:255',
                 Rule::unique('professions', 'slug')->ignore($professionId)
             ],
+            'icon' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'image' => ['sometimes', 'nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'remove_image' => ['sometimes', 'boolean'],
             'description' => ['nullable', 'string', 'max:1000'],
         ];
     }

@@ -55,11 +55,13 @@ const PrivateRoute = () => {
     "/admin/contractor/cotizaciones": null, // TODO: Add contractor_cotizacion_listar permission
     "/admin/contractor/trabajos": null, // TODO: Add contractor_trabajo_listar permission
     "/admin/contractor/servicios": null, // TODO: Add contractor_servicio_listar permission
-
+    "/admin/contractor/jobs": null,
     // CONTRACTOR ROUTES (Alternative structure)
     "/contractor/perfil": null, // Accessible to contractors
     "/contractor/projects": null, // Accessible to contractors  
     "/contractor/customers": null, // Accessible to contractors
+    "/contractor/documents": null,
+    "/contractor/team": null,
 
     // HOMEOWNER SPECIFIC ROUTES
     "/admin/homeowner/perfil": null, // Accessible to homeowners

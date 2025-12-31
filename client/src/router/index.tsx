@@ -61,8 +61,24 @@ import GuGuarantee from "@/pages/WebPage/GuGuarantee";
 import RegisterGuara from "@/pages/WebPage/RegisterGuara";
 
 import HomeownerPage from "@/pages/admin/homeowners/Main";
-import Services from "@/pages/WebPage/Services";
+import JobApplicationPage from "@/pages/admin/job-applications/Main";
+import JobContractsPage from "@/pages/admin/job-contracts/main";
+import JobPostsPage from "@/pages/admin/job-posts/main";
 
+import JobPage from "@/pages/admin/jobs/Main";
+
+import JobPageContrator from "@/pages/contractor/jobs/Main";
+
+import AttributeContractorList from "@/pages/admin/attribute-contractor/main";
+import AttributeContractor from "@/pages/contractor/documents/Main";
+
+import TagsContrator from "@/pages/contractor/tags/Main";
+
+import Team from "@/pages/contractor/team/Main";
+
+import ServicePage from "@/pages/admin/services/Main";
+
+import Services from "@/pages/WebPage/Services";
 
 import LoaderScreen from "@/components/common/LoaderScreen";
 import { ToastContainer } from "react-toastify";
@@ -146,16 +162,43 @@ export default function App() {
               <Route path="/admin/banners" element={<BannerPage />} />
               <Route path="/admin/redes_sociales" element={<SocialNetworkPage />} />
 
+              <Route path="/admin/redes_sociales" element={<SocialNetworkPage />} />
               {/* ADMIN ONLY - User Management */}
               <Route path="/admin/trabajadores" element={<ContractorPage />} />
               <Route path="/admin/homeowners" element={<HomeownerPage />} />
+             
+              <Route path="/admin/job-applications" element={<JobApplicationPage />} />
+              
+              <Route path="/admin/job-contracts" element={<JobContractsPage/>} />
 
+              <Route path="/admin/job-post" element={<JobPostsPage/>} />
+
+              
+              <Route path="/admin/job-post" element={<JobPostsPage/>} />
+
+
+              <Route path="/admin/atribute_contractor" element={<AttributeContractorList />} />
+               
+              
+              <Route path="/admin/jobs" element={<JobPage/>} />
+
+              <Route path="/admin/services" element={<ServicePage />} />
               {/* CONTRACTOR SPECIFIC ROUTES */}
               <Route path="/contractor/perfil" element={<UserProfiles />} />
               <Route path="/contractor/projects" element={<UserProfiles />} />
               <Route path="/contractor/customers" element={<UserProfiles />} />
 
+              <Route path="/contractor/customers" element={<UserProfiles />} />
+              
+              <Route path="/contractor/documents" element={<AttributeContractor />} />
+                            
+              <Route path="/contractor/jobs" element={<JobPageContrator/>} />
 
+              <Route path="/contractor/tags" element={<TagsContrator/>} />
+              
+              <Route path="/contractor/team" element={<Team />} />
+              
+              
               {/* Note: Add contractor-specific routes here when components are created */}
               {/* <Route path="/admin/contractor/proyectos" element={<ContractorProjectsPage />} /> */}
               {/* <Route path="/admin/contractor/clientes" element={<ContractorClientsPage />} /> */}
@@ -174,7 +217,6 @@ export default function App() {
               {/* <Route path="/admin/homeowner/pagos" element={<HomeownerPaymentsPage />} /> */}
               {/* <Route path="/admin/homeowner/favoritos" element={<HomeownerFavoritesPage />} /> */}
               
-
 
             </Route>
           </Route>

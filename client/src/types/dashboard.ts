@@ -3,10 +3,12 @@
 export interface StatCardProps {
   title: string;
   value: string;
+  subtitle?: string;
+  trend?: { value: string; isPositive: boolean };
   change?: string;
   changeType?: 'increase' | 'decrease';
-  icon: string;
-  bgColor: string;
+  icon?: string;
+  bgColor?: string;
 }
 
 export interface UserItemProps {

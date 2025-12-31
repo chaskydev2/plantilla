@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo, useState } from 'react';
 import { InputField, TextAreaField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
@@ -13,7 +13,15 @@ import {
   ProfessionStoreSchema as storeSchema,
   ProfessionUpdateSchema as updateSchema
 } from './validation';
-import { Briefcase, Wrench, Hammer, Scissors, Truck, Tag, Image, User } from 'lucide-react';
+
+import * as LucideIcons from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Icon as LucideIconBase } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+
+/* -------------------------------------------------------------------------- */
+/*                                    TYPES                                   */
+/* -------------------------------------------------------------------------- */
 
 interface ProfessionModalProps {
   isOpen: boolean;
@@ -22,6 +30,36 @@ interface ProfessionModalProps {
   load: () => void;
   mode?: 'create' | 'edit' | 'view';
 }
+
+export type LucideIconName = Exclude<keyof typeof LucideIcons, 'default' | 'createLucideIcon' | 'IconNode' | 'LucideIcon' | 'LucideProps'>;
+
+export type LucideIconItem = {
+  name: LucideIconName;
+  Icon: LucideIcon;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                       LUCIDE ICONS (FIX REAL HERE)                        */
+/* -------------------------------------------------------------------------- */
+
+const isRenderableIcon = (Icon: unknown) => {
+  if (!Icon) return false;
+  const t = typeof Icon;
+  const hasNode = (Icon as any).iconNode && Array.isArray((Icon as any).iconNode);
+  const isForwardRef = !!(Icon as any).displayName && (Icon as any).render;
+  return (hasNode || isForwardRef) && (t === 'function' || t === 'object');
+};
+
+export const LUCIDE_ICONS: LucideIconItem[] = Object.entries(LucideIcons)
+  .filter(([name, Icon]) => /^[A-Z]/.test(name) && isRenderableIcon(Icon))
+  .map(([name, Icon]) => ({
+    name: name as LucideIconName,
+    Icon: Icon as LucideIcon,
+  }));
+
+/* -------------------------------------------------------------------------- */
+/*                               MAIN COMPONENT                               */
+/* -------------------------------------------------------------------------- */
 
 const ProfessionModal = ({
   isOpen,
@@ -32,54 +70,48 @@ const ProfessionModal = ({
 }: ProfessionModalProps) => {
   const isEditing = mode === 'edit';
   const isViewing = mode === 'view';
-  
-  console.log("Debug - Form props:", { mode, initialData, isEditing, isViewing });
 
   type FormValues = (ICreateRequest | IUpdateRequest) & { icon?: string };
 
   const defaultValues: FormValues = (isEditing || isViewing)
     ? {
-      name: initialData?.name || '',
-      slug: initialData?.slug || '',
-      icon: (initialData as any)?.icon || '',
-      description: initialData?.description || '',
-    }
+        name: initialData?.name || '',
+        slug: initialData?.slug || '',
+        icon: (initialData as any)?.icon || '',
+        description: initialData?.description || '',
+      }
     : {
-      name: '',
-      slug: '',
-      icon: '',
-      description: '',
-    };
-    
-  console.log("Debug - defaultValues:", defaultValues);
+        name: '',
+        slug: '',
+        icon: '',
+        description: '',
+      };
 
   const handleSubmit = async (data: FormValues) => {
-    // No submit en modo view
     if (isViewing) return;
-    
+
     const cleanData = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => value != null && value !== '')
     );
-    
+
     try {
       if (isEditing) {
         const response = await ItemService.update(initialData!.id, cleanData as IUpdateRequest);
         toastify.success(response.message || 'Profession updated successfully');
-        onClose();
-        load();
       } else {
         const response = await ItemService.create(cleanData as ICreateRequest);
         toastify.success(response.message || 'Profession created successfully');
-        onClose();
-        load();
       }
+
+      onClose();
+      load();
     } catch (error: any) {
-      console.error('Form submission error:', error);
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          'An error occurred while saving the profession';
-      toastify.error(errorMessage);
+      toastify.error(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'An error occurred'
+      );
     }
   };
 
@@ -98,40 +130,28 @@ const ProfessionModal = ({
         className="w-full"
       >
         <div className="grid grid-cols-1 gap-6">
-          <div className="col-span-1">
-            <InputField
-              name="name"
-              label="Name"
-              placeholder="Ex: Plumbing, Electricity, Carpentry"
-              readOnly={isViewing}
-            />
-          </div>
+          <InputField
+            name="name"
+            label="Name"
+            readOnly={isViewing}
+          />
 
-          <div className="col-span-1">
-            <InputField
-              name="slug"
-              label="Slug (Friendly URL)"
-              placeholder="Ex: plumbing, electricity, carpentry (auto-generated)"
-              helperText="Auto-generated based on the name if left empty"
-              readOnly={isViewing}
-            />
-          </div>
+          <InputField
+            name="slug"
+            label="Slug"
+            readOnly={isViewing}
+          />
 
-          <div className="col-span-1">
-            <TextAreaField
-              name="description"
-              label="Description (Optional)"
-              placeholder="Briefly describe this profession..."
-              rows={4}
-              readOnly={isViewing}
-            />
-          </div>
-          {/* Icon selector */}
-          <div className="col-span-1">
+          <TextAreaField
+            name="description"
+            label="Description"
+            rows={4}
+            readOnly={isViewing}
+          />
+
+          <div>
             <label className="label mb-2">Icon</label>
-            {/* IconSelector uses react-hook-form context (registered below) */}
-            <IconSelector readOnly={isViewing} />
-            <p className="text-xs text-gray-500 mt-2">Suggestion: pick an icon that represents the trade (e.g. Wrench for plumbing, Hammer for carpentry, Briefcase for general contractors, Truck for delivery/transport).</p>
+            <IconField readOnly={isViewing} />
           </div>
         </div>
       </FormProviderWrapper>
@@ -141,260 +161,99 @@ const ProfessionModal = ({
 
 export default ProfessionModal;
 
-// Small component rendered inside the form to pick an icon and preview it
-import { useFormContext } from 'react-hook-form';
+/* -------------------------------------------------------------------------- */
+/*                                ICON FIELD                                  */
+/* -------------------------------------------------------------------------- */
 
-const LocalIconOptions = [
-    { id: 'briefcase', label: 'Briefcase', Icon: Briefcase },
-    { id: 'wrench', label: 'Wrench', Icon: Wrench },
-    { id: 'hammer', label: 'Hammer', Icon: Hammer },
-    { id: 'scissors', label: 'Scissors', Icon: Scissors },
-    { id: 'truck', label: 'Truck', Icon: Truck },
-    { id: 'tag', label: 'Tag', Icon: Tag },
-    { id: 'image', label: 'Image', Icon: Image },
-    { id: 'user', label: 'User', Icon: User },
-  ];
+function IconField({ readOnly }: { readOnly?: boolean }) {
+  const { register, watch } = useFormContext();
+  const iconName = watch('icon') as LucideIconName | undefined;
+  const Icon = iconName ? (LucideIcons[iconName] as LucideIcon) : null;
 
-  type RemoteIcon = {
-    id: string;
-    label: string;
-    // either a url to an image/svg or an inline svg string
-    url?: string;
-    svg?: string;
-  };
+  return (
+    <div className="flex items-center gap-4">
+      <input type="hidden" {...register('icon')} />
 
-  type IconItemLocal = {
-    id: string;
-    label: string;
-    Icon: any;
-    source: 'local';
-  };
-
-  type IconItemRemote = {
-    id: string;
-    label: string;
-    url?: string;
-    svg?: string;
-    source: 'remote';
-  };
-
-  type IconItem = IconItemLocal | IconItemRemote;
-
-  function IconSelector({ readOnly, apiEndpoint }: { readOnly?: boolean; apiEndpoint?: string }) {
-    const { register, setValue, watch } = useFormContext();
-    const current = watch('icon') as string | undefined;
-    const [query, setQuery] = React.useState('');
-    const [remoteIcons, setRemoteIcons] = React.useState<RemoteIcon[] | null>(null);
-    const endpoint = apiEndpoint || '/api/icons';
-    // react-icons dynamic selection state
-    const [riLib, setRiLib] = React.useState('fa'); // default library prefix
-    const [riName, setRiName] = React.useState(''); // icon component name e.g. FaBeer
-    const [riPreview, setRiPreview] = React.useState<any>(null);
-
-    React.useEffect(() => {
-      let mounted = true;
-      // Try to fetch remote icons; if it fails, we keep null and use local icons
-      fetch(endpoint)
-        .then(async (res) => {
-          if (!res.ok) throw new Error('Failed to fetch icons');
-          const data = await res.json();
-          // Expecting data to be Array<{id,label,url?,svg?}>
-          if (mounted) setRemoteIcons(Array.isArray(data) ? data : null);
-        })
-        .catch(() => {
-          if (mounted) setRemoteIcons(null);
-        });
-      return () => {
-        mounted = false;
-      };
-    }, [endpoint]);
-
-    // helper to dynamically import a react-icons component by library prefix and name
-    const loadReactIcon = React.useCallback(async (lib: string, name: string) => {
-      if (!lib || !name) return null;
-      try {
-        // react-icons packages are like 'react-icons/fa', 'react-icons/hi'
-        // library prefix mapping: user supplies 'fa' -> 'fa', 'hi' -> 'hi'
-        const pkg = `react-icons/${lib}`;
-        const mod = await import(/* webpackChunkName: "react-icons-[request]" */ pkg);
-        const Comp = (mod as any)[name];
-        return Comp || null;
-      } catch (e) {
-        return null;
-      }
-    }, []);
-
-    // A small curated sample of react-icons to show as clickable examples (easy selection)
-    const SampleReactIcons: { lib: string; name: string; label: string; id: string }[] = [
-      { lib: 'fa', name: 'FaBeer', label: 'Beer', id: 'fa:FaBeer' },
-      { lib: 'fa', name: 'FaUser', label: 'User', id: 'fa:FaUser' },
-      { lib: 'hi', name: 'HiOutlineHome', label: 'Home', id: 'hi:HiOutlineHome' },
-      { lib: 'hi', name: 'HiOutlineUser', label: 'User', id: 'hi:HiOutlineUser' },
-      { lib: 'md', name: 'MdWork', label: 'Work', id: 'md:MdWork' },
-      { lib: 'ai', name: 'AiOutlineShopping', label: 'Shopping', id: 'ai:AiOutlineShopping' },
-      { lib: 'bs', name: 'BsFillHouseFill', label: 'House', id: 'bs:BsFillHouseFill' },
-      { lib: 'bi', name: 'BiBriefcase', label: 'Briefcase', id: 'bi:BiBriefcase' },
-      { lib: 'ri', name: 'RiCustomerService2Line', label: 'Support', id: 'ri:RiCustomerService2Line' },
-      { lib: 'io', name: 'IoMdConstruct', label: 'Construct', id: 'io:IoMdConstruct' },
-    ];
-
-    const [loadedSamples, setLoadedSamples] = React.useState<Record<string, any>>({});
-
-    const SampleButton: React.FC<{ lib: string; name: string; label: string; id: string }> = ({ lib, name, label, id }) => {
-      const [Comp, setComp] = React.useState<any>(loadedSamples[id] || null);
-      React.useEffect(() => {
-        let mounted = true;
-        if (!Comp) {
-          loadReactIcon(lib, name).then(c => {
-            if (mounted && c) {
-              setComp(() => c);
-              setLoadedSamples(prev => ({ ...prev, [id]: c }));
-            }
-          });
-        }
-        return () => { mounted = false; };
-      }, [lib, name, id, Comp]);
-
-      return (
-        <button
-          key={id}
-          type="button"
-          onClick={() => !readOnly && setValue('icon', `${lib}:${name}`)}
-          className={`flex flex-col items-center p-2 rounded border ${current === `${lib}:${name}` ? 'border-primary bg-primary/10' : 'border-transparent hover:border-gray-300'}`}
-          title={label}
-        >
-          <div className="w-6 h-6">
-            {Comp ? <Comp className="w-6 h-6" /> : <div className="w-6 h-6 bg-gray-200" />}
-          </div>
-          <span className="text-xs mt-1">{label}</span>
-        </button>
-      );
-    };
-
-    // combined list: if remoteIcons available use them first, otherwise fallback to local
-    const combined: IconItem[] = React.useMemo(() => {
-      const remotes = remoteIcons || [];
-      // Normalize remote icon shape to unify rendering
-      const remoteNormalized: IconItemRemote[] = remotes.map(r => ({
-        // prefix remote ids to avoid collisions with local/sample ids
-        id: `remote:${r.id}`,
-        label: r.label,
-        url: r.url,
-        svg: r.svg,
-        source: 'remote',
-      }));
-
-      const localNormalized: IconItemLocal[] = LocalIconOptions.map(l => ({
-        // prefix local ids so they don't collide with react-icons ids
-        id: `local:${l.id}`,
-        label: l.label,
-        Icon: l.Icon,
-        source: 'local',
-      }));
-
-      // If remote icons exist, prefer them but also include local ones for completeness
-      return [...remoteNormalized, ...localNormalized];
-    }, [remoteIcons]);
-
-    const filtered = React.useMemo(() => {
-      const q = query.trim().toLowerCase();
-      if (!q) return combined;
-      return combined.filter(i => i.label.toLowerCase().includes(q) || i.id.toLowerCase().includes(q));
-    }, [combined, query]);
-
-    return (
-      <div>
-        <input type="hidden" {...register('icon')} />
-        <div className="flex items-center gap-2 mb-2">
-          <input
-            type="text"
-            placeholder="Search icons..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="input input-sm w-full"
-          />
-        </div>
-
-        <div className="grid grid-cols-4 gap-2 max-h-56 overflow-auto">
-          {filtered.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => !readOnly && setValue('icon', item.id)}
-              className={`flex flex-col items-center p-2 rounded border ${current === item.id ? 'border-primary bg-primary/10' : 'border-transparent hover:border-gray-300'}`}
-              aria-pressed={current === item.id}
-              title={item.label}
-            >
-              <div className="w-6 h-6">
-                {item.source === 'local' ? (
-                  // local has Icon
-                  <item.Icon className="w-6 h-6" />
-                ) : item.source === 'remote' ? (
-                  // remote may have url or svg
-                  item.url ? (
-                    <img src={item.url} alt={item.label} className="w-6 h-6 object-contain" />
-                  ) : item.svg ? (
-                    <span className="w-6 h-6 block" dangerouslySetInnerHTML={{ __html: item.svg }} />
-                  ) : (
-                    <div className="w-6 h-6 bg-gray-200" />
-                  )
-                ) : (
-                  <div className="w-6 h-6 bg-gray-200" />
-                )}
-              </div>
-              <span className="text-xs mt-1">{item.label}</span>
-            </button>
-          ))}
-          {/* Divider and react-icons picker */}
-          <div className="col-span-4 mt-2 border-t pt-2">
-            <div className="flex items-center gap-2 mb-2">
-              <select value={riLib} onChange={(e) => setRiLib(e.target.value)} className="select select-sm w-32">
-                <option value="fa">fa (FontAwesome)</option>
-                <option value="hi">hi (Heroicons)</option>
-                <option value="md">md (Material)</option>
-                <option value="gi">gi (Game Icons)</option>
-                <option value="ai">ai (Ant Design)</option>
-                <option value="bs">bs (Bootstrap)</option>
-                <option value="bi">bi (BoxIcons)</option>
-                <option value="ci">ci (Circum)</option>
-                <option value="ti">ti (Typicons)</option>
-                <option value="io">io (Ionicons)</option>
-                <option value="ri">ri (Remix Icon)</option>
-                {/* add more prefixes as desired */}
-              </select>
-              <input type="text" placeholder="Icon component name (e.g. FaBeer)" value={riName} onChange={e => setRiName(e.target.value)} className="input input-sm w-full" />
-              <button type="button" className="btn btn-sm" onClick={async () => {
-                const Comp = await loadReactIcon(riLib, riName);
-                setRiPreview(() => Comp);
-              }}>Preview</button>
-              <button type="button" className="btn btn-sm btn-primary" onClick={async () => {
-                // when selecting, store a string marker so we can resolve it later: lib:name
-                if (!riName) return;
-                setValue('icon', `${riLib}:${riName}`);
-              }} disabled={!riName}>Select</button>
-            </div>
-            {riPreview ? (
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6">{
-                  (() => {
-                    const Comp = riPreview as any;
-                    return Comp ? <Comp className="w-6 h-6" /> : null;
-                  })()
-                }</div>
-                <div className="text-sm">Preview of {riLib}:{riName}</div>
-              </div>
-            ) : (
-              <div className="text-xs text-gray-500">Or enter a react-icons component name and press Preview to load it dynamically.</div>
-            )}
-          </div>
-            {/* Sample react-icons grid for easy selection */}
-            <div className="col-span-4 mt-2">
-              <label className="label mb-2">Quick picks</label>
-              <div className="grid grid-cols-6 gap-2">
-                {SampleReactIcons.map(si => <SampleButton key={si.id} {...si} />)}
-              </div>
-            </div>
-        </div>
+      <div className="w-12 h-12 flex items-center justify-center rounded border">
+        {Icon ? <Icon className="w-6 h-6" /> : <span className="text-xs">No icon</span>}
       </div>
-    );
-  }
+
+      {!readOnly && <IconPickerButton />}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           ICON PICKER BUTTON                               */
+/* -------------------------------------------------------------------------- */
+
+function IconPickerButton() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        className="btn btn-outline btn-sm"
+        onClick={() => setOpen(true)}
+      >
+        Select icon
+      </button>
+
+      {open && <IconPickerModal onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           ICON PICKER MODAL                                */
+/* -------------------------------------------------------------------------- */
+
+function IconPickerModal({ onClose }: { onClose: () => void }) {
+  const { setValue, watch } = useFormContext();
+  const current = watch('icon');
+  const [query, setQuery] = useState('');
+
+  const filteredIcons = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return LUCIDE_ICONS;
+    return LUCIDE_ICONS.filter(({ name }) => name.toLowerCase().includes(q));
+  }, [query]);
+
+  return (
+    <Modal isOpen onClose={onClose} title="Select an icon" size="xl">
+      <div className="mb-3">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search icons (e.g. Wrench, Hammer)"
+          className="input input-sm w-full"
+        />
+      </div>
+      <div className="grid grid-cols-6 gap-3 max-h-[60vh] overflow-y-auto p-2">
+        {filteredIcons.map(({ name, Icon }) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => {
+              setValue('icon', name);
+              onClose();
+            }}
+            className={`flex flex-col items-center p-2 rounded border
+              ${current === name
+                ? 'border-primary bg-primary/10'
+                : 'border-transparent hover:border-gray-300'}`}
+          >
+            {Icon
+              ? <Icon className="w-6 h-6" />
+              : <LucideIconBase iconNode={(LucideIcons as any)[name]?.iconNode ?? []} className="w-6 h-6" />}
+            <span className="text-xs mt-1 truncate w-full text-center">
+              {name}
+            </span>
+          </button>
+        ))}
+      </div>
+    </Modal>
+  );
+}

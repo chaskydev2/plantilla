@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
+use App\Models\AttributeContractor;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\User\UserCollection;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\Pagination\PaginationRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Requests\User\VerificationStatusRequest;
 use App\Http\Resources\Auth\ProfileResource;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -23,15 +25,17 @@ class UserController extends Controller
 
         $query = User::query()
             ->with('roles')
-            ->withTrashed()
             ->excludeAdmin()
             ->search($request->input('search'))
             ->filterByRole($request->input('role'))
+            ->when($request->has('verification'), function ($q) use ($request) {
+                $q->where('verification', $request->boolean('verification'));
+            })
             ->sort(
                 $request->input('sortBy.sort', 'id'),
                 $request->input('sortBy.order', 'asc')
             );
-
+        
         $result = $query->paginate(
             $request->input('limit', 10),
             ['*'],
@@ -213,4 +217,59 @@ class UserController extends Controller
             'message' => 'Usuario eliminado permanentemente'
         ])->setStatusCode(Response::HTTP_OK);
     }
+
+    public function getUserInformation($id): JsonResponse
+    {
+        $user = User::with([
+            'academicTrainings',
+            'workExperiences',
+            'technicalSkills',
+            'workReferences',
+            'contractor' // solo contractor directo
+        ])->findOrFail($id);
+
+        $atributeContractors = AttributeContractor::where('contractor_id', $user->id)
+            ->with('attribute')
+            ->get();
+
+        // Unir los datos del usuario y los atributos del contractor en un solo array plano
+        $merged = array_merge(
+            $user->toArray(),
+            ['contractor_attributes' => $atributeContractors->toArray()]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Información de usuario obtenida correctamente',
+            'data' => $merged
+        ], Response::HTTP_OK);
+    }
+
+    public function updateEditProfileStatus(EditProfileStatusRequest $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        $user->edit_profile = $request->input('edit_profile');
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado de edición de perfil actualizado',
+            'data' => $user
+        ]);
+    }
+
+    public function updateVerificationStatus(VerificationStatusRequest $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        $user->verification = $request->input('verification');
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado de verificación actualizado',
+            'data' => $user
+        ]);
+    }
+    
+    
 }

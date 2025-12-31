@@ -3,7 +3,8 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { ProfessionService as ItemService } from "@/core/services/profession/profession.service";
 import type { IProfession as IItemResource } from "@/core/types/IProfession";
 import { Search, Plus, Trash2, Edit, Briefcase, Eye } from "lucide-react";
-import { IconRenderer } from '@/core/utils/icons';
+import * as LucideIcons from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
@@ -38,7 +39,14 @@ export default function ProfessionList() {
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <IconRenderer iconId={(item as any).icon || 'local:briefcase'} className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                {(() => {
+                  const iconName = (item as any).icon as keyof typeof LucideIcons | undefined;
+                  const Icon = iconName && typeof LucideIcons[iconName] === "function"
+                    ? (LucideIcons[iconName] as LucideIcon)
+                    : undefined;
+                  const SafeIcon = Icon || Briefcase;
+                  return <SafeIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />;
+                })()}
               </div>
           </div>
           <div>

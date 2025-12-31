@@ -5,6 +5,7 @@ export type Contractor = {
   name: string;
   rating: number; // 0-5
   reviews: number;
+  tags?: string[];
   elite: boolean;
   projectsRegistered: number;
   services: string[];

@@ -88,7 +88,7 @@ export async function resolveIcon(iconId?: string | null): Promise<ResolvedIcon>
       // dynamic import the requested lib
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const pkg = `react-icons/${lib}`;
-      const mod = await import(/* webpackChunkName: "react-icons-[request]" */ pkg);
+      const mod = await import(/* @vite-ignore */ pkg);
       const Comp = (mod as any)[compName] as ResolvedIconComponent;
       reactIconCache.set(cacheKey, Comp || null);
       return Comp ? { kind: 'component', Component: Comp } : { kind: 'none' };

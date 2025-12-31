@@ -143,6 +143,36 @@ class Contractor extends Model
         return $this->belongsToMany(Profession::class, 'contractor_professions', 'contractor_user_id', 'profession_id', 'user_id');
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'contractor_tag', 'contractor_user_id', 'tag_id', 'user_id');
+    }
+
+    // Team relationships (self-referential)
+    public function teamMembers()
+    {
+        return $this->belongsToMany(
+            Contractor::class,
+            'contractor_team_members',
+            'leader_user_id',
+            'member_user_id',
+            'user_id',
+            'user_id'
+        );
+    }
+
+    public function teamLeaders()
+    {
+        return $this->belongsToMany(
+            Contractor::class,
+            'contractor_team_members',
+            'member_user_id',
+            'leader_user_id',
+            'user_id',
+            'user_id'
+        );
+    }
+
     // Scopes
     public function scopeApproved(Builder $query): Builder
     {
@@ -284,5 +314,10 @@ class Contractor extends Model
     public function getStatusLabelAttribute(): string
     {
         return self::getStatuses()[$this->contract_status] ?? 'Desconocido';
+    }
+
+    public function attributeContractors()
+    {
+        return $this->hasMany(AttributeContractor::class, 'contractor_id', 'id');
     }
 }

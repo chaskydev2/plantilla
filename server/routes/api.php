@@ -33,11 +33,24 @@ use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\HomeownerProfileController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\Api\V1\JobPostController;
+use App\Http\Controllers\Api\V1\JobContractController;
+use App\Http\Controllers\Api\V1\JobApplicationController; 
+use App\Http\Controllers\Api\V1\AttributeContractorController;
+use App\Http\Controllers\Api\V1\JobController;
+use App\Http\Controllers\Api\V1\JobContractorController;
+use App\Http\Controllers\Api\V1\ContractorTagController;
+use App\Http\Controllers\Api\V1\ContractorTeamMemberController;
+use App\Http\Controllers\Api\V1\ServiceController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('/v1')
     ->name('v1.')
     ->group(function () {
+        
+         Route::get('trabajadores/near', [ContractorController::class, 'nearLocation']);
+           Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
 
         Route::post('login', [AuthController::class, 'login']);
         
@@ -83,6 +96,7 @@ Route::prefix('/v1')
         Route::post('newsletters/send', [NewsletterController::class, 'send']);
 
         Route::middleware(['auth:api'])->group(function () {
+
             Route::post('me', [AuthController::class, 'me']);
 
             Route::post('profile', [ProfileController::class, 'profile']);
@@ -95,10 +109,26 @@ Route::prefix('/v1')
 
             Route::post('users/{id}/restore', [UserController::class, 'restore']);
             // Permanently remove a user
+
+            // Permanently remove job application, contract, and post
+            // Actualizar comentario de AttributeContractor
+            Route::delete('job-applications/{id}/force', [JobApplicationController::class, 'forceDelete']);
+            Route::delete('job-contracts/{id}/force', [JobContractController::class, 'forceDelete']);
+            Route::delete('job-posts/{id}/force', [JobPostController::class, 'forceDelete']);
+
+
+            // CRUD resource routes for jobs
+            Route::apiResource('job-applications', JobApplicationController::class);
+            Route::apiResource('job-contracts', JobContractController::class);
+            Route::apiResource('job-posts', JobPostController::class);
+           
+            
             Route::delete('users/{id}/force', [UserController::class, 'forceDelete']);
 
             Route::get('users/all', [UserController::class, 'all']);
 
+            Route::get('users/{id}/info', [UserController::class, 'getUserInformation']);
+            
             Route::apiResource('users', UserController::class);
 
             Route::apiResource('users.academictrainings', AcademicTrainingController::class);
@@ -158,12 +188,28 @@ Route::prefix('/v1')
 
             Route::apiResource('tags', TagController::class);
 
+            Route::apiResource('services', ServiceController::class);
+
+            // Contractor tags
+            Route::get('contractor-tags', [ContractorTagController::class, 'index']);
+            Route::post('contractor-tags', [ContractorTagController::class, 'store']);
+            Route::put('contractor-tags', [ContractorTagController::class, 'update']);
+            Route::delete('contractor-tags', [ContractorTagController::class, 'destroy']);
+            Route::get('contractors/{contractor}/tags', [ContractorTagController::class, 'tagsByContractor']);
+
+            // Contractor teams
+            Route::get('contractor-team-members', [ContractorTeamMemberController::class, 'index']);
+            Route::post('contractor-team-members', [ContractorTeamMemberController::class, 'store']);
+            Route::get('contractor-team-members/{leader}', [ContractorTeamMemberController::class, 'teamByLeader']);
+            Route::get('contractor-team-members/member/{member}', [ContractorTeamMemberController::class, 'teamByMember']);
+            Route::delete('contractor-team-members/{member}', [ContractorTeamMemberController::class, 'destroy']);
+
             Route::apiResource('payment', PaymentController::class);
 
             // Contractor routes (también accesible como trabajadores)
             Route::get('contractors/stats', [ContractorController::class, 'stats']);
             Route::get('contractors/status/{status}', [ContractorController::class, 'byStatus']);
-            Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
+            Route::get('contractors/search-by-name', [ContractorController::class, 'searchByUserName']);
             Route::patch('contractors/{contractor}/approve', [ContractorController::class, 'approve']);
             Route::patch('contractors/{contractor}/reject', [ContractorController::class, 'reject']);
             Route::patch('contractors/{contractor}/suspend', [ContractorController::class, 'suspend']);
@@ -172,7 +218,6 @@ Route::prefix('/v1')
             // Trabajadores routes (alias para contractors)
             Route::get('trabajadores/stats', [ContractorController::class, 'stats']);
             Route::get('trabajadores/status/{status}', [ContractorController::class, 'byStatus']);
-            Route::get('trabajadores/near', [ContractorController::class, 'nearLocation']);
             Route::patch('trabajadores/{contractor}/approve', [ContractorController::class, 'approve']);
             Route::patch('trabajadores/{contractor}/reject', [ContractorController::class, 'reject']);
             Route::patch('trabajadores/{contractor}/suspend', [ContractorController::class, 'suspend']);
@@ -203,7 +248,7 @@ Route::prefix('/v1')
             Route::delete('categories/{category}/with-children', [CategoryController::class, 'destroyWithChildren']);
             Route::apiResource('categories', CategoryController::class);
 
-                        // Attribute routes
+            // Attribute routes
             Route::get('attributes/for-contractors', [AttributeController::class, 'forContractors']);
             Route::get('attributes/for-homeowners', [AttributeController::class, 'forHomeowners']);
             Route::get('attributes/statistics', [AttributeController::class, 'statistics']);
@@ -212,6 +257,34 @@ Route::prefix('/v1')
             // Homeowner Profile routes
             Route::get('homeowner-profiles/all', [HomeownerProfileController::class, 'all']);
             Route::get('homeowner-profiles/stats', [HomeownerProfileController::class, 'stats']);
-             Route::apiResource('homeowner-profiles', HomeownerProfileController::class);
+            Route::apiResource('homeowner-profiles', HomeownerProfileController::class);
+        
+            Route::get('attribute-contractors', [AttributeContractorController::class, 'index']);
+            Route::post('attribute-contractors', [AttributeContractorController::class, 'store']);
+            Route::get('attribute-contractors/by-contractor/{contractor_id}', [AttributeContractorController::class, 'byContractor']);
+            
+            Route::get('attribute-contractors/by-user/{userId}', [AttributeContractorController::class, 'byUser']);
+        
+            Route::patch('attribute-contractors/{id}/status', [AttributeContractorController::class, 'updateStatus']);
+            Route::patch('attribute-contractors/{id}/comentario', [AttributeContractorController::class, 'updateComentario']);                
+            
+            Route::patch('users/{id}/edit-profile', [UserController::class, 'updateEditProfileStatus']);
+            Route::patch('users/{id}/verification', [UserController::class, 'updateVerificationStatus']);
+     
+            Route::put('contractors/{id}/update-all', [ContractorController::class, 'updateAllFields']);
+            Route::get('contractors/{id}/full-info', [ContractorController::class, 'showFullInfo']);
+
+            Route::post('attribute-contractors/{id}/update-document', [AttributeContractorController::class, 'updateDocument']);
+
+            // Jobs CRUD routes
+            Route::get('jobs-creator', [JobContractorController::class, 'index']);
+            Route::post('jobs-creator', [JobContractorController::class, 'store']);
+            Route::get('jobs-creator/{id}', [JobContractorController::class, 'show']);
+            Route::post('jobs-creator/{id}', [JobContractorController::class, 'update']);
+            Route::delete('jobs-creator/{id}', [JobContractorController::class, 'destroy']);
+            Route::patch('jobs-creator/{id}/status', [JobContractorController::class, 'updateStatus']);
+            Route::get('jobs-creator/creator/{creatorId}', [JobContractorController::class, 'jobsByCreator']);
+            Route::get('jobs-creator/homeowner/{homeownerId}', [JobContractorController::class, 'jobsByHomeowner']);
+            Route::get('jobs-creator/statistics', [JobContractorController::class, 'statistics']);
         });
     });

@@ -1,4 +1,27 @@
 {
+  "contractorDashboard": {
+    "companyName": "Servicios de Contratistas S.A.",
+    "specialists": "Especialistas en electricidad y plomería • Calificación 4.8/5",
+    "verified": "Verificado",
+    "availableInArea": "Disponible en tu área",
+    "completedPercent": "{{percent}}% Completado",
+    "verificationProgress": "Progreso de verificación",
+    "nextStep": "Siguiente paso",
+    "verificationInProgress": "Nuestro equipo está realizando la verificación final de tu documentación.",
+    "estimatedTime": "Tiempo estimado",
+    "hours": "horas",
+    "notifyByEmail": "Te notificaremos por correo electrónico",
+    "important": "¡Importante!",
+    "attachFiles": "Adjunta tus archivos para completar el registro",
+    "attachFilesDescription": "Para continuar, adjunta los documentos requeridos para la verificación de tu perfil. Esto nos ayuda a validar tu identidad y experiencia profesional.",
+    "loadingRequirements": "Cargando requisitos...",
+    "requirement": "Requisito",
+    "sendDocuments": "Enviar documentos",
+    "selectedFiles": "Archivos seleccionados",
+    "sending": "Enviando...",
+    "sendSuccess": "¡Documentos enviados correctamente!",
+    "sendError": "Error al enviar los documentos."
+  },
   "hero": {
     "topText": "Protegiendo a las familias en EE. UU. y Canadá",
     "title": "Solo profesionales verificados. Respaldados por nuestra garantía de $250,000",
@@ -222,7 +245,12 @@
       "consultations": "Consultas",
       "faq": "Preguntas Frecuentes",
       "banner": "Banner",
-      "socialNetworks": "Redes Sociales"
+      "socialNetworks": "Redes Sociales",
+      "jobApplicationsSection": "Solicitudes",
+      "jobApplications": "Solicitudes de Trabajo"
+      ,
+      "documentsrequirements": "Requisitos de Documentos",
+      "documentscontractors": "Documentos de Contratistas"
     },
     "common": {
       "id": "ID",
@@ -266,7 +294,8 @@
       "workers": "Trabajadores",
       "totalUsers": "Usuarios Totales",
       "comparedToLastMonth": "comparado con el mes pasado",
-      "thisMonth": "este mes"
+      "thisMonth": "este mes",
+      "welcome": "Bienvenido, {{name}}!"
     },
     "principles": {
       "mission": "Misión",

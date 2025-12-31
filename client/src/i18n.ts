@@ -15,10 +15,8 @@ const resources = {
   },
 };
 
-// Clear any previous language setting to force English default
-if (!localStorage.getItem('i18nextLng') || !['en', 'es'].includes(localStorage.getItem('i18nextLng') || '')) {
-  localStorage.setItem('i18nextLng', 'en');
-}
+
+
 
 i18n
   // Detect user language
@@ -28,11 +26,9 @@ i18n
   // Initialize i18next
   .init({
     resources,
-    lng: 'en', // Force English as default
-    fallbackLng: 'en',
+    fallbackLng: 'es', // fallback a español si no se detecta
     debug: import.meta.env.DEV,
-    
-    // Language detection options
+
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
@@ -43,7 +39,6 @@ i18n
       escapeValue: false, // React already escapes values
     },
 
-    // Namespace and key separator
     keySeparator: '.',
     nsSeparator: ':',
   });

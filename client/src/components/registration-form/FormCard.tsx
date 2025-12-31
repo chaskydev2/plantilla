@@ -21,17 +21,14 @@ const FormCard: React.FC<FormCardProps> = ({
   handleNext,
   handlePrev,
   handleSubmit,
-  // Email verification props
   showEmailVerification,
   verificationCode,
   setVerificationCode,
   verificationError,
-
   sendVerificationEmail,
   onGoBackToForm,
 }) => {
   const contractorSteps = ["Account", "Company"];
-
   return (
     <motion.form
       onSubmit={handleSubmit}
@@ -40,20 +37,10 @@ const FormCard: React.FC<FormCardProps> = ({
       transition={{ duration: 0.5 }}
       className="relative max-w-6xl mx-auto mt-8 px-6 md:px-8"
     >
-      <div
-        className="relative rounded-2xl border p-6 md:p-10 shadow-sm"
-        style={{ background: "white", ...borderPrimary }}
-      >
+      <div className="relative rounded-2xl border p-6 md:p-10 shadow-sm" style={{ background: "white", ...borderPrimary }}>
         <LoadingOverlay loading={loading} />
-        
-        <ProgressSection 
-          userType={userType} 
-          step={step} 
-          contractorSteps={contractorSteps} 
-        />
-
+        <ProgressSection userType={userType} step={step} contractorSteps={contractorSteps} />
         <div className="h-[1px] w-full mb-8" style={{ background: "rgba(0,0,0,0.06)" }} />
-
         <FormSection
           userType={userType}
           formData={formData}
@@ -70,22 +57,18 @@ const FormCard: React.FC<FormCardProps> = ({
           verificationCode={verificationCode}
           setVerificationCode={setVerificationCode}
           verificationError={verificationError}
-
           sendVerificationEmail={sendVerificationEmail}
           onGoBackToForm={onGoBackToForm}
         />
-
-        <FormFooter
-          userType={userType}
-          loading={loading}
-          isFormMinimallyValid={isFormMinimallyValid}
-        />
-
-        <SuccessToast
-          submitted={submitted}
-          errors={errors}
-          loading={loading}
-        />
+       <FormFooter
+        userType={userType}
+        loading={loading}
+        isFormMinimallyValid={isFormMinimallyValid}
+        onGoBack={onGoBackToForm || (() => {})}
+      >
+        {/* children */}
+      </FormFooter>
+        <SuccessToast submitted={submitted} errors={errors} loading={loading} />
       </div>
     </motion.form>
   );

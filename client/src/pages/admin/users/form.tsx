@@ -2,6 +2,8 @@ import { InputField, PasswordField, SwitchField, MultiSelectField } from '@/comp
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { 
   IUserCreateRequest as ICreateRequest, 
   IUserUpdateRequest as IUpdateRequest, 
@@ -43,6 +45,7 @@ const UserModal = ({
         password: '',
         role_ids: (initialData as any)?.roles?.map((role: any) => role.id) || [],
         edit_profile: initialData.edit_profile || false,
+        is_active: initialData.is_active ?? true,
       }
     : {
         first_name: '',
@@ -52,7 +55,49 @@ const UserModal = ({
         confirmPassword: '',
         role_ids: [],
         edit_profile: false,
+        is_active: true,
       };
+
+
+  const defaultIsActive = isEditing ? (initialData.is_active ?? true) : true;
+
+  // Componente interno para escuchar cambios del switch y sincronizar con backend
+  const IsActiveField: React.FC = () => {
+    const { watch, setValue } = useFormContext<FormValues>();
+    const [updatingStatus, setUpdatingStatus] = useState(false);
+    const prevStatusRef = useRef<boolean | undefined>(defaultIsActive);
+
+    useEffect(() => {
+      if (!isEditing || !initialData?.id) return;
+
+      const subscription = watch(async (value, { name, type }) => {
+        if (name !== 'is_active' || type !== 'change') return;
+        const next = (value as any)?.is_active;
+        if (next === undefined) return;
+        try {
+          setUpdatingStatus(true);
+          const res = await ItemService.updateStatus(initialData.id, next);
+          toastify.success(res?.message || t('admin.users.statusUpdated', { defaultValue: 'Estado actualizado' }));
+          prevStatusRef.current = next;
+        } catch (err: any) {
+          toastify.error(err?.response?.data?.message || t('admin.users.statusUpdateError', { defaultValue: 'Error al actualizar estado' }));
+          setValue('is_active' as any, prevStatusRef.current, { shouldDirty: false, shouldValidate: false });
+        } finally {
+          setUpdatingStatus(false);
+        }
+      });
+
+      return () => subscription.unsubscribe();
+    }, [isEditing, initialData?.id, watch, setValue]);
+
+    return (
+      <SwitchField
+        name="is_active"
+        label={t("admin.users.active", { defaultValue: "Activo" })}
+        disabled={updatingStatus}
+      />
+    );
+  };
 
   const validationSchema = isEditing ? updateSchema : storeSchema;
 
@@ -165,6 +210,10 @@ const UserModal = ({
               name="edit_profile"
               label={t("admin.users.editProfile")}
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <IsActiveField />
           </div>
         </div>
       </FormProviderWrapper>

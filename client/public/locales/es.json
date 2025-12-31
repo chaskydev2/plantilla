@@ -1,0 +1,29 @@
+{
+  "admin": {
+      "jobApplications": {
+        "pageTitle": "Aplicaciones de trabajo",
+        "columns": {
+          "id": "ID",
+          "jobPostId": "ID de trabajo",
+          "contractorId": "ID de contratista",
+          "coverLetter": "Carta de presentación",
+          "status": "Estado",
+          "createdAt": "Fecha de creación"
+        },
+        "actions": {
+          "view": "Ver",
+          "edit": "Editar",
+          "delete": "Eliminar",
+          "confirm": "Confirmar"
+        },
+        "searchPlaceholder": "Buscar aplicaciones",
+        "closeButton": "Cerrar"
+      },
+    "sidebar": {
+      "jobApplicationsSection": "Aplicación de trabajo",
+      "jobApplications": "Listado de aplicaciones",
+      "jobContracts": "Contratos de trabajo",
+      "jobPosts": "Publicaciones de trabajo"
+    }
+  }
+}

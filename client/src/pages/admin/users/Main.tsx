@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import UserDetailModal from "./UserDetailModal";
 import { useTranslation } from "react-i18next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { UserService as ItemService } from "@/core/services/user/user.service";
 import type { IUserResponse as IItemResource } from "@/core/types/IUser";
-import { Search, Plus, Trash2, RotateCw, Edit, EyeIcon } from "lucide-react";
+import { Search, Plus, Trash2, RotateCw, Edit, EyeIcon, FileText } from "lucide-react";
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -30,6 +31,34 @@ type FilterConfig = {
 export default function UserList() {
   const { t } = useTranslation();
 
+  const [userDetailModal, setUserDetailModal] = useState<{ open: boolean; user: IItemResource | null }>({ open: false, user: null });
+
+  const handleOpenUserDetail = (user: IItemResource) => {
+    setUserDetailModal({ open: true, user });
+  };
+
+  const isContractor = (item: IItemResource) => {
+    const roles = (item as any).roles || [];
+    return roles.some((role: any) => {
+      const name = (role.slug || role.name || "").toString().toLowerCase();
+      return name.includes("contractor") || name.includes("contratista");
+    });
+  };
+
+  const isHomeowner = (item: IItemResource) => {
+    const roles = (item as any).roles || [];
+    return roles.some((role: any) => {
+      const name = (role.slug || role.name || "").toString().toLowerCase();
+      return name.includes("homeowner") || name.includes("propietario");
+    });
+  };
+
+  const handleStatusChange = async (id: number, status: boolean) => {
+    // Aquí deberías llamar a tu servicio para actualizar el estado del usuario
+    await ItemService.updateStatus(id, status ? 1 : 0);
+    fetchItems();
+  };
+
   const columns = [
     {
       key: "id",
@@ -47,7 +76,9 @@ export default function UserList() {
       key: "name",
       header: t("admin.users.firstName"),
       render: (item: IItemResource) => (
-        <div className="font-bold">{item.name}</div>
+        <button className="font-bold text-blue-600 underline hover:text-blue-800" onClick={() => handleOpenUserDetail(item)}>
+          {item.name}
+        </button>
       ),
       sortable: true,
     },
@@ -79,14 +110,28 @@ export default function UserList() {
         );
       },
     },
-    {
+    { 
       key: "status",
       header: "Estado",
-      render: (item: IItemResource) => (
-        <span className="badge badge-success">
-          {item.deleted_id == null ? "Activo" : "Inactivo"}
-        </span>
-      ),
+      render: (item: IItemResource) => {
+        let badgeClass = "badge ";
+        let label = "Desconocido";
+        if (item.verification !== undefined && item.verification !== null) {
+          if (item.verification === true) {
+            badgeClass += "badge-success";
+            label = "Activo";
+          } else if (item.verification === false) {
+            badgeClass += "badge-danger";
+            label = "Inactivo";
+          } else {
+            badgeClass += "badge-secondary";
+            label = String(item.verification);
+          }
+        } else {
+          badgeClass += "badge-secondary";
+        }
+        return <span className={badgeClass}>{label}</span>;
+      },
     },
     {
       key: "edit_profile",
@@ -104,6 +149,7 @@ export default function UserList() {
     loading,
     pagination,
     sort,
+    filters: activeFilters,
     searchInput,
     handlePageChange,
     handleSortChange,
@@ -136,6 +182,16 @@ export default function UserList() {
       options: [{ value: "", label: "All" }],
       currentValue: "",
     },
+    {
+      key: "verification",
+      label: "Estado",
+      options: [
+        { value: "", label: "Todos" },
+        { value: "1", label: "Activo" },
+        { value: "0", label: "Inactivo" },
+      ],
+      currentValue: "",
+    },
   ]);
   const [roles, setRoles] = useState<IRolResponse[]>([]);
 
@@ -149,6 +205,7 @@ export default function UserList() {
 
   // Print users to console when they change
   useEffect(() => {
+
     if (items && items.length > 0) {
       console.log("===== ALL USERS =====");
       console.log(items);
@@ -172,12 +229,21 @@ export default function UserList() {
       label: item.name,
     }));
     setFilters((prev) => [
-      {
-        ...prev[0],
-        options: [{ value: "", label: "All" }, ...rolOptions],
-      },
+      ...prev.map((filter) =>
+        filter.key === "role"
+          ? { ...filter, options: [{ value: "", label: "All" }, ...rolOptions] }
+          : filter
+      ),
     ]);
     setRoles(res.data);
+  };
+
+  const handleFiltersChange = (newFilter: Record<string, string>) => {
+    const next = { ...activeFilters, ...newFilter } as Record<string, string | undefined>;
+    if ('verification' in newFilter && newFilter.verification === "") {
+      delete next.verification; // no filter when selecting "Todos"
+    }
+    handleFilterChange(next as Record<string, string>);
   };
 
   const openDialog = (
@@ -290,6 +356,14 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_eliminar"),
     },
     {
+      label: "Documentos",
+      icon: <FileText className="w-4 h-4" />,
+      onClick: (item: IItemResource) => handleOpenUserDetail(item),
+      variant: "secondary" as const,
+      show: (item: IItemResource) =>
+        (isContractor(item) || isHomeowner(item)) && hasPermission("usuario_ver"),
+    },
+    {
       label: t("admin.common.restore"),
       icon: <RotateCw className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmRestore(item),
@@ -355,7 +429,7 @@ export default function UserList() {
         filters={filters}
         sort={sort}
         onSortChange={handleSortChange}
-        onFilterChange={handleFilterChange}
+        onFilterChange={handleFiltersChange}
         onSearch={handleSearch}
         pagination={pagination}
         onPageChange={handlePageChange}
@@ -373,6 +447,12 @@ export default function UserList() {
         initialData={currentItem}
         load={fetchItems}
         roles={roles}
+      />
+      <UserDetailModal
+        user={userDetailModal.user}
+        isOpen={userDetailModal.open}
+        onClose={() => setUserDetailModal({ open: false, user: null })}
+        onStatusChange={handleStatusChange}
       />
       {dialogConfig && (
         <ConfirmDialog

@@ -58,11 +58,9 @@ class StoreProfessionRequest extends FormRequest
                 'max:255',
                 Rule::unique('professions', 'slug'),
             ],
-            'description' => [
-                'nullable',
-                'string',
-                'max:1000',
-            ],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 

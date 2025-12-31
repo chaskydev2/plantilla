@@ -37,6 +37,12 @@ class Tag extends Model
         );
     }
 
+    // Relationships
+    public function contractors()
+    {
+        return $this->belongsToMany(Contractor::class, 'contractor_tag', 'tag_id', 'contractor_user_id', 'id', 'user_id');
+    }
+
     // Boot method to auto-generate slug
     protected static function boot()
     {

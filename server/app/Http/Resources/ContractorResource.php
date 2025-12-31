@@ -5,6 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\User\UserResource;
+use App\Http\Resources\Tag\TagResource;
+use App\Http\Resources\ProfessionResource;
 
 class ContractorResource extends JsonResource
 {
@@ -37,6 +39,7 @@ class ContractorResource extends JsonResource
             'location' => [
                 'lat' => $this->lat,
                 'lng' => $this->lng,
+                'distance_km' => $this->when(isset($this->distance), fn() => round((float) $this->distance, 2)),
             ],
             'contact' => [
                 'mobile_number' => $this->mobile_number,
@@ -48,6 +51,8 @@ class ContractorResource extends JsonResource
                 'has_driving_license' => $this->has_driving_license,
                 'driving_license_category' => $this->driving_license_category,
             ],
+            'professions' => ProfessionResource::collection($this->whenLoaded('professions')),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
             'contract' => [
                 'affiliation_date' => $this->affiliation_date?->format('Y-m-d'),
                 'approval_date' => $this->approval_date?->format('Y-m-d'),

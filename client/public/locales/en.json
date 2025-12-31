@@ -1,0 +1,30 @@
+{
+  "admin": {
+      "jobApplications": {
+        "pageTitle": "Job Applications",
+        "columns": {
+          "id": "ID",
+          "jobPostId": "Job Post ID",
+          "contractorId": "Contractor ID",
+          "coverLetter": "Cover Letter",
+          "status": "Status",
+          "createdAt": "Created At"
+        },
+        "actions": {
+          "view": "View",
+          "edit": "Edit",
+          "delete": "Delete",
+          "confirm": "Confirm"
+        },
+        "searchPlaceholder": "Search applications",
+        "closeButton": "Close"
+      },
+    "sidebar": {
+      "jobApplicationsSection": "Job Application",
+      "jobApplications": "Applications List"
+    {
+      "contractorDashboard": {
+        // ...other texts...
+        "documentsPendingReview": "Documents have been sent and are pending review."
+      }
+    }

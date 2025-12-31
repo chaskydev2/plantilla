@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 import  Logo from "@/assets/images/LOGO GUD.svg?url";
 
-
 import {
   LayoutDashboard,
   Users,
@@ -27,8 +26,9 @@ import {
   BarChart2,
   Briefcase,
   Tag,
-  // removed unused icons: FolderOpen, Home, CheckCircle, AlertTriangle
+  Wrench
 } from "lucide-react";
+
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
 import useAuth from "@/core/hooks/useAuth";
@@ -55,6 +55,45 @@ const AppSidebar: React.FC = () => {
   const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Menú exclusivo para contractor
+  const contractorItems: MenuItem[] = [
+    {
+      icon: <LayoutDashboard className="w-5 h-5" />,
+      name: t("contractor.sidebar.dashboard", "Dashboard"),
+      path: "/admin",
+    },
+    {
+      name: t("contractor.sidebar.profile", "Mi Perfil"),
+      icon: <Users className="w-5 h-5" />,
+      path: "/admin/perfil",
+    },
+    {
+      name: t("contractor.sidebar.documents", "Mis Documentos"),
+      icon: <Clipboard className="w-5 h-5" />,
+      path: "/contractor/documents",
+    },
+    {
+      name: t("contractor.sidebar.jobs", "Trabajos"),
+      icon: <Briefcase className="w-5 h-5" />,
+      path: "/contractor/jobs",
+    },
+    {
+      name: t("contractor.sidebar.tags", "Etiquetas"),
+      icon: <Tag className="w-5 h-5 text-amber-400" />,
+      path: "/contractor/tags",
+    },
+    {
+      name: t("contractor.sidebar.team", "Equipo"),
+      icon: <Users className="w-5 h-5" />,
+      path: "/contractor/team",
+    },
+    {
+      name: t("contractor.sidebar.payments", "Pagos"),
+      icon: <BarChart2 className="w-5 h-5" />,
+      path: "/contractor/payments",
+    },
+  ];
 
   const navItems: MenuItem[] = [
     {
@@ -106,7 +145,6 @@ const AppSidebar: React.FC = () => {
         },
       ],
     },
-    
     {
       name: t("admin.sidebar.payments"),
       icon: <BookOpen className="w-5 h-5" />,
@@ -128,13 +166,13 @@ const AppSidebar: React.FC = () => {
     },
     {
       name: t("admin.sidebar.professions"),
-      icon: <Briefcase className="w-5 h-5" />,
+      icon: <Star className="w-5 h-5 text-yellow-400" />,
       //permissions: ["profesion_listar", "etiqueta_listar"],
       subItems: [
         {
           name: t("admin.sidebar.professionsList"),
           path: "/admin/profesiones",
-          icon: <Briefcase className="w-4 h-4" />,
+          icon: <Star className="w-4 h-4 text-yellow-400" />, 
         //  permissions: ["profesion_listar"]
         },
         {
@@ -143,6 +181,35 @@ const AppSidebar: React.FC = () => {
           icon: <Tag className="w-4 h-4" />,
         //  permissions: ["etiqueta_listar"]
         },
+        {
+          name: t("admin.sidebar.services"),
+          path: "/admin/services",
+          icon: <Wrench className="w-4 h-4" />,
+        //  permissions: ["etiqueta_listar"]
+        },
+      ],
+    },
+    {
+      name: t("admin.sidebar.jobApplicationsSection"),
+      icon: <Clipboard className="w-5 h-5" />,
+      // Puedes agregar permisos si lo necesitas
+      subItems: [
+        {
+          name: t("admin.sidebar.jobApplications"),
+          path: "/admin/job-applications",
+          icon: <Clipboard className="w-4 h-4" />,
+        },
+        {
+          name: t("admin.sidebar.jobContracts"),
+          path: "/admin/job-contracts",
+          icon: <Clipboard className="w-4 h-4" />,
+        },
+        {
+          name: t("admin.sidebar.jobPosts"),
+          path: "/admin/job-post",
+          icon: <Clipboard className="w-4 h-4" />,
+        },
+        // Puedes agregar más subItems aquí si lo necesitas
       ],
     },
     {
@@ -151,10 +218,21 @@ const AppSidebar: React.FC = () => {
       //permissions: ["profesion_listar"],
       subItems: [
         {
-          name: t("admin.sidebar.requirementsList"),
+          name: t("admin.sidebar.documentsrequirements"),
           path: "/admin/atributes",
-          icon: <Briefcase className="w-4 h-4" />,
+          icon: <Clipboard className="w-4 h-4 text-blue-500" />,
         //  permissions: ["profesion_listar"]
+        },
+        {
+          name: t("admin.sidebar.documentscontractors"),
+          path: "/admin/atribute_contractor",
+          icon: <Users className="w-4 h-4 text-emerald-500" />,
+        //  permissions: ["profesion_listar"]
+        },
+        {
+          name: t("admin.sidebar.contractorJobs", "Trabajos"),
+          path: "/admin/jobs",
+          icon: <Briefcase className="w-4 h-4" />,
         },
       ],
     },
@@ -348,12 +426,15 @@ const AppSidebar: React.FC = () => {
       .filter(item => item.path || (item.subItems && item.subItems.length > 0));
   };
 
+
   // 🔐 RESTRICCIÓN DE ACCESO POR ROLES:
+  // - Contractor: menú exclusivo
   // - Dashboard: Visible para todos los usuarios autenticados
   // - Completed Jobs & Claims Submitted: Solo para homeowners
   // - Resto de rutas: Solo para admins (con filtros de permisos)
   const filteredNavItems = filterMenuItems(navItems);
   const filteredWebItems = filterMenuItems(webItems);
+  const filteredContractorItems = contractorItems; // No hay permisos, solo rol
 
   const handleSubmenuToggle = (index: number, menuType: "main" | "web") => {
     setOpenSubmenu(prev =>
@@ -481,7 +562,8 @@ const AppSidebar: React.FC = () => {
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            {filteredNavItems.length > 0 && (
+            {/* Menú para contractor */}
+            {hasRole("contractor") ? (
               <div>
                 <h2 className={classNames(
                   "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
@@ -490,25 +572,42 @@ const AppSidebar: React.FC = () => {
                     "justify-start": isExpanded || isHovered
                   }
                 )}>
-                  {isExpanded || isHovered || isMobileOpen ? "Menu" : <ChevronDown className="size-6" />}
+                  {isExpanded || isHovered || isMobileOpen ? "Menú" : <ChevronDown className="size-6" />}
                 </h2>
-                {renderMenuItems(filteredNavItems, "main")}
+                {renderMenuItems(filteredContractorItems, "main")}
               </div>
-            )}
+            ) : (
+              <>
+                {filteredNavItems.length > 0 && (
+                  <div>
+                    <h2 className={classNames(
+                      "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
+                      {
+                        "lg:justify-center": !isExpanded && !isHovered,
+                        "justify-start": isExpanded || isHovered
+                      }
+                    )}>
+                      {isExpanded || isHovered || isMobileOpen ? "Menu" : <ChevronDown className="size-6" />}
+                    </h2>
+                    {renderMenuItems(filteredNavItems, "main")}
+                  </div>
+                )}
 
-            {filteredWebItems.length > 0 && (
-              <div>
-                <h2 className={classNames(
-                  "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
-                  {
-                    "lg:justify-center": !isExpanded && !isHovered,
-                    "justify-start": isExpanded || isHovered
-                  }
-                )}>
-                  {isExpanded || isHovered || isMobileOpen ? "Web" : <ChevronDown className="size-6" />}
-                </h2>
-                {renderMenuItems(filteredWebItems, "web")}
-              </div>
+                {filteredWebItems.length > 0 && (
+                  <div>
+                    <h2 className={classNames(
+                      "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
+                      {
+                        "lg:justify-center": !isExpanded && !isHovered,
+                        "justify-start": isExpanded || isHovered
+                      }
+                    )}>
+                      {isExpanded || isHovered || isMobileOpen ? "Web" : <ChevronDown className="size-6" />}
+                    </h2>
+                    {renderMenuItems(filteredWebItems, "web")}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </nav>

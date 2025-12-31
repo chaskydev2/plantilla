@@ -1,4 +1,28 @@
 {
+  "contractorDashboard": {
+    "companyName": "Contractor Services Inc.",
+    "specialists": "Specialists in electricity and plumbing • 4.8/5 rating",
+    "verified": "Verified",
+    "availableInArea": "Available in your area",
+    "completedPercent": "{{percent}}% Completed",
+    "verificationProgress": "Verification progress",
+    "nextStep": "Next step",
+    "verificationInProgress": "Our team is performing the final verification of your documentation.",
+    "estimatedTime": "Estimated time",
+    "hours": "hours",
+    "notifyByEmail": "We will notify you by email",
+    "important": "Important!",
+    "attachFiles": "Attach your files to complete registration",
+    "attachFilesDescription": "To continue, attach the required documents for your profile verification. This helps us validate your identity and professional experience.",
+    "loadingRequirements": "Loading requirements...",
+    "requirement": "Requirement",
+    "sendDocuments": "Send documents",
+    "selectedFiles": "Selected files",
+    "sending": "Sending...",
+    "sendSuccess": "Documents sent successfully!",
+    "sendError": "Error sending documents.",
+    "documentsPendingReview": "Documents have been sent and are pending review."
+  },
   "hero": {
     "topText": "Protecting families in the U.S. and Canada",
     "title": "Only vetted professionals. Backed by our $250,000 guarantee",
@@ -222,7 +246,12 @@
       "consultations": "Consultations",
       "faq": "FAQ",
       "banner": "Banner",
-      "socialNetworks": "Social Networks"
+      "socialNetworks": "Social Networks", 
+       "jobApplicationsSection": "Job Applications",
+      "jobApplications": "Job Applications List"
+      ,
+      "documentsrequirements": "Document Requirements",
+      "documentscontractors": "Contractor Documents"
     },
     "common": {
       "id": "ID",
@@ -266,7 +295,8 @@
       "workers": "Workers",
       "totalUsers": "Total Users",
       "comparedToLastMonth": "compared to last month",
-      "thisMonth": "this month"
+      "thisMonth": "this month",
+      "welcome": "welcome {{name}}!" 
     },
     "principles": {
       "mission": "Mission",

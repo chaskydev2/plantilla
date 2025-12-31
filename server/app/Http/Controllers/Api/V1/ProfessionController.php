@@ -10,6 +10,7 @@ use App\Models\Profession;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\File;
 
 class ProfessionController extends Controller
 {
@@ -74,7 +75,11 @@ class ProfessionController extends Controller
      */
     public function store(StoreProfessionRequest $request): JsonResponse
     {
-        $profession = Profession::create($request->validated());
+        $data = $request->validated();
+
+        $data['image'] = $this->persistImage($request, null) ?? $data['image'] ?? null;
+
+        $profession = Profession::create($data);
 
         return response()->json([
             'message' => 'Profesión creada exitosamente',
@@ -125,8 +130,17 @@ class ProfessionController extends Controller
             $profession = is_numeric($id) 
                 ? Profession::findOrFail($id)
                 : Profession::where('slug', $id)->firstOrFail();
-            
-            $profession->update($request->validated());
+
+            $data = $request->validated();
+
+            $image = $this->persistImage($request, $profession->image);
+            if ($image !== '__keep') {
+                $data['image'] = $image;
+            } else {
+                unset($data['image']);
+            }
+
+            $profession->update($data);
 
             return response()->json([
                 'message' => 'Profesión actualizada exitosamente',
@@ -162,7 +176,7 @@ class ProfessionController extends Controller
                     'message' => 'No se puede eliminar la profesión porque tiene contratistas asociados'
                 ], 422);
             }
-
+            $this->deleteImageIfExists($profession->image);
             $profession->delete();
 
             return response()->json([
@@ -267,6 +281,47 @@ class ProfessionController extends Controller
         $professions = $query->get();
 
         return ProfessionResource::collection($professions);
+    }
+
+    private function persistImage(Request $request, ?string $currentPath): ?string
+    {
+        if ($request->boolean('remove_image')) {
+            $this->deleteImageIfExists($currentPath);
+            return null;
+        }
+
+        if (!$request->hasFile('image')) {
+            return '__keep';
+        }
+
+        $file = $request->file('image');
+        if (!$file || !$file->isValid()) {
+            return '__keep';
+        }
+
+        $this->deleteImageIfExists($currentPath);
+
+        $directory = public_path('assets/professions');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        $filename = uniqid('profession_image_') . '.' . $file->getClientOriginalExtension();
+        $file->move($directory, $filename);
+
+        return 'assets/professions/' . $filename;
+    }
+
+    private function deleteImageIfExists(?string $path): void
+    {
+        if (!$path) {
+            return;
+        }
+
+        $fullPath = public_path($path);
+        if (File::exists($fullPath)) {
+            @File::delete($fullPath);
+        }
     }
 
     /**

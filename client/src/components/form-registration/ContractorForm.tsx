@@ -166,7 +166,7 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
 
           <div className="md:col-span-2">
             <label className={labelCls} style={{ color: "var(--color-secondary)" }}>
-              Professional Roles *
+              Professional Roless *
             </label>
             <MultiSelectField
               name="role_ids"

@@ -249,4 +249,6 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'restored_id');
     }
+
+
 }

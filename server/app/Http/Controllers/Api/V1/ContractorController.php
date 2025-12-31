@@ -249,31 +249,118 @@ class ContractorController extends Controller
      */
     public function nearLocation(Request $request): AnonymousResourceCollection
     {
-        $request->validate([
+     
+        $validated = $request->validate([
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'nullable|numeric|min:1|max:500',
             'service_area' => 'nullable|string',
             'min_rating' => 'nullable|numeric|min:0|max:5',
+            'profession_name' => 'nullable|string',
         ]);
 
-        $lat = (float) $request->lat;
-        $lng = (float) $request->lng;
-        $radius = $request->filled('radius') ? (float) $request->radius : 50;
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = $request->filled('radius') ? (float) $validated['radius'] : 20.0;
+        $tagIds = $validated['tags'] ?? [];
+        $professionIds = $validated['professions'] ?? [];
+        $professionName = $validated['profession_name'] ?? null;
 
-        $query = Contractor::with('user')
-            ->approved()
-            ->withinRadius($lat, $lng, $radius);
+        $query = Contractor::with(['user', 'tags', 'professions']);
 
-        if ($request->filled('service_area')) {
-            $query->byServiceArea($request->service_area);
-        }
-
-        if ($request->filled('min_rating')) {
-            $query->byRating((float) $request->min_rating);
+        // Filtrar por nombre de profesión si se proporciona
+        if ($professionName) {
+           
+            $query->whereHas('professions', function ($q) use ($professionName) {
+                $q->where('name', 'like', "%{$professionName}%");
+            });
         }
 
         $contractors = $query->get();
+
+        return ContractorResource::collection($contractors);
+    }
+
+     public function updateAllFields(Request $request, $id): JsonResponse
+    {
+        $contractor = Contractor::findOrFail($id);
+
+        // Validación rápida (puedes personalizar según tus reglas)
+        $validated = $request->validate([
+            'user_id' => 'sometimes|exists:users,id',
+            'preferred_zip' => 'nullable|string|max:15',
+            'address_line1' => 'nullable|string|max:200',
+            'address_line2' => 'nullable|string|max:200',
+            'city' => 'nullable|string|max:120',
+            'company_name' => 'nullable|string|max:255',
+            'license_number' => 'nullable|string|max:255',
+            'is_insured' => 'nullable|boolean',
+            'service_area' => 'nullable|string|max:255',
+            'average_rating' => 'nullable|numeric|min:0|max:5',
+            'state_code' => 'nullable|string|max:10',
+            'country_code' => 'nullable|string|max:2',
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            'mobile_number' => 'nullable|string|max:20',
+            'phone_number' => 'nullable|string|max:20',
+            'has_driving_license' => 'nullable|boolean',
+            'driving_license_category' => 'nullable|string|max:10',
+            'linkedin_url' => 'nullable|string|max:500',
+            'portfolio_url' => 'nullable|string|max:500',
+            'affiliation_date' => 'nullable|date',
+            'approval_date' => 'nullable|date',
+            'contract_status' => 'nullable|in:pendiente,aprobado,rechazado,suspendido',
+        ]);
+
+        // Solo actualizar si hay cambios
+        $contractor->fill($validated);
+        $dirty = $contractor->getDirty();
+        if (!empty($dirty)) {
+            $contractor->save();
+        }
+
+        // Cargar relaciones útiles si es necesario
+        $contractor->load('user');
+
+        return response()->json([
+            'success' => true,
+            'message' => empty($dirty)
+                ? 'No hubo cambios para actualizar'
+                : 'Contractor actualizado correctamente',
+            'data' => $contractor
+        ]);
+    }
+
+    public function showFullInfo($id): JsonResponse
+    {
+        $contractor = Contractor::with([
+                'user',
+                'professions',
+                'attributeContractors.attribute',
+        ])->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Información completa del contractor obtenida correctamente',
+                'data' => $contractor
+            ]);
+    }
+
+    public function searchByUserName(Request $request): AnonymousResourceCollection
+    {
+        $request->validate([
+            'name' => 'required|string|min:1',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $name = strtolower($request->name);
+        $perPage = $request->input('per_page', 15);
+
+        $contractors = Contractor::with('user')
+            ->whereHas('user', function ($q) use ($name) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . $name . '%']);
+            })
+            ->paginate($perPage);
 
         return ContractorResource::collection($contractors);
     }
