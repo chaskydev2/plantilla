@@ -4,6 +4,12 @@ namespace App\Http\Resources\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Auth\AcademicTraining\AcademicTrainingResource;
+use App\Http\Resources\Auth\TechnicalSkill\TechnicalSkillResource;
+use App\Http\Resources\Auth\WorkExperience\WorkExperienceResource;
+use App\Http\Resources\Auth\WorkReference\WorkReferenceResource;
+use App\Http\Resources\HomeownerProfileResource;
+use App\Http\Resources\ProfessionResource;
 
 class UserResource extends JsonResource
 {
@@ -48,6 +54,26 @@ class UserResource extends JsonResource
             'role_name' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name')->join(', ');
             }),
+
+            // Información profesional detallada
+            'academic_trainings' => AcademicTrainingResource::collection(
+                $this->whenLoaded('academicTrainings')
+            ),
+            'work_experiences' => WorkExperienceResource::collection(
+                $this->whenLoaded('workExperiences')
+            ),
+            'technical_skills' => TechnicalSkillResource::collection(
+                $this->whenLoaded('technicalSkills')
+            ),
+            'work_references' => WorkReferenceResource::collection(
+                $this->whenLoaded('workReferences')
+            ),
+            'professions' => ProfessionResource::collection(
+                $this->whenLoaded('professions')
+            ),
+            'homeowner_profile' => new HomeownerProfileResource(
+                $this->whenLoaded('homeownerProfile')
+            ),
         ];
     }
 }

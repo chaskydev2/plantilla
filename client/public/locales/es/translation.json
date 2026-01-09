@@ -21,5 +21,30 @@
     "sending": "Enviando...",
     "sendSuccess": "¡Documentos enviados correctamente!",
     "sendError": "Error al enviar los documentos."
+  },
+  "searchBar": {
+    "servicePlaceholder": "¿En qué podemos ayudarte?",
+    "tagsPlaceholder": "Ej. ayudante de cocina experto",
+    "locationPlaceholder": "Ciudad, calle o código postal",
+    "searchButton": "Buscar un profesional",
+    "locationRequired": "Selecciona tu ubicación",
+    "gettingLocation": "Obteniendo ubicación…",
+    "gettingLocationShort": "Obteniendo…",
+    "pleaseWait": "Por favor espera.",
+    "allowLocationTitle": "¿Permitir acceso a tu ubicación?",
+    "allowLocationDesc": "Usamos tu ubicación para encontrar profesionales cerca de ti más rápido. También puedes escribir una ciudad o código postal.",
+    "useMyLocation": "Usar mi ubicación",
+    "chooseOnMap": "Elegir en el mapa",
+    "quickLocations": "Ubicaciones rápidas",
+    "searching": "Buscando…",
+    "noResults": "Sin resultados",
+    "autocompleteFailed": "No se pudo autocompletar",
+    "googleMapsNotLoaded": "No se pudo cargar Google Maps",
+    "failedToLoadGoogleMaps": "Error al cargar Google Maps",
+    "mapSearchFailed": "No pudimos buscar en el mapa",
+    "locationNotFound": "No encontramos esa ubicación",
+    "notFound": "No encontramos esa ubicación",
+    "currentLocation": "Ubicación actual",
+    "couldNotGetLocation": "No pudimos obtener tu ubicación. Intenta escribir tu ciudad o ZIP."
   }
 }

@@ -7,6 +7,8 @@ import PasswordInput from "./PasswordInput";
 import MultiSelectField from "./MultiSelectField";
 import { ProfessionService } from "@/core/services/profession/profession.service";
 import type { IProfession } from "@/core/types/IProfession";
+import { ServiceService } from "@/core/services/service/service.service";
+import type { IService } from "@/core/types/IService";
 
 interface ContractorFormProps {
   formData: Extract<FormData, { userType: "contractor" }>;
@@ -35,6 +37,8 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
 }) => {
   const [professionsData, setProfessionsData] = useState<IProfession[]>([]);
   const [loadingProfessions, setLoadingProfessions] = useState(true);
+  const [servicesData, setServicesData] = useState<IService[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
 
   // Cargar profesiones cuando el componente se monta
   useEffect(() => {
@@ -52,6 +56,23 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
     };
 
     loadProfessions();
+  }, []);
+
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const response = await ServiceService.getAllServices();
+        if (response.success && Array.isArray(response.data)) {
+          setServicesData(response.data);
+        }
+      } catch (error) {
+        console.error("Error loading services:", error);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    loadServices();
   }, []);
 
   // Transformar las profesiones al formato esperado por MultiSelectField
@@ -246,20 +267,32 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
           </div>
 
           <div className="md:col-span-2">
-            <label className={labelCls} style={{ color: "var(--color-secondary)" }}>
+            <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="services">
               Services <span className="font-normal" style={helpMuted}>
                 (optional)
               </span>
             </label>
-            <input
-              type="text"
+            <select
+              id="services"
               name="services"
               value={formData.services}
               onChange={handleChange}
               className={fieldCls}
               style={borderPrimary}
-              placeholder="e.g., Plumbing, Electrical, HVAC"
-            />
+              disabled={loadingServices}
+            >
+              <option value="">{loadingServices ? "Loading services..." : "Select a service"}</option>
+              {servicesData.map((service) => (
+                <option key={service.id} value={service.name}>
+                  {service.name}
+                </option>
+              ))}
+            </select>
+            {!loadingServices && !servicesData.length && (
+              <p className="mt-2 text-xs" style={helpMuted}>
+                No services available yet. Please contact support to add new services.
+              </p>
+            )}
           </div>
 
           <div>
@@ -329,4 +362,4 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
   );
 };
 
-export default ContractorForm;
+export default ContractorForm

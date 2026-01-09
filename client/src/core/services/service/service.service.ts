@@ -68,6 +68,9 @@ const buildFormData = (
   if (request.slug !== undefined && request.slug !== null) {
     formData.append('slug', request.slug);
   }
+  if ((request as IServiceCreateRequest).description !== undefined && (request as IServiceCreateRequest).description !== null) {
+    formData.append('description', (request as IServiceCreateRequest).description as string);
+  }
 
   appendFileField(formData, 'icon', (request as IServiceCreateRequest).icon);
   appendFileField(formData, 'image', (request as IServiceCreateRequest).image);
@@ -134,10 +137,22 @@ export const remove = async (id: number): Promise<IApiResponse> => {
   return res.data;
 };
 
+export const getFirstFifteenServices = async (): Promise<IApiResponse<IService[]>> => {
+  const res = await axios.get('/v1/services/first-fifteen');
+  return res.data;
+};
+
+export const getAllServices = async (): Promise<IApiResponse<IService[]>> => {
+  const res = await axios.get('/v1/services/all');
+  return res.data;
+};
+
 export const ServiceService = {
   getAllPaginated,
   get,
   create,
   update,
   remove,
+  getFirstFifteenServices,
+  getAllServices,
 };

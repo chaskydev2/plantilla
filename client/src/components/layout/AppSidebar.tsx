@@ -26,7 +26,8 @@ import {
   BarChart2,
   Briefcase,
   Tag,
-  Wrench
+  Wrench,
+  UserPlus
 } from "lucide-react";
 
 import { useSidebar } from "@/core/context/SidebarContext";
@@ -50,50 +51,95 @@ type OpenSubmenu = {
 const AppSidebar: React.FC = () => {
   const { t } = useTranslation();
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
-  const { hasAnyPermission, hasRole } = useAuth();
+  const { hasAnyPermission, hasRole, user } = useAuth();
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Menú exclusivo para contractor
+  // Contractor-only menu
   const contractorItems: MenuItem[] = [
+      // Homeowner-only menu
     {
       icon: <LayoutDashboard className="w-5 h-5" />,
       name: t("contractor.sidebar.dashboard", "Dashboard"),
       path: "/admin",
     },
     {
-      name: t("contractor.sidebar.profile", "Mi Perfil"),
+      name: t("contractor.sidebar.profile", "My Profile"),
       icon: <Users className="w-5 h-5" />,
       path: "/admin/perfil",
     },
     {
-      name: t("contractor.sidebar.documents", "Mis Documentos"),
+      name: t("contractor.sidebar.documents", "Documents"),
       icon: <Clipboard className="w-5 h-5" />,
       path: "/contractor/documents",
     },
     {
-      name: t("contractor.sidebar.jobs", "Trabajos"),
+      name: t("contractor.sidebar.jobs", "Jobs"),
       icon: <Briefcase className="w-5 h-5" />,
       path: "/contractor/jobs",
     },
     {
-      name: t("contractor.sidebar.tags", "Etiquetas"),
+      name: t("contractor.sidebar.tags", "Tags"),
       icon: <Tag className="w-5 h-5 text-amber-400" />,
       path: "/contractor/tags",
     },
     {
-      name: t("contractor.sidebar.team", "Equipo"),
-      icon: <Users className="w-5 h-5" />,
+      name: t("contractor.sidebar.team", "Team"),
+      icon: <UserPlus className="w-5 h-5" />,
       path: "/contractor/team",
     },
     {
-      name: t("contractor.sidebar.payments", "Pagos"),
+      name: t("contractor.sidebar.teamUser", "Team User"),
+      icon: <Users className="w-5 h-5" />,
+      path: "/contractor/team-user",
+    },
+    {
+      name: t("contractor.sidebar.payments", "Payments"),
       icon: <BarChart2 className="w-5 h-5" />,
       path: "/contractor/payments",
     },
   ];
+
+
+  const homeownerItems: MenuItem[] = [
+        {
+          icon: <LayoutDashboard className="w-5 h-5" />,
+          name: t("homeowner.sidebar.dashboard", "Dashboard"),
+          path: "/admin",
+        },
+        {
+          name: t("homeowner.sidebar.profile", "My Profile"),
+          icon: <Users className="w-5 h-5" />,
+          path: "/homeowner/perfil",
+        },
+        {
+          name: t("homeowner.sidebar.documents", "Documents"),
+          icon: <Clipboard className="w-5 h-5" />,
+          path: "/homeowner/documents",
+        },
+        {
+          name: t("homeowner.sidebar.jobs", "Jobs"),
+          icon: <Briefcase className="w-5 h-5" />,
+          path: "/homeowner/jobs",
+        },
+        {
+          name: t("homeowner.sidebar.claims", "Claims"),
+          icon: <Clipboard className="w-5 h-5" />,
+          path: "/homeowner/claims",
+        },
+        {
+          name: t("homeowner.sidebar.payments", "Payments"),
+          icon: <BarChart2 className="w-5 h-5" />,
+          path: "/homeowner/payments",
+        },
+        {
+          name: t("homeowner.sidebar.postJob", "Post Job"),
+          icon: <Tag className="w-5 h-5 text-amber-400" />,
+          path: "/homeowner/post-job",
+        },
+    ];
 
   const navItems: MenuItem[] = [
     {
@@ -209,7 +255,7 @@ const AppSidebar: React.FC = () => {
           path: "/admin/job-post",
           icon: <Clipboard className="w-4 h-4" />,
         },
-        // Puedes agregar más subItems aquí si lo necesitas
+        // Add more subItems here if needed
       ],
     },
     {
@@ -230,7 +276,13 @@ const AppSidebar: React.FC = () => {
         //  permissions: ["profesion_listar"]
         },
         {
-          name: t("admin.sidebar.contractorJobs", "Trabajos"),
+          name: t("admin.sidebar.documentshomeowners","Documents Homeowners"),
+          path: "/admin/attribute_homeowner",
+          icon: <Clipboard className="w-4 h-4 text-blue-500" />,
+        //  permissions: ["profesion_listar"]
+        },
+        {
+          name: t("admin.sidebar.contractorJobs", "Contractor Jobs"),
           path: "/admin/jobs",
           icon: <Briefcase className="w-4 h-4" />,
         },
@@ -331,7 +383,7 @@ const AppSidebar: React.FC = () => {
             }
           });
         }
-        // También verificar si la ruta principal coincide
+        // Also check whether the main route matches
         else if (nav.path && isActive(nav.path)) {
           submenuMatched = true;
         }
@@ -347,7 +399,7 @@ const AppSidebar: React.FC = () => {
       const currentPath = location.pathname;
       let shouldKeepOpen = false;
       
-      // Verificar si estamos en una ruta que debería mantener un submenu abierto
+      // Check if the current path should keep a submenu open
       if (currentPath.startsWith('/admin/usuarios') || 
           currentPath.startsWith('/admin/roles') || 
           currentPath.startsWith('/admin/permisos') ||
@@ -408,7 +460,7 @@ const AppSidebar: React.FC = () => {
         // ✅ Dashboard siempre visible para todos los usuarios autenticados
         if (item.name === "Dashboard") return true;
         
-        // 🏠 Elementos específicos para homeowners
+        // 🏠 Homeowner-specific items
         if (item.name === "Completed Jobs" || item.name === "Claims Submitted") {
           return hasRole("homeowner");
         }
@@ -427,14 +479,21 @@ const AppSidebar: React.FC = () => {
   };
 
 
-  // 🔐 RESTRICCIÓN DE ACCESO POR ROLES:
-  // - Contractor: menú exclusivo
+  // 🔐 ACCESS RESTRICTION BY ROLES:
+  // - Contractor: exclusive menu
   // - Dashboard: Visible para todos los usuarios autenticados
   // - Completed Jobs & Claims Submitted: Solo para homeowners
   // - Resto de rutas: Solo para admins (con filtros de permisos)
   const filteredNavItems = filterMenuItems(navItems);
   const filteredWebItems = filterMenuItems(webItems);
-  const filteredContractorItems = contractorItems; // No hay permisos, solo rol
+
+  // Hide the contractor menu if verification is false for contractor users
+  const showContractorMenu = user && user.role_name === "contractor" && (user as any).verification === true;
+  const filteredContractorItems = showContractorMenu ? contractorItems : [];
+
+  // Homeowner menu (always visible for homeowner role)
+  const showHomeownerMenu = user && user.role_name === "homeowner";
+  const filteredHomeownerItems = showHomeownerMenu ? homeownerItems : [];
 
   const handleSubmenuToggle = (index: number, menuType: "main" | "web") => {
     setOpenSubmenu(prev =>
@@ -562,8 +621,27 @@ const AppSidebar: React.FC = () => {
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            {/* Menú para contractor */}
+            {/* Contractor or Homeowner menu */}
             {hasRole("contractor") ? (
+              showContractorMenu ? (
+                <div>
+                  <h2 className={classNames(
+                    "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
+                    {
+                      "lg:justify-center": !isExpanded && !isHovered,
+                      "justify-start": isExpanded || isHovered
+                    }
+                  )}>
+                    {isExpanded || isHovered || isMobileOpen ? "Menu" : <ChevronDown className="size-6" />}
+                  </h2>
+                  {renderMenuItems(filteredContractorItems, "main")}
+                </div>
+              ) : (
+                <div className="text-center text-gray-400 mt-8">
+                  {t("contractor.sidebar.verified_message", "Your account is already verified. You do not have access to this menu.")}
+                </div>
+              )
+            ) : hasRole("homeowner") ? (
               <div>
                 <h2 className={classNames(
                   "mb-4 text-xs uppercase flex leading-[20px] text-gray-400",
@@ -572,9 +650,9 @@ const AppSidebar: React.FC = () => {
                     "justify-start": isExpanded || isHovered
                   }
                 )}>
-                  {isExpanded || isHovered || isMobileOpen ? "Menú" : <ChevronDown className="size-6" />}
+                  {isExpanded || isHovered || isMobileOpen ? "Menu" : <ChevronDown className="size-6" />}
                 </h2>
-                {renderMenuItems(filteredContractorItems, "main")}
+                {renderMenuItems(filteredHomeownerItems, "main")}
               </div>
             ) : (
               <>

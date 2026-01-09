@@ -3,7 +3,7 @@ import DataTable from '@/components/table/DataTable';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import { Search, Eye, Plus, Trash } from 'lucide-react';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { getTeamByMember, deleteTeamMember } from '@/core/services/contractor/contractor.service';
+import { getTeamMembersByLeader, deleteTeamMember } from '@/core/services/contractor/contractor.service';
 import MemberDetailModal from './MemberDetailModal';
 import type { ITableColumn, ITableAction, ITableSort, ITableProps } from '@/core/types/ITable';
 import type { IPagination } from '@/core/types/IApi';
@@ -38,6 +38,49 @@ export type ContractorTeamMember = {
 };
 
 export type WithRelations = ContractorTeamMember;
+
+const resolveLeaderName = (item: WithRelations): string => {
+  const raw = item as any;
+  return (
+    item.leader?.user?.name ||
+    item.leader?.name ||
+    raw?.leader_user?.name ||
+    raw?.leader?.user_name ||
+    raw?.leader_name ||
+    `Usuario #${item.leader_user_id}`
+  );
+};
+
+const resolveLeaderEmail = (item: WithRelations): string => {
+  const raw = item as any;
+  return (
+    item.leader?.user?.email ||
+    raw?.leader_user?.email ||
+    raw?.leader_email ||
+    'Sin email'
+  );
+};
+
+const resolveMemberName = (item: WithRelations): string => {
+  const raw = item as any;
+  return (
+    item.member?.user?.name ||
+    raw?.member?.name ||
+    raw?.member_user?.name ||
+    raw?.member_name ||
+    `Usuario #${item.member_user_id}`
+  );
+};
+
+const resolveMemberEmail = (item: WithRelations): string => {
+  const raw = item as any;
+  return (
+    item.member?.user?.email ||
+    raw?.member_user?.email ||
+    raw?.member_email ||
+    'Sin email'
+  );
+};
 
 function getUserIdFromLocalStorage(): number | null {
   try {
@@ -106,7 +149,7 @@ const ContractorTeam: React.FC = () => {
         return;
       }
 
-      const response = await getTeamByMember(userId);
+      const response = await getTeamMembersByLeader(userId);
         
       // Short-circuit when the API comes empty/undefined
       if (!response || (!Array.isArray(response?.data) && !Array.isArray(response?.data?.data))) {
@@ -184,7 +227,7 @@ const ContractorTeam: React.FC = () => {
       render: (item: WithRelations) => (
         <div className="flex flex-col">
           <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {item.leader?.name || item.leader?.user?.name || `Usuario #${item.leader_user_id}`}
+            {resolveLeaderName(item)}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {item.leader?.company_name || ''}
@@ -199,10 +242,10 @@ const ContractorTeam: React.FC = () => {
       render: (item: WithRelations) => (
         <div className="flex flex-col">
           <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {item.member?.user?.name || `Usuario #${item.member_user_id}`}
+            {resolveMemberName(item)}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {item.member?.user?.email || 'Sin email'}
+            {resolveMemberEmail(item)}
           </span>
         </div>
       ),
@@ -295,8 +338,10 @@ const ContractorTeam: React.FC = () => {
 
   const filteredItems = searchInput
     ? items.filter(item =>
-        (item.member?.user?.name || '').toLowerCase().includes(searchInput.toLowerCase()) ||
-        (item.member?.user?.email || '').toLowerCase().includes(searchInput.toLowerCase()) ||
+        resolveMemberName(item).toLowerCase().includes(searchInput.toLowerCase()) ||
+        resolveMemberEmail(item).toLowerCase().includes(searchInput.toLowerCase()) ||
+        resolveLeaderName(item).toLowerCase().includes(searchInput.toLowerCase()) ||
+        resolveLeaderEmail(item).toLowerCase().includes(searchInput.toLowerCase()) ||
         String(item.member_user_id).includes(searchInput)
       )
     : items;

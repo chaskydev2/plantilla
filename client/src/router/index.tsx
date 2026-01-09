@@ -78,10 +78,19 @@ import Team from "@/pages/contractor/team/Main";
 
 import ServicePage from "@/pages/admin/services/Main";
 
+import TeamUser from "@/pages/contractor/team-user/Main";
+
+import AttributeHomeownerList from "@/pages/admin/attribute-homeowner/main";
+
+import PostJob from "@/pages/homeownner/PostJob/Main";
+
+
 import Services from "@/pages/WebPage/Services";
 
 import LoaderScreen from "@/components/common/LoaderScreen";
 import { ToastContainer } from "react-toastify";
+
+import ContractorProfilePage from "@/pages/WebPage/FindPro/ContractorProfilePage";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -110,6 +119,7 @@ export default function App() {
           <Route element={<AppLayoutWeb />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/findpro" element={<FindProPage />} />
+            <Route path="/findpro/contractor/:id" element={<ContractorProfilePage />} />
             <Route path="/contacto" element={<ContactPage />} />
             <Route path="/requisitos" element={<Requisitospage />} />
             <Route path="/renovacion_datos" element={<Renovationpage />} />
@@ -178,14 +188,17 @@ export default function App() {
 
 
               <Route path="/admin/atribute_contractor" element={<AttributeContractorList />} />
-               
-              
+
+              <Route path="/admin/attribute_homeowner" element={<AttributeHomeownerList />} />
+
               <Route path="/admin/jobs" element={<JobPage/>} />
 
               <Route path="/admin/services" element={<ServicePage />} />
               {/* CONTRACTOR SPECIFIC ROUTES */}
               <Route path="/contractor/perfil" element={<UserProfiles />} />
+              
               <Route path="/contractor/projects" element={<UserProfiles />} />
+              
               <Route path="/contractor/customers" element={<UserProfiles />} />
 
               <Route path="/contractor/customers" element={<UserProfiles />} />
@@ -196,9 +209,19 @@ export default function App() {
 
               <Route path="/contractor/tags" element={<TagsContrator/>} />
               
-              <Route path="/contractor/team" element={<Team />} />
+              <Route path="/contractor/team" element={<Team/>} />
               
-              
+              <Route path="/contractor/team-user" element={<TeamUser/>} />
+
+              {/* HOMEOWNER SPECIFIC ROUTES */}
+              <Route path="/homeowner/post-job" element={<PostJob/>} />
+              <Route path="/homeowner/jobs" element={<JobPage/>} />
+              <Route path="/homeowner/claims" element={<JobApplicationPage/>} />
+              <Route path="/homeowner/documents" element={<AttributeHomeownerList/>} />
+              <Route path="/homeowner/payments" element={<PaymentPage/>} />
+              <Route path="/homeowner/perfil" element={<UserProfiles/>} />
+
+
               {/* Note: Add contractor-specific routes here when components are created */}
               {/* <Route path="/admin/contractor/proyectos" element={<ContractorProjectsPage />} /> */}
               {/* <Route path="/admin/contractor/clientes" element={<ContractorClientsPage />} /> */}

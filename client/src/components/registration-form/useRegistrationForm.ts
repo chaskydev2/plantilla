@@ -7,6 +7,7 @@ import {
   useFormValidation 
 } from "../form-registration";
 import { AuthService } from "../../core/services/auth/auth.service";
+import { ProfessionService } from "../../core/services/profession/profession.service";
 import variables from "../../core/config/variables";
 import type { AppDispatch } from "../../store";
 import { toastify } from "../../core/utils/toastify";
@@ -79,7 +80,7 @@ export const useRegistrationForm = () => {
       
       if (response.data.access_token) {
         await saveAuthData(response.data);
-        toastify.success(`¡Registro exitoso! Bienvenido a nuestra plataforma.`);
+        toastify.success('¡Registro exitoso! Bienvenido a nuestra plataforma.');
         resetVerificationStates();
         
         // 🔄 Redirigir al dashboard
@@ -206,7 +207,7 @@ export const useRegistrationForm = () => {
       setEmailSent(true);
       
       // Para testing - código fijo 00000
-      console.log(`📧 Verification code sent to ${email}: ${code}`);
+      
       toastify.success(`Código de verificación enviado a ${email}. Usa: ${code}`);
       
     } catch (error) {
@@ -306,7 +307,24 @@ export const useRegistrationForm = () => {
   // 👷 CONTRACTOR REGISTRATION  
   const registerContractor = useCallback(async () => {
     const contractorData = formData as Extract<FormData, { userType: "contractor" }>;
-    const payload = {
+
+    // Obtener las profesiones disponibles y mapear las seleccionadas
+    let professionsSelected: Array<{ id: number; name?: string }> = [];
+    try {
+      const profRes = await ProfessionService.getAll();
+      const allProfessions: any[] = profRes.success && profRes.data ? profRes.data : [];
+      professionsSelected = (contractorData.role_ids || []).map((id: number) => {
+        const found = allProfessions.find((p) => p.id === id);
+        return found ? { id: found.id, name: found.name } : { id, name: undefined };
+      });
+    } catch (err) {
+      // Si falla la carga, enviamos al menos los ids
+      professionsSelected = (contractorData.role_ids || []).map((id: number) => ({ id }));
+      console.error('Error fetching professions for payload:', err);
+    }
+
+    console.log("📤 Sending contractor registration payload (form):", contractorData);
+  const payload = {
       // User data (matches Laravel User model)
       first_name: contractorData.firstName,
       last_name: contractorData.lastName,
@@ -328,7 +346,10 @@ export const useRegistrationForm = () => {
       
       // Categories and professions 
       categories: contractorData.role_ids || [],
-      professions: [],
+      professions: professionsSelected,
+
+  // Código de verificación (por defecto 5 ceros si no se generó otro)
+  verification_code: generatedCode || "00000",
       
       // Additional contractor fields
       portfolio_url: contractorData.portfolioUrl || null,
@@ -346,7 +367,7 @@ export const useRegistrationForm = () => {
     
     const response = await AuthService.registerContractor(payload);
     await handleRegistrationSuccess(response, "Contractor");
-  }, [formData, handleRegistrationSuccess]);
+  }, [formData, handleRegistrationSuccess, generatedCode]);
 
   // 🐛 DEBUG - Solo en desarrollo
   useEffect(() => {

@@ -1,6 +1,6 @@
 /**
  * UnderConstruction Component
- * Displays a "under construction" placeholder with animated loading dots
+ * Displays a "nstruction" placeholder with animated loading dots
  */
 const UnderConstruction = () => (
   <div className="min-h-96 flex items-center justify-center">

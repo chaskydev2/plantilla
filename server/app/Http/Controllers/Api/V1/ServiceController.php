@@ -14,6 +14,30 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ServiceController extends Controller
 {
+    /**
+     * Obtener los primeros 15 servicios
+     */
+    public function firstFifteen(): JsonResponse
+    {
+        $services = Service::orderBy('name', 'asc')->limit(15)->get();
+        return response()->json([
+            'success' => true,
+            'data' => $services,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Obtener todos los servicios
+     */
+    public function all(): JsonResponse
+    {
+        $services = Service::orderBy('name', 'asc')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $services,
+        ], Response::HTTP_OK);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = Service::query();

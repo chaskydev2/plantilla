@@ -124,6 +124,12 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
     }
   };
 
+  const handlePickCandidate = (candidate: { id: number; name: string; email?: string }) => {
+    const label = `${candidate.id} - ${candidate.name}${candidate.email ? ` (${candidate.email})` : ''}`;
+    setSearchTerm(label);
+    setValues(prev => ({ ...prev, member_user_id: candidate.id }));
+  };
+
   const handleSearch = async (term?: string) => {
     const query = (term ?? searchTerm).trim();
     if (!query) return;
@@ -176,6 +182,31 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
                 return <option key={c.id} value={label} />;
               })}
             </datalist>
+            {searchResults.length > 0 && (
+              <div className="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                {searchResults.map((candidate) => {
+                  const isSelected = String(values.member_user_id) === String(candidate.id);
+                  return (
+                    <button
+                      type="button"
+                      key={candidate.id}
+                      className={`w-full text-left px-3 py-2 text-sm transition-colors ${
+                        isSelected
+                          ? 'bg-gray-900 text-white dark:bg-gray-600'
+                          : 'bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100'
+                      }`}
+                      onClick={() => handlePickCandidate(candidate)}
+                    >
+                      <span className="font-semibold">{candidate.name}</span>
+                      <span className="ml-2 text-xs text-gray-500 dark:text-gray-300">ID: {candidate.id}</span>
+                      {candidate.email && (
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-300">{candidate.email}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Estado</label>

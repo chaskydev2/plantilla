@@ -61,6 +61,11 @@ export const getStats = async (): Promise<IApiResponse> => {
   return res.data;
 }
 
+export const getAttributesForHomeowners = async (): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/attributes/for-homeowners');
+  return res.data;
+}
+
 // Métodos específicos para filtros (usando parámetros en lugar de rutas específicas)
 export const getByCountry = async (countryCode: string, params?: IPaginationRequest): Promise<IApiResponse> => {
   const filterParams = { ...params, country_code: countryCode };
@@ -91,4 +96,5 @@ export const HomeownerService = {
   getByState,
   getByZip,
   getStats,
+  getAttributesForHomeowners,
 }

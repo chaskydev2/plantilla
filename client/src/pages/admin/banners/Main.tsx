@@ -155,10 +155,10 @@ const actions = [
   const renderToolbar = () => (
     <div className="flex flex-col gap-4 w-full sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-2">
-        {
-          ( hasPermission('historia_crear') && items.length == 0 ) &&
+        {/* Botón para agregar más banners, siempre visible si tiene permiso */}
+        {hasPermission('historia_crear') && (
           <button
-            className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+            className="bg-primary-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-primary-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
             onClick={() => {
               setCurrentItem(null);
               setIsModalOpen(true);
@@ -167,7 +167,7 @@ const actions = [
             <Plus className="w-5 h-5" />
             {t("admin.common.add")}
           </button>
-        }
+        )}
       </div>
       <div className="relative w-full sm:w-64">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-700 dark:text-gray-300">
@@ -186,7 +186,8 @@ const actions = [
 
   return (
     <div>
-  <PageBreadcrumb pageTitle={t("admin.sidebar.banner")} />
+      <PageBreadcrumb pageTitle={t("admin.sidebar.banner")} />
+      {/* Botón destacado para agregar nuevo banner */}
       <DataTable
         data={items as IItemResource[]}
         columns={columns}

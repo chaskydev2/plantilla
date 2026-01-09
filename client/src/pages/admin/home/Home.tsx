@@ -8,6 +8,7 @@ import React, { lazy, Suspense, useMemo } from "react";
 // Lazy-load the heavier dashboard views to improve initial load time
 const AdminDashboard = lazy(() => import("@/components/dashboard/AdminDashboard"));
 const ContractorDashboard = lazy(() => import("@/components/dashboard/ContractorDashboard"));
+const HomeOwnerDashboard = lazy(() => import("@/components/dashboard/HomeOwnerDashboard"));
 
 /**
  * Dashboard Component
@@ -65,6 +66,9 @@ export default function Dashboard(): JSX.Element {
     if (typeof hasRole === "function" && hasRole("contractor")) {
       // Pass user object (may be undefined) and let the child handle it
       return <ContractorDashboard user={user} />;
+    }
+    if (typeof hasRole === "function" && hasRole("homeowner")) {
+      return <HomeOwnerDashboard user={user} />;
     }
     return <UnderConstruction />;
     // eslint-disable-next-line react-hooks/exhaustive-deps

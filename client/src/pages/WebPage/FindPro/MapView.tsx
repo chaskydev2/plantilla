@@ -1,16 +1,36 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, Circle } from "@react-google-maps/api";
-import { MapPin, Star, ShieldCheck } from "lucide-react";
+import { MapPin, Star, Navigation2, ExternalLink, Search, Filter, Crosshair, Loader2, X } from "lucide-react";
 import type { Contractor } from "./ContractorCard";
 
-interface Props {
+interface MapViewProps {
   contractors: Contractor[];
   initialCenter?: { lat: number; lng: number };
   radiusMiles?: number;
 }
 
-export default function MapView({ contractors, initialCenter, radiusMiles = 10 }: Props) {
+// Estilo Silver para que el mapa no compita con los colores de la UI
+const mapStyle = [
+  { "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }] },
+  { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
+  { "featureType": "poi", "stylers": [{ "visibility": "off" }] },
+  { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e9e9e9" }] },
+  { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#9e9e9e" }] }
+];
+
+const categories = [
+  { label: "Todos", value: "all", keywords: [] },
+  { label: "Plomería", value: "plumbing", keywords: ["plumb", "water", "drain"] },
+  { label: "Electricidad", value: "electric", keywords: ["electric", "lighting", "wiring"] },
+  { label: "Techos", value: "roof", keywords: ["roof", "gutter", "shingle"] },
+  { label: "Pintura", value: "paint", keywords: ["paint", "finish", "coating"] }
+];
+
+export default function MapView({ contractors, initialCenter, radiusMiles = 10 }: MapViewProps) {
   const [selectedContractor, setSelectedContractor] = useState<Contractor | null>(null);
+  const [activeFilter, setActiveFilter] = useState(categories[0].value);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -19,275 +39,309 @@ export default function MapView({ contractors, initialCenter, radiusMiles = 10 }
   });
 
   const mapCenter = useMemo(() => initialCenter || { lat: 35.4676, lng: -97.5164 }, [initialCenter]);
+  const activeCategory = useMemo(() => categories.find((item) => item.value === activeFilter) ?? categories[0], [activeFilter]);
 
-  const mapOptions = useMemo<google.maps.MapOptions>(
-    () => ({
-      disableDefaultUI: false,
-      clickableIcons: true,
-      scrollwheel: true,
-      zoomControl: true,
-      streetViewControl: false,
-      mapTypeControl: false,
-      fullscreenControl: true,
-    }),
-    []
-  );
+  const filteredContractors = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
 
-  if (!isLoaded) {
-    return (
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-yellow-50">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <MapPin className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">Interactive Contractor Map</h3>
-                <p className="text-sm text-gray-600">Discover professionals in Oklahoma City area</p>
-              </div>
-            </div>
-          </div>
+    return contractors.filter((contractor) => {
+      const matchesSearch = normalizedSearch
+        ? [contractor.name, ...(contractor.services ?? [])].some((field) => field.toLowerCase().includes(normalizedSearch))
+        : true;
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg p-3 shadow-sm border border-blue-100">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
-                <div>
-                  <p className="text-xs text-gray-500">Available</p>
-                  <p className="font-bold text-blue-600">{contractors.length}</p>
-                </div>
-              </div>
-            </div>
+      if (activeFilter === "all") {
+        return matchesSearch;
+      }
 
-            <div className="bg-white rounded-lg p-3 shadow-sm border border-yellow-100">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></div>
-                <div>
-                  <p className="text-xs text-gray-500">Elite $250K</p>
-                  <p className="font-bold text-yellow-600">{contractors.filter((c) => c.elite).length}</p>
-                </div>
-              </div>
-            </div>
+      const keywords = activeCategory.keywords;
+      const matchesCategory = (contractor.services ?? []).some((service) =>
+        keywords.some((keyword) => service.toLowerCase().includes(keyword))
+      );
 
-            <div className="bg-white rounded-lg p-3 shadow-sm border border-green-100">
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-green-500" />
-                <div>
-                  <p className="text-xs text-gray-500">Avg Rating</p>
-                  <p className="font-bold text-green-600">{contractors.length ? (contractors.reduce((acc, c) => acc + c.rating, 0) / contractors.length).toFixed(1) : "0.0"}</p>
-                </div>
-              </div>
-            </div>
+      return matchesSearch && matchesCategory;
+    });
+  }, [activeCategory, activeFilter, contractors, searchTerm]);
 
-            <div className="bg-white rounded-lg p-3 shadow-sm border border-purple-100">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-purple-500" />
-                <div>
-                  <p className="text-xs text-gray-500">Active</p>
-                  <p className="font-bold text-purple-600">24/7</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  const stats = useMemo(() => {
+    if (!filteredContractors.length) {
+      return { averageRating: 0, eliteTotal: 0 };
+    }
 
-        <div className="h-[600px] bg-gradient-to-br from-blue-50 via-gray-50 to-yellow-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
-              <MapPin className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Loading Interactive Map</h3>
-            <p className="text-gray-600">Preparing contractor locations...</p>
-          </div>
-        </div>
+    const eliteTotal = filteredContractors.filter((contractor) => contractor.elite).length;
+    const ratingSum = filteredContractors.reduce((total, contractor) => total + (contractor.rating ?? 0), 0);
 
-        <div className="p-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-4 text-xs text-gray-600">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Regular Contractors</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span>Elite $250K Guaranteed</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 text-center">Interactive Google Maps • Click pins for details • Zoom to explore</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    return {
+      averageRating: Math.round((ratingSum / filteredContractors.length) * 10) / 10,
+      eliteTotal,
+    };
+  }, [filteredContractors]);
+
+  const topContractors = useMemo(() => filteredContractors.slice(0, 4), [filteredContractors]);
+
+  const handleResetPosition = () => {
+    if (!mapInstance) return;
+
+    mapInstance.panTo(mapCenter);
+    mapInstance.setZoom(12);
+    setSelectedContractor(null);
+  };
+
+  useEffect(() => {
+    if (!mapInstance || !selectedContractor) return;
+
+    mapInstance.panTo({ lat: selectedContractor.lat, lng: selectedContractor.lng });
+  }, [mapInstance, selectedContractor]);
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-yellow-50">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MapPin className="h-6 w-6 text-blue-600" />
+    <div className="bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_rgba(0,0,0,0.12)]">
+      
+      {/* 1. Header Dinámico con Búsqueda */}
+      <div className="p-6 space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3.5 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl shadow-blue-200 rotate-3">
+              <MapPin className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Interactive Contractor Map</h3>
-              <p className="text-sm text-gray-600">Discover professionals in Oklahoma City area</p>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">Red de Expertos</h3>
+              <p className="text-sm font-medium text-slate-500 flex items-center gap-1">
+                <Navigation2 className="h-3 w-3 fill-current" /> Oklahoma City, OK
+              </p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-full lg:w-auto">
+            <div className="relative flex-grow lg:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input 
+                type="search" 
+                placeholder="Buscar por servicio..." 
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                className="bg-transparent border-none text-sm w-full pl-9 pr-8 focus:ring-0 placeholder:text-slate-400 font-medium"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  aria-label="Limpiar búsqueda"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <button type="button" className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl shadow-sm hover:bg-slate-50 transition-colors border border-slate-200">
+              <Filter className="h-4 w-4 text-slate-600" />
+              <span className="text-xs font-semibold text-slate-500">{activeCategory.label}</span>
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg p-3 shadow-sm border border-blue-100">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
-              <div>
-                <p className="text-xs text-gray-500">Available</p>
-                <p className="font-bold text-blue-600">{contractors.length}</p>
-              </div>
-            </div>
-          </div>
+        {/* Chips de Categorías Rápidas */}
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {categories.map((category) => (
+            <button
+              key={category.value}
+              onClick={() => setActiveFilter(category.value)}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${
+                activeFilter === category.value 
+                ? "bg-slate-900 border-slate-900 text-white shadow-md" 
+                : "bg-white border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600"
+              }`}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
 
-          <div className="bg-white rounded-lg p-3 shadow-sm border border-yellow-100">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></div>
-              <div>
-                <p className="text-xs text-gray-500">Elite $250K</p>
-                <p className="font-bold text-yellow-600">{contractors.filter((c) => c.elite).length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-3 shadow-sm border border-green-100">
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-green-500" />
-              <div>
-                <p className="text-xs text-gray-500">Avg Rating</p>
-                <p className="font-bold text-green-600">{contractors.length ? (contractors.reduce((acc, c) => acc + c.rating, 0) / contractors.length).toFixed(1) : "0.0"}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-3 shadow-sm border border-purple-100">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-purple-500" />
-              <div>
-                <p className="text-xs text-gray-500">Active</p>
-                <p className="font-bold text-purple-600">24/7</p>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
+          <span className="uppercase tracking-widest">{filteredContractors.length} resultados</span>
+          <span className="w-1 h-1 rounded-full bg-slate-300" />
+          <span>
+            Promedio {stats.averageRating ? stats.averageRating.toFixed(1) : "-"} ★
+          </span>
+          <span className="w-1 h-1 rounded-full bg-slate-300" />
+          <span>{stats.eliteTotal} con garantía elite</span>
         </div>
       </div>
 
-      <div className="relative h-[600px]">
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          center={mapCenter}
-          zoom={12}
-          options={mapOptions}
-          onLoad={() => console.log("Google Map loaded successfully")}
+      {/* 2. Contenedor del Mapa con Botones Flotantes */}
+      <div className="relative h-[650px] group">
+        
+        {/* Botón de centrado flotante */}
+        <button
+          type="button"
+          onClick={handleResetPosition}
+          className="absolute right-4 top-4 z-20 bg-white p-3 rounded-2xl shadow-2xl border border-slate-100 hover:scale-110 active:scale-95 transition-all text-slate-700 group/btn"
+          disabled={!isLoaded}
         >
-          <Circle
-            center={mapCenter}
-            radius={radiusMiles * 1609.34}
-            options={{
-              fillColor: "#F5D238",
-              fillOpacity: 0.12,
-              strokeColor: "#1E1E17",
-              strokeOpacity: 0.45,
-              strokeWeight: 2,
-            }}
-          />
+          <Crosshair className="h-5 w-5 group-hover/btn:text-blue-600" />
+        </button>
 
-          {contractors
-            .filter(
-              (contractor) =>
-                typeof contractor.lat === "number" &&
-                typeof contractor.lng === "number" &&
-                !isNaN(contractor.lat) &&
-                !isNaN(contractor.lng)
-            )
-            .map((contractor) => (
+        {!isLoaded && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-slate-100/80 backdrop-blur-sm">
+            <Loader2 className="h-7 w-7 animate-spin text-slate-500" />
+            <p className="text-sm font-semibold text-slate-500">Cargando mapa inteligente…</p>
+          </div>
+        )}
+
+        {isLoaded && (
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "100%" }}
+            center={mapCenter}
+            zoom={12}
+            onLoad={setMapInstance}
+            onUnmount={() => setMapInstance(null)}
+            options={{
+              styles: mapStyle,
+              disableDefaultUI: true,
+              zoomControl: true,
+            }}
+          >
+            {/* Círculo de cobertura con degradado visual */}
+            <Circle
+              center={mapCenter}
+              radius={radiusMiles * 1609.34}
+              options={{
+                fillColor: "#3b82f6",
+                fillOpacity: 0.05,
+                strokeColor: "#3b82f6",
+                strokeOpacity: 0.2,
+                strokeWeight: 1,
+              }}
+            />
+
+            {filteredContractors.map((contractor: Contractor) => (
               <Marker
                 key={contractor.id}
                 position={{ lat: contractor.lat, lng: contractor.lng }}
                 onClick={() => setSelectedContractor(contractor)}
                 options={{
                   icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: contractor.elite ? 14 : 12,
-                    fillColor: contractor.elite ? "#F5D238" : "#1E1E17",
+                    path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",
+                    fillColor: contractor.elite ? "#f59e0b" : "#2563eb",
                     fillOpacity: 1,
-                    strokeColor: "#FFFFFF",
-                    strokeWeight: 3,
+                    strokeWeight: selectedContractor?.id === contractor.id ? 3 : 2,
+                    strokeColor: contractor.elite ? "#fcd34d" : "#ffffff",
+                    scale: selectedContractor?.id === contractor.id ? 1.7 : 1.5,
+                    anchor: new google.maps.Point(12, 24),
                   },
                 }}
               />
             ))}
 
-          {selectedContractor && (
-            <InfoWindow
-              position={{ lat: selectedContractor.lat, lng: selectedContractor.lng }}
-              onCloseClick={() => setSelectedContractor(null)}
-              options={{ pixelOffset: new google.maps.Size(0, -10) }}
-            >
-              <div className="p-4 max-w-sm">
-                <h3 className="font-bold text-gray-900 mb-2 text-lg">{selectedContractor.name}</h3>
-                {selectedContractor.elite && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-800 px-3 py-1 text-sm font-semibold mb-3">
-                    <ShieldCheck className="h-4 w-4" /> $250K Elite Guarantee
-                  </span>
-                )}
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${i < Math.floor(selectedContractor.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
-                      />
-                    ))}
+            {selectedContractor && (
+              <InfoWindow
+                position={{ lat: selectedContractor.lat, lng: selectedContractor.lng }}
+                onCloseClick={() => setSelectedContractor(null)}
+                options={{ pixelOffset: new google.maps.Size(0, -35) }}
+              >
+                <div className="p-0.5 min-w-[260px] animate-in fade-in zoom-in duration-200">
+                  <div className="relative h-24 mb-3 rounded-xl overflow-hidden bg-slate-900">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                    <div className="absolute bottom-2 left-3 z-20">
+                       <h4 className="font-bold text-white text-base">{selectedContractor.name}</h4>
+                       <p className="text-[10px] text-blue-200 font-bold uppercase tracking-widest">
+                         {selectedContractor.services?.[0] ?? "Servicio destacado"}
+                       </p>
+                    </div>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">
-                    {selectedContractor.rating.toFixed(1)} ({selectedContractor.reviews} reviews)
-                  </span>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                  <p className="text-sm font-medium text-gray-800 mb-1">Services:</p>
-                  <p className="text-sm text-gray-600">
-                    {selectedContractor.services.join(", ")}
-                    {selectedContractor.extraServicesCount && ` and ${selectedContractor.extraServicesCount} more`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                  <MapPin className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium">{selectedContractor.distanceMiles} miles away</span>
-                </div>
-                <button
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 transform hover:scale-105 shadow-md"
-                  onClick={() => console.log("Get quote for:", selectedContractor.name)}
-                >
-                  Get Free Quote
-                </button>
-              </div>
-            </InfoWindow>
-          )}
-        </GoogleMap>
-      </div>
 
-      <div className="p-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-4 text-xs text-gray-600">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>Regular Contractors</span>
+                  <div className="px-1 pb-2">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
+                        <Star className="h-3 w-3 text-amber-500 fill-current" />
+                        <span className="text-xs font-black text-amber-700">{selectedContractor.rating?.toFixed(1)}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                        {selectedContractor.distanceMiles} millas de ti
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="w-full bg-slate-900 hover:bg-blue-600 text-white text-[11px] font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 group/btn"
+                      onClick={() => console.log("Action")}
+                    >
+                      SOLICITAR COTIZACIÓN
+                      <ExternalLink className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </InfoWindow>
+            )}
+          </GoogleMap>
+        )}
+
+        {!!topContractors.length && (
+          <div className="absolute left-4 bottom-4 z-20 w-72 max-h-[75%] overflow-y-auto bg-white/90 backdrop-blur rounded-[1.75rem] border border-slate-200 shadow-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase font-semibold text-slate-400 tracking-[0.2em]">Resultados</p>
+                <p className="text-lg font-black text-slate-900">Destacados cerca de ti</p>
+              </div>
+              <span className="text-sm font-bold text-slate-500">{filteredContractors.length}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-              <span>Elite $250K Guaranteed</span>
+
+            <div className="space-y-3">
+              {topContractors.map((contractor) => (
+                <button
+                  key={contractor.id}
+                  type="button"
+                  onClick={() => setSelectedContractor(contractor)}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all ${
+                    selectedContractor?.id === contractor.id
+                      ? "border-blue-500 bg-blue-50/70 shadow-sm"
+                      : "border-slate-200 hover:border-blue-400 hover:bg-blue-50/50"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-black text-slate-900">{contractor.name}</p>
+                      <p className="text-[11px] font-semibold text-slate-500">
+                        {contractor.services.slice(0, 2).join(" • ")}
+                      </p>
+                    </div>
+                    {contractor.elite && (
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-full uppercase tracking-widest">
+                        Elite
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-semibold text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Star className="h-3 w-3 text-amber-500 fill-current" />
+                      {contractor.rating?.toFixed(1) ?? "-"}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      {contractor.distanceMiles} mi
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
-          <p className="text-xs text-gray-500 text-center">Interactive Google Maps • Click pins for details • Zoom to explore</p>
+        )}
+      </div>
+
+      {/* 3. Footer con Estadísticas */}
+      <div className="p-5 bg-slate-50 border-t border-slate-100 flex flex-wrap justify-between items-center gap-4">
+        <div className="flex gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 bg-blue-600 rounded-full animate-pulse" />
+            <span className="text-[11px] font-bold text-slate-600 uppercase">En línea</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" />
+            <span className="text-[11px] font-bold text-slate-600 uppercase">Garantía Elite</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400">
+          <span>Promedio actualizado en tiempo real</span>
+          <span className="w-1 h-1 rounded-full bg-slate-300" />
+          <span>© 2024 Contractor Network • Google Maps Premium Partner</span>
         </div>
       </div>
     </div>

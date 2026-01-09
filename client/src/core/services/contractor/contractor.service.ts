@@ -99,6 +99,18 @@ export const getNearLocation = async (
   return res.data;
 }
 
+export const getNearByContractorId = async (
+  contractorId: number | string,
+  params: IPaginationRequest = {},
+  config: { signal?: AbortSignal } = {}
+): Promise<IApiResponse> => {
+  const res = await axios.get(`/v1/contractors/${contractorId}/near`, {
+    params,
+    ...config,
+  });
+  return res.data;
+};
+
 export const approve = async (id: any): Promise<IApiResponse> => {
   const res = await axios.patch(`/v1/trabajadores/${id}/approve`);
   return res.data;
@@ -146,12 +158,14 @@ export const getAttributeContractorsByUser = async (userId: number): Promise<IAp
 };
 
 export const getTeamMembersByLeader = async (leaderUserId: number): Promise<IApiResponse> => {
-  const res = await axios.get(`/v1/contractors/${leaderUserId}/team-members`);
+  const res = await axios.get(`/v1/contractor-team-members/${leaderUserId}`);
   return res.data;
 };
 
 export const getTeamByMember = async (memberUserId: number): Promise<IApiResponse> => {
-  const res = await axios.get(`/v1/contractor-team-members/member/${memberUserId}`);
+  const res = await axios.get('/v1/contractor-members-users', {
+    params: { member_user_id: memberUserId },
+  });
   return res.data;
 };
 
@@ -162,6 +176,17 @@ export const createTeamMember = async (payload: {
   compania?: string;
 }): Promise<IApiResponse> => {
   const res = await axios.post('/v1/contractor-team-members', payload);
+  return res.data;
+};
+
+export const updateTeamMemberStatus = async (
+  memberUserId: number,
+  payload: {
+    leader_user_id: number;
+    status: 'pending' | 'active' | 'inactive';
+  }
+): Promise<IApiResponse> => {
+  const res = await axios.patch(`/v1/attribute-contractors/${memberUserId}/status`, payload);
   return res.data;
 };
 
@@ -189,6 +214,7 @@ export const ContractorService = {
   getStats,
   getByStatus,
   getNearLocation,
+  getNearByContractorId,
   approve,
   reject,
   suspend,
@@ -200,6 +226,7 @@ export const ContractorService = {
   getTeamMembersByLeader,
   getTeamByMember,
   createTeamMember,
+  updateTeamMemberStatus,
   deleteTeamMember,
   searchContractorsByName,
 }

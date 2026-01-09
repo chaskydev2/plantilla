@@ -19,7 +19,21 @@ class ContractorController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Contractor::with('user');
+        $query = Contractor::with([
+            // Relaciones del contractor
+            'professions',
+            'tags',
+            'attributeContractors.attribute',
+
+            // Relaciones del usuario asociado
+            'user.roles',
+            'user.academicTrainings',
+            'user.workExperiences',
+            'user.technicalSkills',
+            'user.workReferences',
+            'user.professions',
+            'user.homeownerProfile',
+        ]);
 
         // Apply filters
         if ($request->filled('search')) {
@@ -187,7 +201,21 @@ class ContractorController extends Controller
             abort(400, 'Estado no válido');
         }
 
-        $query = Contractor::with('user')->where('contract_status', $status);
+        $query = Contractor::with([
+            'professions',
+            'tags',
+            'attributeContractors.attribute',
+            'teamMembers.user',
+            'teamLeaders.user',
+            'jobsCreator',
+            'user.roles',
+            'user.academicTrainings',
+            'user.workExperiences',
+            'user.technicalSkills',
+            'user.workReferences',
+            'user.professions',
+            'user.homeownerProfile',
+        ])->where('contract_status', $status);
 
         // Apply additional filters
         if ($request->filled('search')) {
@@ -257,6 +285,7 @@ class ContractorController extends Controller
             'service_area' => 'nullable|string',
             'min_rating' => 'nullable|numeric|min:0|max:5',
             'profession_name' => 'nullable|string',
+            'tag_name' => 'nullable|string',
         ]);
 
         $lat = (float) $validated['lat'];
@@ -265,14 +294,36 @@ class ContractorController extends Controller
         $tagIds = $validated['tags'] ?? [];
         $professionIds = $validated['professions'] ?? [];
         $professionName = $validated['profession_name'] ?? null;
+        $tagName = $validated['tag_name'] ?? null;
 
-        $query = Contractor::with(['user', 'tags', 'professions']);
+
+        $query = Contractor::with([
+                'professions',
+                'tags',
+                'attributeContractors.attribute',
+                'user.roles',
+                'user.academicTrainings',
+                'user.workExperiences',
+                'user.technicalSkills',
+                'user.workReferences',
+                'user.professions',
+                'user.homeownerProfile',
+            ])
+            ->whereHas('user', function($q) {
+                $q->where('verification', true);
+            });
 
         // Filtrar por nombre de profesión si se proporciona
         if ($professionName) {
-           
             $query->whereHas('professions', function ($q) use ($professionName) {
                 $q->where('name', 'like', "%{$professionName}%");
+            });
+        }
+
+        // Filtrar por nombre de tag si se proporciona
+        if (!empty($tagName)) {
+            $query->whereHas('tags', function ($q) use ($tagName) {
+                $q->where('name', 'like', "%{$tagName}%");
             });
         }
 
@@ -334,16 +385,86 @@ class ContractorController extends Controller
     public function showFullInfo($id): JsonResponse
     {
         $contractor = Contractor::with([
-                'user',
-                'professions',
-                'attributeContractors.attribute',
+            // Relaciones directas del contractor
+            'professions',
+            'tags',
+            'attributeContractors.attribute',
+
+            // Relaciones del usuario asociado
+            'user.roles',
+            'user.academicTrainings',
+            'user.workExperiences',
+            'user.technicalSkills',
+            'user.workReferences',
+            'user.professions',
+            'user.homeownerProfile',
         ])->findOrFail($id);
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Información completa del contractor obtenida correctamente',
+            'data' => new ContractorResource($contractor),
+        ]);
+    }
+
+    /**
+     * Contractors cercanos a un contractor dado (por lat/lng),
+     * limitados por defecto a 10 resultados.
+     *
+     * Respuesta siempre envuelta en { success, message, data }
+     * para que el frontend pueda tratarlo como IApiResponse.
+     */
+    public function nearByContractor(Request $request, int $id): JsonResponse
+    {
+        $baseContractor = Contractor::find($id);
+
+        if (!$baseContractor) {
             return response()->json([
-                'success' => true,
-                'message' => 'Información completa del contractor obtenida correctamente',
-                'data' => $contractor
-            ]);
+                'success' => false,
+                'message' => 'Contractor no encontrado',
+                'data' => [],
+            ], 404);
+        }
+
+        if ($baseContractor->lat === null || $baseContractor->lng === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El contractor base no tiene coordenadas (lat/lng) definidas',
+                'data' => [],
+            ], 400);
+        }
+
+        $validated = $request->validate([
+            'radius' => 'nullable|numeric|min:1|max:500',
+            'limit' => 'nullable|integer|min:1|max:50',
+        ]);
+
+        $radius = isset($validated['radius']) ? (float) $validated['radius'] : 20.0;
+        $limit = isset($validated['limit']) ? (int) $validated['limit'] : 10;
+
+        $query = Contractor::with([
+                'professions',
+                'tags',
+                'attributeContractors.attribute',
+                'user.roles',
+                'user.academicTrainings',
+                'user.workExperiences',
+                'user.technicalSkills',
+                'user.workReferences',
+                'user.professions',
+                'user.homeownerProfile',
+            ])
+            ->withinRadius((float) $baseContractor->lat, (float) $baseContractor->lng, $radius)
+            ->where('user_id', '!=', $baseContractor->user_id);
+
+        $contractors = $query->take($limit)->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contractors cercanos obtenidos correctamente',
+            // Si no hay ninguno, esto será simplemente una colección vacía
+            'data' => ContractorResource::collection($contractors),
+        ]);
     }
 
     public function searchByUserName(Request $request): AnonymousResourceCollection
@@ -356,11 +477,114 @@ class ContractorController extends Controller
         $name = strtolower($request->name);
         $perPage = $request->input('per_page', 15);
 
-        $contractors = Contractor::with('user')
+        $contractors = Contractor::with([
+                'professions',
+                'tags',
+                'attributeContractors.attribute',
+                'user.roles',
+                'user.academicTrainings',
+                'user.workExperiences',
+                'user.technicalSkills',
+                'user.workReferences',
+                'user.professions',
+                'user.homeownerProfile',
+            ])
             ->whereHas('user', function ($q) use ($name) {
                 $q->whereRaw('LOWER(name) LIKE ?', ['%' . $name . '%']);
             })
             ->paginate($perPage);
+
+        return ContractorResource::collection($contractors);
+    }
+
+    /**
+     * Lightweight list of contractors (basic user + contractor data).
+     */
+    public function indexSimple(Request $request): AnonymousResourceCollection
+    {
+        $query = Contractor::with(['user.roles']);
+
+        if ($request->filled('search')) {
+            $query->search($request->search);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('contract_status', $request->status);
+        }
+
+        if ($request->filled('city')) {
+            $query->byCity($request->city);
+        }
+
+        if ($request->filled('service_area')) {
+            $query->byServiceArea($request->service_area);
+        }
+
+        if ($request->filled('min_rating')) {
+            $query->byRating((float) $request->min_rating);
+        }
+
+        if ($request->filled('is_insured')) {
+            $query->where('is_insured', $request->boolean('is_insured'));
+        }
+
+        if ($request->filled('has_driving_license')) {
+            $query->where('has_driving_license', $request->boolean('has_driving_license'));
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDir = $request->get('sort_dir', 'desc');
+        $query->sort($sortBy, $sortDir);
+
+        // Pagination
+        $perPage = $request->get('per_page', 15);
+        $contractors = $query->paginate($perPage);
+
+        return ContractorResource::collection($contractors);
+    }
+
+    /**
+     * Lightweight contractor detail (basic user + contractor data).
+     */
+    public function showSimple(Contractor $contractor): ContractorResource
+    {
+        $contractor->load(['user.roles']);
+
+        return new ContractorResource($contractor);
+    }
+
+    /**
+     * Listado completo de contractors con toda la información relacionada,
+     * sin filtros adicionales (solo orden y paginación).
+     */
+    public function advancedSearch(Request $request): AnonymousResourceCollection
+    {
+        $validated = $request->validate([
+            'per_page' => 'nullable|integer|min:1|max:100',
+            'sort_by' => 'nullable|string',
+            'sort_dir' => 'nullable|in:asc,desc',
+        ]);
+
+        $query = Contractor::with([
+            'professions',
+            'tags',
+            'attributeContractors.attribute',
+            'user.roles',
+            'user.academicTrainings',
+            'user.workExperiences',
+            'user.technicalSkills',
+            'user.workReferences',
+            'user.professions',
+            'user.homeownerProfile',
+        ]);
+
+        $sortBy = $validated['sort_by'] ?? 'created_at';
+        $sortDir = $validated['sort_dir'] ?? 'desc';
+        $query->sort($sortBy, $sortDir);
+
+        $perPage = $validated['per_page'] ?? 15;
+        $contractors = $query->paginate($perPage);
 
         return ContractorResource::collection($contractors);
     }

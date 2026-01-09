@@ -54,7 +54,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
         setAttributes(res?.data?.data || res?.data || res || []);
         setError(null);
       })
-      .catch(() => setError("Error al cargar los requisitos"))
+      .catch(() => setError("Failed to load requirements"))
       .finally(() => setLoading(false));
   }, [user?.verification]);
 
@@ -63,7 +63,10 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
     if (!contractorId) return;
 
     AttributeContractorUploadService.getByContractor(contractorId)
-      .then((res: any) => setUploadedAttributes(res?.data || res || []))
+      .then((res: any) => {
+        const candidates = res?.data?.data ?? res?.data ?? res;
+        setUploadedAttributes(Array.isArray(candidates) ? candidates : []);
+      })
       .catch(() => setUploadedAttributes([]));
   }, [user?.id, user?.user_id, submitSuccess]);
 
@@ -94,7 +97,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
 
     try {
       const contractorId = user?.id || user?.user_id;
-      if (!contractorId) throw new Error("Contractor no encontrado");
+      if (!contractorId) throw new Error("Contractor not found");
 
       const payload = attributes
         .map(attr => ({
@@ -102,10 +105,12 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
           value: selectedFiles[attr.slug || attr.name] ?? null,
         }))
         .filter(p => p.value !== null);
+      
+      console.log("Payload:", payload);
+      
+      if (!payload.length) throw new Error("Select at least one file");
 
-      if (!payload.length) throw new Error("Selecciona al menos un archivo");
-
-      await AttributeContractorUploadService.upload(
+      const response = await AttributeContractorUploadService.upload(
         contractorId,
         payload,
         localStorage.getItem("token") || localStorage.getItem("_tkn") || "",
@@ -118,11 +123,19 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
         }
       );
 
-      setSubmitSuccess("Documentos enviados correctamente");
+      const successMessage =
+        response?.data?.message ||
+        response?.data?.detail ||
+        "Documents submitted successfully";
+
+      console.log(response);
+
+      setSubmitSuccess(successMessage);
       setSelectedFiles({});
       setUploadProgress(null);
     } catch (err: any) {
-      setSubmitError(err.message || "Error al enviar");
+      console.log("Submission error:", err);
+      setSubmitError(err.message || "Submission failed");
     } finally {
       setSubmitLoading(false);
     }
@@ -153,14 +166,14 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
             <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-yellow-200">
               <header className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-yellow-200">
-                  📄 Documentación requerida
+                  📄 Required documentation
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Sube los documentos para validar tu perfil
+                  Upload the documents to validate your profile
                 </p>
               </header>
 
-              {loading && <p className="text-sm text-gray-500">Cargando requisitos...</p>}
+              {loading && <p className="text-sm text-gray-500">Loading requirements...</p>}
               {error && <p className="text-sm text-red-500">{error}</p>}
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -180,7 +193,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
                           onClick={() => setPdfViewerUrl(getDocumentUrl(uploaded.value))}
                           className="text-green-600 font-semibold underline"
                         >
-                          ✔ Ver documento enviado
+                          ✔ View uploaded document
                         </button>
                       ) : (
                         <label className="flex flex-col items-center justify-center border-2 border-dashed border-yellow-300 rounded-xl p-5 cursor-pointer hover:bg-yellow-50 transition">
@@ -188,7 +201,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
                             upload_file
                           </span>
                           <span className="text-sm font-semibold mt-2">
-                            Seleccionar archivo
+                            Select file
                           </span>
                           <input
                             type="file"
@@ -202,7 +215,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
 
                       {selectedFiles[key] && !uploaded?.value && (
                         <p className="text-sm text-green-600 mt-2">
-                          Archivo seleccionado: {selectedFiles[key]?.name}
+                          Selected file: {selectedFiles[key]?.name}
                         </p>
                       )}
                     </div>
@@ -214,14 +227,14 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
                     disabled={submitLoading}
                     className="w-full py-4 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold shadow-lg"
                   >
-                    {submitLoading ? "Enviando..." : "Enviar documentos"}
+                    {submitLoading ? "Submitting..." : "Submit documents"}
                   </button>
                 )}
 
                 {uploadProgress !== null && (
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span>Subiendo</span>
+                      <span>Uploading</span>
                       <span>{uploadProgress}%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full">
@@ -239,9 +252,9 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
 
               {uploadedAttributes.length > 0 && (
                 <section className="mt-6">
-                  <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-yellow-100">
-                    Documentos enviados
-                  </h3>
+                    <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-yellow-100">
+                      Submitted documents
+                    </h3>
                   <ul className="space-y-2">
                     {uploadedAttributes.map(item => (
                       <UploadedDocumentItem
@@ -261,9 +274,9 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
           {user?.verification && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title="Activos" value="8" subtitle="Trabajos activos" />
-                <StatCard title="Completados" value="45" subtitle="Finalizados" />
-                <StatCard title="Rating" value="4.8/5" subtitle="Calificación" />
+                <StatCard title="Active" value="8" subtitle="Active jobs" />
+                <StatCard title="Completed" value="45" subtitle="Finished jobs" />
+                <StatCard title="Rating" value="4.8/5" subtitle="Average rating" />
               </div>
 
               <EarningsOverview contractorStats={contractorStats} />

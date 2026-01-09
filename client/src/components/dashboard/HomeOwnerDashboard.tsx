@@ -1,0 +1,426 @@
+import React, { useEffect, useState } from "react";
+import type { AxiosProgressEvent } from "axios";
+import type { User } from "@/types/dashboard";
+import { AttributeHomeownerService } from "@/core/services/homeowner/attributeHomeowner.service";
+import { AttributeHomeownerUploadService } from "@/core/services/homeowner/attributeHomeownerUpload.service";
+
+import StatCard from "./StatCard";
+import QuickActionsPanel from "./QuickActionsPanel";
+import SupportChat from "./SupportChat";
+import UploadedDocumentItem from "./UploadedDocumentItem";
+
+interface HomeOwnerDashboardProps {
+  user?: User | null;
+}
+
+const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
+  const [attributes, setAttributes] = useState<any[]>([]);
+  const [uploadedAttributes, setUploadedAttributes] = useState<any[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
+
+  const homeownerProfile: any =
+    (user as any)?.homeowner_profile ||
+    (user as any)?.homeownerProfile ||
+    (user as any)?.profile ||
+    null;
+
+  const homeownerId: number | null =
+    homeownerProfile?.id ||
+    homeownerProfile?.homeowner_id ||
+    homeownerProfile?.user_id ||
+    (user as any)?.homeowner_id ||
+    user?.id ||
+    (user as any)?.user_id ||
+    null;
+
+  const userId = (user as any)?.id ?? null;
+  const userAltId = (user as any)?.user_id ?? null;
+
+  const isVerified = Boolean(
+    (user as any)?.verification ||
+      homeownerProfile?.verification ||
+      homeownerProfile?.verified_at
+  );
+
+  const displayName =
+    homeownerProfile?.first_name && homeownerProfile?.last_name
+      ? `${homeownerProfile.first_name} ${homeownerProfile.last_name}`
+      : user?.name || user?.email || "";
+
+  const getDocumentUrl = (value: string) => `https://gud.zion-soft.com/${value}`;
+
+  const extractArray = (source: any): any[] => {
+    if (!source) return [];
+
+    if (Array.isArray(source)) {
+      return source;
+    }
+
+    if (typeof source === "object") {
+      for (const value of Object.values(source)) {
+        const candidate = extractArray(value);
+        if (candidate.length) {
+          return candidate;
+        }
+      }
+    }
+
+    return [];
+  };
+
+  const normalizeAttributes = (items: any[]): any[] => {
+    const uniqueMap = new Map<number, any>();
+
+    items
+      .map(item => {
+        if (item?.attribute) {
+          return {
+            ...item.attribute,
+            id: item.attribute.id ?? item.attribute.attribute_id,
+            slug: item.attribute.slug ?? item.attribute.key ?? item.attribute.name,
+          };
+        }
+
+        if (item?.attribute_id && item?.name) {
+          return {
+            ...item,
+            id: item.attribute_id,
+            slug: item.slug || item.key || item.code || item.name,
+          };
+        }
+
+        return item;
+      })
+      .filter(attr => attr && (attr.id || attr.attribute_id))
+      .forEach(attr => {
+        const attrId = Number(attr.id || attr.attribute_id);
+        if (Number.isNaN(attrId)) return;
+
+        if (!uniqueMap.has(attrId)) {
+          uniqueMap.set(attrId, {
+            ...attr,
+            id: attrId,
+            name:
+              attr.name ||
+              attr.title ||
+              attr.attribute_name ||
+              attr.label ||
+              `Requirement #${attrId}`,
+            slug: attr.slug || attr.key || attr.code || attr.name || String(attrId),
+          });
+        }
+      });
+
+    return Array.from(uniqueMap.values());
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRequirements = async () => {
+      if (isVerified) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const fallback = async () => {
+          const res = await AttributeHomeownerService.getCatalog();
+          const fallbackList = extractArray(res);
+          return normalizeAttributes(fallbackList);
+        };
+
+        const fetchByHomeowner = async () => {
+          if (!homeownerId) return [];
+          const res = await AttributeHomeownerService.getByHomeowner(Number(homeownerId));
+          return normalizeAttributes(extractArray(res));
+        };
+
+        const fetchByUser = async () => {
+          const identifier =
+            (user as any)?.user_id ||
+            (user as any)?.id ||
+            homeownerProfile?.user_id;
+
+          if (!identifier) return [];
+          const res = await AttributeHomeownerService.getByUser(Number(identifier));
+          return normalizeAttributes(extractArray(res));
+        };
+
+        let normalizedAttributes = await fetchByHomeowner();
+
+        
+        if (!normalizedAttributes.length) {
+          normalizedAttributes = await fetchByUser();
+        }
+
+        if (!normalizedAttributes.length) {
+          normalizedAttributes = await fallback();
+        }
+
+        if (isMounted) {
+          setAttributes(normalizedAttributes);
+          setError(normalizedAttributes.length ? null : "No requirements found");
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          setError(err?.message || "Failed to load requirements");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchRequirements();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isVerified, homeownerId, userId, userAltId]);
+
+  useEffect(() => {
+    if (!homeownerId) return;
+
+    AttributeHomeownerUploadService.getByHomeowner(homeownerId)
+      .then(res => {
+        const data = res?.data?.data ?? res?.data ?? res;
+        setUploadedAttributes(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setUploadedAttributes([]));
+  }, [homeownerId, submitSuccess]);
+
+  const handleFileChange = (key: string, file?: File | null) => {
+    setSelectedFiles(prev => ({ ...prev, [key]: file ?? null }));
+  };
+
+  const allRequirementsUploaded =
+    attributes.length > 0 &&
+    attributes.every(attr =>
+      uploadedAttributes.some(
+        ua =>
+          (ua.attribute_id === attr.id || ua.attribute?.id === attr.id) &&
+          ua.value
+      )
+    );
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    setSubmitLoading(true);
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    try {
+      if (!homeownerId) {
+        throw new Error("Homeowner not found");
+      }
+
+      const payload = attributes
+        .map(attr => ({
+          attribute_id: Number(attr.id),
+          value: selectedFiles[attr.slug || attr.name] ?? null,
+        }))
+        .filter(item => item.value !== null);
+
+      if (!payload.length) {
+        throw new Error("Select at least one file");
+      }
+
+      const response = await AttributeHomeownerUploadService.upload(
+        homeownerId,
+        payload,
+        localStorage.getItem("token") ||
+          localStorage.getItem("_tkn") ||
+          "",
+        {
+          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            if (progressEvent.total) {
+              setUploadProgress(
+                Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              );
+            }
+          },
+        }
+      );
+
+      const successMessage =
+        response?.data?.message ||
+        response?.data?.detail ||
+        "Documents submitted successfully";
+
+      setSubmitSuccess(successMessage);
+      setSelectedFiles({});
+      setUploadProgress(null);
+    } catch (err: any) {
+      setSubmitError(err.message || "Submission failed");
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      {pdfViewerUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center"
+          onClick={() => setPdfViewerUrl(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[80vh]"
+            onClick={event => event.stopPropagation()}
+          >
+            <iframe src={pdfViewerUrl} className="w-full h-full rounded-2xl" />
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col lg:flex-row gap-8">
+        <main className="flex-1 space-y-8">
+          {!isVerified && (
+            <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-yellow-200">
+              <header className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-yellow-200">
+                  Documentación requerida
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Sube los documentos necesarios para validar tu cuenta de propietario.
+                </p>
+              </header>
+
+              {loading && <p className="text-sm text-gray-500">Loading requirements...</p>}
+              {error && <p className="text-sm text-red-500">{error}</p>}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {attributes.map(attr => {
+                  const key = attr.slug || attr.name;
+                  const uploaded = uploadedAttributes.find(
+                    ua => ua.attribute_id === attr.id || ua.attribute?.id === attr.id
+                  );
+
+                  return (
+                    <div key={attr.id} className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
+                      <p className="font-semibold mb-2">{attr.name}</p>
+
+                      {uploaded?.value ? (
+                        <button
+                          type="button"
+                          onClick={() => setPdfViewerUrl(getDocumentUrl(uploaded.value))}
+                          className="text-green-600 font-semibold underline"
+                        >
+                          ✔ View uploaded document
+                        </button>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-yellow-300 rounded-xl p-5 cursor-pointer hover:bg-yellow-50 transition">
+                          <span className="material-icons text-3xl text-yellow-500">
+                            upload_file
+                          </span>
+                          <span className="text-sm font-semibold mt-2">Select file</span>
+                          <input
+                            type="file"
+                            hidden
+                            onChange={event => handleFileChange(key, event.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                      )}
+
+                      {selectedFiles[key] && !uploaded?.value && (
+                        <p className="text-sm text-green-600 mt-2">
+                          Selected file: {selectedFiles[key]?.name}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {!allRequirementsUploaded && (
+                  <button
+                    disabled={submitLoading}
+                    className="w-full py-4 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold shadow-lg"
+                  >
+                    {submitLoading ? "Submitting..." : "Submit documents"}
+                  </button>
+                )}
+
+                {uploadProgress !== null && (
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Uploading</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div
+                        className="h-2 bg-yellow-400 rounded-full"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {submitSuccess && <p className="text-green-600">{submitSuccess}</p>}
+                {submitError && <p className="text-red-600">{submitError}</p>}
+              </form>
+
+              {uploadedAttributes.length > 0 && (
+                <section className="mt-6">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-yellow-100">
+                    Submitted documents
+                  </h3>
+                  <ul className="space-y-2">
+                    {uploadedAttributes.map(item => (
+                      <UploadedDocumentItem
+                        key={item.id || `${item.attribute_id}-${item.value}`}
+                        item={item}
+                        allRequirementsUploaded={allRequirementsUploaded}
+                        getDocumentUrl={getDocumentUrl}
+                        setPdfViewerUrl={setPdfViewerUrl}
+                      />
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </section>
+          )}
+
+          {isVerified && (
+            <>
+              <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100">
+                <h2 className="text-2xl font-semibold text-gray-800 dark:text-yellow-200">
+                  Bienvenido{displayName ? `, ${displayName}` : ""}
+                </h2>
+                <p className="mt-2 text-sm text-gray-600">
+                  Gestiona tus proyectos, programa visitas y guarda a tus contratistas favoritos.
+                </p>
+              </section>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard title="Solicitudes activas" value="0" subtitle="Proyectos en curso" />
+                <StatCard title="Visitas agendadas" value="0" subtitle="Próximas visitas" />
+                <StatCard title="Favoritos" value="0" subtitle="Contratistas guardados" />
+              </div>
+            </>
+          )}
+        </main>
+
+        {user?.edit_profile && (
+          <aside className="w-full lg:w-96 space-y-6">
+            <QuickActionsPanel />
+            <SupportChat />
+          </aside>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default HomeOwnerDashboard;

@@ -15,6 +15,49 @@ use Illuminate\Support\Facades\Gate;
 
 class BannerController extends Controller
 {
+    /**
+     * Guardar imagen del banner
+     */
+    private function persistImage($request, ?string $currentPath): ?string
+    {
+        if ($request->boolean('remove_image')) {
+            $this->deleteImageIfExists($currentPath);
+            return null;
+        }
+
+        if (!$request->hasFile('image')) {
+            return '__keep';
+        }
+
+        $file = $request->file('image');
+        if (!$file || !$file->isValid()) {
+            return '__keep';
+        }
+
+        $this->deleteImageIfExists($currentPath);
+
+        $directory = public_path('assets/banners');
+        if (!\File::isDirectory($directory)) {
+            \File::makeDirectory($directory, 0755, true);
+        }
+
+        $filename = uniqid('banner_') . '.' . $file->getClientOriginalExtension();
+        $file->move($directory, $filename);
+
+        return 'assets/banners/' . $filename;
+    }
+
+    private function deleteImageIfExists(?string $path): void
+    {
+        if (!$path) {
+            return;
+        }
+        $fullPath = public_path($path);
+        if (\File::exists($fullPath)) {
+            @\File::delete($fullPath);
+        }
+    }
+
     public function index(PaginationRequest $request): JsonResponse
     {
         Gate::authorize('banner_listar');
@@ -54,7 +97,11 @@ class BannerController extends Controller
     {
         Gate::authorize('banner_crear');
 
-        $banner = Banner::create($request->validated());
+        $data = $request->validated();
+        $imagePath = $this->persistImage($request, null);
+        $data['image'] = $imagePath === '__keep' ? null : $imagePath;
+
+        $banner = Banner::create($data);
 
         return (new BannerResource($banner))
             ->additional([
@@ -70,7 +117,12 @@ class BannerController extends Controller
         Gate::authorize('banner_editar');
 
         $banner = Banner::findOrFail($id);
-        $banner->update($request->validated());
+        $data = $request->validated();
+        $data['image'] = $this->persistImage($request, $banner->image);
+        if ($data['image'] === '__keep') {
+            unset($data['image']);
+        }
+        $banner->update($data);
 
         return (new BannerResource($banner))
             ->additional([
@@ -86,6 +138,7 @@ class BannerController extends Controller
         Gate::authorize('banner_eliminar');
 
         $banner = Banner::findOrFail($id);
+        $this->deleteImageIfExists($banner->image);
         $banner->delete();
         return response()->json([
             'success' => true,

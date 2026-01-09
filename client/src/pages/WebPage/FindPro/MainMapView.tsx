@@ -1,43 +1,32 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { createPortal } from "react-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FilterPopup } from "../../../components/FilterPopup";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, Circle, OverlayView } from "@react-google-maps/api";
 import { Navigation, MapPin, Star, ShieldCheck, Search } from "lucide-react";
 // Minimal typings for Google Places to avoid using any
-type PlacesPrediction = { description: string; place_id: string };
-type PlacesAutocompleteService = {
-  getPlacePredictions: (
-    request: { input: string; sessionToken?: unknown; types?: string[] },
-    callback: (predictions: PlacesPrediction[] | null, status: string) => void
-  ) => void;
-};
-type AddressComponent = { long_name: string; short_name: string; types: string[] };
-type GeocoderResult = { address_components: AddressComponent[]; formatted_address: string };
-type Geocoder = {
-  geocode: (
-    request: { location: { lat: number; lng: number } } | { address: string },
-    callback: (results: GeocoderResult[] | null, status: string) => void
-  ) => void;
-};
+
 // Quick locations for the filter popup
-const quickLocations = [
-  "Madrid, ES",
-  "Barcelona, ES",
-  "Valencia, ES",
-  "Sevilla, ES",
-  "Bilbao, ES",
-];
+
 import locationContractorIcon from "../../../assets/images/locationContractor.svg";
 import type { Contractor } from "./ContractorCard";
+
+const DEFAULT_AVATAR = "/default-avatar.png";
 interface Props {
   contractors: Contractor[];
   initialCenter?: { lat: number; lng: number };
+  onVisibleChange?: (visible: Contractor[]) => void;
 }
 
-export default function MainMapView({ contractors, initialCenter }: Props) {
+export default function MainMapView({ contractors, initialCenter, onVisibleChange }: Props) {
+  const navigate = useNavigate();
+  const routeLocation = useLocation();
   // Popup filter state
   const [showFilter, setShowFilter] = useState(false);
   const filterRef = useRef<HTMLDivElement | null>(null);
+  // Log para depuración del modal de filtros
+  useEffect(() => {
+    console.log("showFilter:", showFilter);
+  }, [showFilter]);
   // Filter fields
   const [filterService, setFilterService] = useState("");
   const [filterLocation, setFilterLocation] = useState("");
@@ -46,6 +35,9 @@ export default function MainMapView({ contractors, initialCenter }: Props) {
   const [filterError, setFilterError] = useState<string | null>(null);
   // For closing popup on outside click/Escape
   useEffect(() => {
+    filterLocation
+    filterLatLng
+    setFilterError
     if (!showFilter) return;
     const handleClick = (e: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
@@ -67,8 +59,15 @@ export default function MainMapView({ contractors, initialCenter }: Props) {
   const [nearbyContractors, setNearbyContractors] = useState<Contractor[]>([]);
   // Opcional: para mostrar todos los contractors filtrados
   const [filteredContractors, setFilteredContractors] = useState<Contractor[]>([]);
+  useEffect(() => {
+    if (onVisibleChange) {
+      onVisibleChange(filteredContractors);
+    }
+  }, [filteredContractors, onVisibleChange]);
   const [searchRadius, setSearchRadius] = useState(10);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const selectedAvatar = selectedContractor?.logoUrl || DEFAULT_AVATAR;
+  const selectedRatingValue = typeof selectedContractor?.rating === "number" ? selectedContractor.rating : 0;
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -160,28 +159,28 @@ export default function MainMapView({ contractors, initialCenter }: Props) {
   if (!isLoaded) {
     return (
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="p-6 border-b border-[#F5D238]/40 bg-gradient-to-r from-[#F5D238]/20 via-white to-[#1E1E17]/5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Navigation className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-[#F5D238] rounded-lg shadow-sm">
+                <Navigation className="h-6 w-6 text-[#1E1E17]" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Find Contractors Near You</h2>
-                <p className="text-sm text-gray-600">Discovering professionals in your area</p>
+                <p className="text-sm text-[#1E1E17]/70">Discovering professionals in your area</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="h-[500px] bg-gradient-to-br from-blue-50 via-gray-50 to-indigo-50 flex items-center justify-center">
+        <div className="h-[500px] bg-gradient-to-br from-[#fff8d1] via-[#fffef5] to-[#f7eed2] flex items-center justify-center">
           <div className="text-center">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
-              <Navigation className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-blue-600" />
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#F5D238]/40 border-t-[#F5D238] mx-auto mb-4"></div>
+              <Navigation className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-[#1E1E17]" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Loading Your Location</h3>
-            <p className="text-gray-600">Finding contractors near you...</p>
+            <h3 className="text-lg font-semibold text-[#1E1E17] mb-2">Loading Your Location</h3>
+            <p className="text-[#1E1E17]/80">Finding contractors near you...</p>
           </div>
         </div>
       </div>
@@ -270,7 +269,7 @@ export default function MainMapView({ contractors, initialCenter }: Props) {
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
               getPixelPositionOffset={() => ({ x: -70, y: -210 })}
             >
-              <div className="bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-lg border border-yellow-200 flex flex-col items-center justify-center py-1 px-3 shadow-md min-h-[38px] min-w-[110px]">
+              <div className="bg-gradient-to-br from-[#F5D238]/20 via-white to-[#F5D238]/30 rounded-lg border border-[#F5D238] flex flex-col items-center justify-center py-1 px-3 shadow-md min-h-[38px] min-w-[110px]">
                 <div className="flex items-center gap-1 mb-0.5">
                   <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-yellow-400/20">
                     <Star className="w-2.5 h-2.5 text-yellow-600" />
@@ -317,7 +316,16 @@ export default function MainMapView({ contractors, initialCenter }: Props) {
             <Marker
               key={contractor.id}
               position={{ lat: contractor.lat, lng: contractor.lng }}
-              onClick={() => setSelectedContractor(contractor)}
+              onClick={() =>
+                navigate(`/findpro/contractor/${contractor.id}`, {
+                  state: {
+                    from: {
+                      pathname: routeLocation.pathname,
+                      search: routeLocation.search,
+                    },
+                  },
+                })
+              }
               options={{
                 icon: {
                   url: locationContractorIcon,
@@ -335,39 +343,49 @@ export default function MainMapView({ contractors, initialCenter }: Props) {
               onCloseClick={() => setSelectedContractor(null)}
               options={{ pixelOffset: new google.maps.Size(0, -10) }}
             >
-              <div className="p-4 max-w-sm">
-                <h3 className="font-bold text-gray-900 mb-2 text-lg">{selectedContractor.name}</h3>
-                {selectedContractor.elite && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-[#1E1E17] px-3 py-1 text-sm font-semibold mb-3">
-                    <ShieldCheck className="h-4 w-4" /> Elite Contractor
-                  </span>
-                )}
-                <div className="flex items-center gap-2 mb-3">
+              <div className="p-4 max-w-sm bg-gradient-to-br from-[#fffce6] via-white to-[#fdf3b0] rounded-xl border border-[#F5D238]/60 shadow-lg text-[#1E1E17]">
+                <div className="flex items-center gap-3 mb-4">
+                  <img
+                    src={selectedAvatar}
+                    alt={selectedContractor.name}
+                    className="h-14 w-14 rounded-full border-2 border-[#F5D238] object-cover bg-white"
+                  />
+                  <div>
+                    <h3 className="font-extrabold text-base leading-tight">{selectedContractor.name}</h3>
+                    <p className="text-xs text-[#1E1E17]/70">{selectedContractor.locationLabel}</p>
+                    {selectedContractor.elite && (
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#F5D238]/20 text-[#1E1E17] px-2.5 py-0.5 text-[11px] font-semibold">
+                        <ShieldCheck className="h-3.5 w-3.5" /> Elite Contractor
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center">
                     {Array.from({ length: 5 }, (_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${i < Math.floor(selectedContractor.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                        className={`h-4 w-4 ${i < Math.round(selectedRatingValue) ? "text-[#F5D238] fill-current" : "text-gray-300"}`}
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">
-                    {selectedContractor.rating.toFixed(1)} ({selectedContractor.reviews} reviews)
+                  <span className="text-sm font-semibold">
+                    {selectedRatingValue.toFixed(1)} ({selectedContractor.reviews} reviews)
                   </span>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                  <p className="text-sm font-medium text-gray-800 mb-1">Services:</p>
-                  <p className="text-sm text-gray-600">
+                <div className="rounded-lg border border-[#F5D238]/40 bg-white/80 p-3 mb-3">
+                  <p className="text-sm font-semibold mb-1">Services destacados</p>
+                  <p className="text-xs text-[#1E1E17]/80 leading-relaxed">
                     {selectedContractor.services.join(", ")}
                     {selectedContractor.extraServicesCount && ` and ${selectedContractor.extraServicesCount} more`}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                  <MapPin className="h-4 w-4 text-[#1E1E17]" />
-                  <span className="font-medium">{selectedContractor.distanceMiles} miles away</span>
+                <div className="flex items-center gap-2 text-sm font-semibold mb-4">
+                  <MapPin className="h-4 w-4 text-[#F5D238]" />
+                  <span>{selectedContractor.distanceMiles} miles away</span>
                 </div>
                 <button
-                  className="w-full bg-gradient-to-r from-[#1E1E17] to-[#1E1E17] text-white text-sm font-semibold py-3 px-4 rounded-lg hover:from-[#1E1E17] hover:to-[#1E1E17] transition-all duration-200 transform hover:scale-105 shadow-md"
+                  className="w-full bg-[#F5D238] text-[#1E1E17] text-sm font-bold py-3 px-4 rounded-lg transition-all duration-200 hover:bg-[#f7df52] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#1E1E17]/20"
                   onClick={() => console.log("Get quote for:", selectedContractor.name)}
                 >
                   Get Free Quote

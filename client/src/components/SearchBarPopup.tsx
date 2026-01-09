@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import SearchBar from "../pages/WebPage/FindPro/SearchBar";
+
 
 export default function SearchBarPopup() {
   const [open, setOpen] = useState(false);
@@ -50,7 +50,7 @@ export default function SearchBarPopup() {
                 >
                   ×
                 </button>
-                <SearchBar isLoading={false} />
+              
               </div>
             </div>,
             document.body

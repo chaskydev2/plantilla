@@ -4,6 +4,7 @@ export interface IService {
   slug: string;
   icon?: string | null;
   image?: string | null;
+  description?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -13,6 +14,7 @@ export interface IServiceCreateRequest {
   slug?: string | null;
   icon?: string | null;
   image?: string | null;
+  description?: string | null;
 }
 
 export interface IServiceUpdateRequest {
@@ -22,4 +24,5 @@ export interface IServiceUpdateRequest {
   remove_icon?: boolean;
   image?: string | null;
   remove_image?: boolean;
+  description?: string | null;
 }

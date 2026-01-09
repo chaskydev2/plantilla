@@ -23,28 +23,32 @@
     "sendError": "Error sending documents."
 
     },
-    "hero": {
-      "topText": "Protecting families in the US and Canada",
-      "title": "Only verified professionals. Backed by our $250,000 guarantee",
-      "subtitle": "All contractors undergo background and financial checks — and if they fail, your project is protected."
-    },
-    "services": {
-      "roofing": "Roofing",
-      "gutters": "Gutters",
-      "siding": "Siding",
-      "windows": "Windows",
-      "painting": "Painting",
-      "drywall": "Drywall",
-      "solar": "Solar panels",
-      "insulation": "Insulation"
-    },
-    "whatYouFind": {
-      "title": "What you'll find at GU",
-      "licensed": "Licensed and verified",
-      "verified": "Financially verified",
-      "protected": "Protected by a guarantee",
-      "upTo": "Up to $250,000"
-    },
+    "searchBar": {
+      "servicePlaceholder": "How can we help you?",
+      "tagsPlaceholder": "E.g. expert kitchen helper",
+      "locationPlaceholder": "City, street or ZIP code",
+      "searchButton": "Find a professional",
+      "locationRequired": "Select your location",
+      "gettingLocation": "Getting location…",
+      "gettingLocationShort": "Getting…",
+      "pleaseWait": "Please wait.",
+      "allowLocationTitle": "Allow access to your location?",
+      "allowLocationDesc": "We use your location to find nearby pros faster. You can also type a city or ZIP instead.",
+      "useMyLocation": "Use my location",
+      "chooseOnMap": "Choose on map",
+      "quickLocations": "Quick locations",
+      "searching": "Searching…",
+      "noResults": "No results",
+      "autocompleteFailed": "Autocomplete failed",
+      "googleMapsNotLoaded": "Could not load Google Maps",
+      "failedToLoadGoogleMaps": "Failed to load Google Maps",
+      "mapSearchFailed": "Could not search on the map",
+      "locationNotFound": "We couldn't find that location",
+      "notFound": "We couldn't find that location",
+      "currentLocation": "Current location",
+      "couldNotGetLocation": "We couldn't get your location. Try typing your city or ZIP."
+    }
+    ,
     "videos": {
       "title": "What is GU",
       "roofingWarranty": "Roofing warranty: what happens when contractors fail",

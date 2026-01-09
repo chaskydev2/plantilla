@@ -1,12 +1,11 @@
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Briefcase, MapPin, Plus, Search, Tag } from "lucide-react";
+import { Briefcase, Locate, MapPin, Plus, Search, Tag } from "lucide-react";
 import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
 import { ProfessionService } from "@/core/services/profession/profession.service";
-import { MapPickerSection } from "@/pages/WebPage/HomePage/components/MapPickerSection";
-import { QuickLocations } from "@/pages/WebPage/HomePage/components/QuickLocations";
+
 import { toLucideIcon } from "@/pages/WebPage/HomePage/utils/iconUtils";
 
 type PlacesPrediction = { description: string; place_id: string };
@@ -17,7 +16,12 @@ type PlacesAutocompleteService = {
   ) => void;
 };
 type AddressComponent = { long_name: string; short_name: string; types: string[] };
-type GeocoderResult = { address_components: AddressComponent[]; formatted_address: string };
+type LatLngLiteralFn = { lat: () => number; lng: () => number };
+type GeocoderResult = {
+  address_components: AddressComponent[];
+  formatted_address: string;
+  geometry?: { location?: LatLngLiteralFn };
+};
 type Geocoder = {
   geocode: (
     request: { location: { lat: number; lng: number } } | { address: string },
@@ -47,13 +51,7 @@ type FilterPopupProps = {
   error?: string | null;
 };
 
-const quickLocations = [
-  "Madrid, ES",
-  "Barcelona, ES",
-  "Valencia, ES",
-  "Sevilla, ES",
-  "Bilbao, ES",
-];
+
 
 export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps) {
   const navigate = useNavigate();
@@ -73,6 +71,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
   const [mapSearchQuery, setMapSearchQuery] = useState("");
   const [mapSearchLoading, setMapSearchLoading] = useState(false);
   const [mapSearchError, setMapSearchError] = useState<string | null>(null);
+  const [mapGeoLoading, setMapGeoLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const locationPopupRef = useRef<HTMLDivElement | null>(null);
@@ -88,6 +87,8 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     if (!show) return;
     const loadServices = async () => {
       try {
+        locationFetching; 
+        mapReady; 
         const res = await ProfessionService.getAll();
         const data = (res.data as any[]) || [];
         const mapped = data.map((item, idx) => ({
@@ -219,6 +220,31 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     });
   };
 
+  const resolveLatLngFromAddress = async (address: string) => {
+    const ready = await ensureMapsAvailable();
+    if (!ready) return null;
+    const w = window;
+    if (!geocoderRef.current && w.google && w.google.maps && w.google.maps.Geocoder) {
+      geocoderRef.current = new w.google.maps.Geocoder();
+    }
+    const geo = geocoderRef.current;
+    if (!geo) return null;
+    return new Promise<{ lat: number; lng: number } | null>((resolve) => {
+      geo.geocode({ address }, (results, status) => {
+        if (status !== "OK" || !Array.isArray(results) || results.length === 0) {
+          resolve(null);
+          return;
+        }
+        const loc = results[0].geometry?.location;
+        if (!loc) {
+          resolve(null);
+          return;
+        }
+        resolve({ lat: loc.lat(), lng: loc.lng() });
+      });
+    });
+  };
+
   const ensureMapsAvailable = async () => {
     const w = window;
     if (w.google && w.google.maps) return true;
@@ -336,6 +362,85 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     });
   };
 
+  const handleSelectPrediction = async (prediction: PlacesPrediction) => {
+    setLocationError(null);
+    setLocationFetching(true);
+    setQueryLocation(prediction.description);
+    try {
+      const coords = await resolveLatLngFromAddress(prediction.description);
+      if (coords) {
+        setQueryLatLng(coords);
+      } else {
+        setQueryLatLng(null);
+        setLocationError("No pudimos obtener coordenadas para esa ubicación");
+      }
+      setOpenLocation(false);
+    } catch {
+      setLocationError("No pudimos obtener coordenadas para esa ubicación");
+    } finally {
+      setLocationFetching(false);
+    }
+  };
+
+  const handleUseCurrentLocation = () => {
+    setMapSearchError(null);
+    if (!navigator?.geolocation) {
+      setMapSearchError("La geolocalización no está disponible en este dispositivo");
+      return;
+    }
+    setMapGeoLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const ready = await ensureMapsAvailable();
+          if (!ready) {
+            setMapSearchError("Google Maps API not loaded");
+            setMapGeoLoading(false);
+            return;
+          }
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const w = window;
+          const maps = w.google!.maps as any;
+          if (!mapInstanceRef.current && mapContainerRef.current) {
+            mapInstanceRef.current = new maps.Map(mapContainerRef.current, {
+              center: { lat, lng },
+              zoom: 14,
+              disableDefaultUI: true,
+            });
+          }
+          mapInstanceRef.current?.setCenter({ lat, lng });
+          mapInstanceRef.current?.setZoom(14);
+          if (!mapMarkerRef.current) {
+            mapMarkerRef.current = new maps.Marker({ position: { lat, lng }, map: mapInstanceRef.current });
+          } else {
+            mapMarkerRef.current.setPosition({ lat, lng });
+            mapMarkerRef.current.setMap(mapInstanceRef.current);
+          }
+          const resolved = await resolveAddressFromLatLng(lat, lng);
+          setQueryLocation(resolved);
+          setQueryLatLng({ lat, lng });
+          setShowMapPicker(false);
+          setOpenLocation(false);
+          setMapSearchError(null);
+        } catch {
+          setMapSearchError("No pudimos obtener tu ubicación");
+        } finally {
+          setMapGeoLoading(false);
+        }
+      },
+      (geoError) => {
+        setMapGeoLoading(false);
+        if (geoError?.code === 1) {
+          setMapSearchError("Debes permitir el acceso a tu ubicación");
+          return;
+        }
+        setMapSearchError("No pudimos obtener tu ubicación");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   useEffect(() => {
     if (showMapPicker) {
       setTimeout(() => {
@@ -357,111 +462,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     setOpenService(false);
   };
 
-  const handleUseLocation = () => {
-    const key = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
-    setLocationError(null);
-    setLocationFetching(true);
-    setQueryLocation("Obteniendo ubicación…");
-    const ensureGeocoder = async () => {
-      const w = window;
-      if (w.google && w.google.maps) {
-        if (!geocoderRef.current && w.google.maps.Geocoder) {
-          geocoderRef.current = new w.google.maps.Geocoder();
-        }
-        return;
-      }
-      if (!key) return;
-      if (!w.__gmapsLoadingPromise) {
-        w.__gmapsLoadingPromise = new Promise<void>((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&v=weekly`;
-          script.async = true;
-          script.onload = () => resolve();
-          script.onerror = (e) => reject(e);
-          document.head.appendChild(script);
-        });
-      }
-      try {
-        await w.__gmapsLoadingPromise;
-        if (w.google && w.google.maps && w.google.maps.Geocoder) {
-          geocoderRef.current = new w.google.maps.Geocoder();
-        }
-      } catch {
-        // ignore, we'll fallback
-      }
-    };
-    const applyAddress = (results: GeocoderResult[] | null, status: string, lat?: number, lng?: number) => {
-      if (status !== "OK" || !Array.isArray(results) || results.length === 0) {
-        setQueryLocation("Current location");
-        setOpenLocation(false);
-        return;
-      }
-      const ac = results[0].address_components;
-      const postal = ac.find((c) => c.types.includes("postal_code"))?.long_name;
-      const city =
-        ac.find((c) => c.types.includes("locality"))?.long_name ||
-        ac.find((c) => c.types.includes("postal_town"))?.long_name ||
-        ac.find((c) => c.types.includes("sublocality"))?.long_name;
-      const state = ac.find((c) => c.types.includes("administrative_area_level_1"))?.short_name;
-      const value = postal || (city && state ? `${city}, ${state}` : results[0].formatted_address);
-      setQueryLocation(value);
-      if (typeof lat === "number" && typeof lng === "number") {
-        setQueryLatLng({ lat, lng });
-      }
-      setOpenLocation(false);
-    };
-    const reverseGeocode = async (lat: number, lng: number) => {
-      await ensureGeocoder();
-      const geo = geocoderRef.current;
-      if (!geo) {
-        setQueryLocation("Current location");
-        setOpenLocation(false);
-        return;
-      }
-      geo.geocode({ location: { lat, lng } }, (results, status) => applyAddress(results, status, lat, lng));
-    };
-    const fallbackWithGoogleGeoAPI = async () => {
-      if (!key) return false;
-      try {
-        const res = await fetch(`https://www.googleapis.com/geolocation/v1/geolocate?key=${key}`, {
-          method: "POST",
-        });
-        if (!res.ok) return false;
-        const data = await res.json();
-        if (data?.location?.lat && data?.location?.lng) {
-          await reverseGeocode(data.location.lat, data.location.lng);
-          return true;
-        }
-      } catch {
-        return false;
-      }
-      return false;
-    };
-    const handleFailure = async () => {
-      const ok = await fallbackWithGoogleGeoAPI();
-      if (!ok) {
-        setLocationError("No pudimos obtener tu ubicación. Intenta escribir tu ciudad o ZIP.");
-        setQueryLocation("");
-        setOpenLocation(false);
-      }
-      setLocationFetching(false);
-    };
-    if (!("geolocation" in navigator)) {
-      handleFailure();
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        reverseGeocode(latitude, longitude);
-        setLocationFetching(false);
-      },
-      () => {
-        handleFailure();
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
+ 
 
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -489,9 +490,9 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       params.delete("service");
     }
     if (queryTags) {
-      params.set("tags", queryTags);
+      params.set("tag_name", queryTags);
     } else {
-      params.delete("tags");
+      params.delete("tag_name");
     }
     if (finalLocation) {
       params.set("location", finalLocation);
@@ -625,6 +626,9 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                     {queryLocation.trim() ? (
                       <div>
                         {locationLoading && <div className="px-3 py-2 text-sm text-gray-500">Buscando…</div>}
+                        {locationFetching && !locationLoading && (
+                          <div className="px-3 py-2 text-sm text-gray-500">Obteniendo coordenadas…</div>
+                        )}
                         {!locationLoading && locationPredictions.length === 0 && !locationError && (
                           <div className="px-3 py-2 text-sm text-gray-500">No se encontraron resultados</div>)}
                         {locationError && <div className="px-3 py-2 text-sm text-red-600">{locationError}</div>}
@@ -634,11 +638,8 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                               <button
                                 key={p.place_id}
                                 className="w-full text-left px-3 py-2 rounded-lg hover:bg-green-50"
-                                onClick={() => {
-                                  setQueryLocation(p.description);
-                                  setQueryLatLng(null);
-                                  setOpenLocation(false);
-                                }}
+                                onClick={() => handleSelectPrediction(p)}
+                                disabled={locationFetching}
                               >
                                 {p.description}
                               </button>
@@ -708,6 +709,15 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 Buscar
               </button>
             </form>
+            <button
+              type="button"
+              onClick={handleUseCurrentLocation}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 mb-3 rounded-lg border border-[#F5D238] text-[#F5D238] hover:bg-[#F5D238]/10 transition font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={mapGeoLoading}
+            >
+              <Locate className="w-5 h-5" />
+              <span>{mapGeoLoading ? "Localizando..." : "Usar mi ubicación actual"}</span>
+            </button>
             {mapSearchError && (
               <div className="text-red-600 text-sm mb-2 w-full text-center">{mapSearchError}</div>
             )}
@@ -734,70 +744,3 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
   );
 }
 
-function DropdownItem({
-  label,
-  icon,
-  iconLabel,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  icon?: LucideIcon;
-  iconLabel?: string;
-  disabled?: boolean;
-  onClick?: () => void;
-}) {
-  const SafeIcon = icon || (iconLabel ? toLucideIcon(iconLabel) : undefined) || Briefcase;
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={`w-full flex justify-between items-center px-3 py-2 rounded-md text-sm text-left ${
-        disabled ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center shadow-sm">
-          <SafeIcon className="w-4 h-4 text-blue-700 dark:text-blue-300" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-black">{label}</span>
-          {iconLabel && <span className="text-xs text-gray-500">{iconLabel}</span>}
-        </div>
-      </div>
-    </button>
-  );
-}
-function DropdownItemGeneral({
-  label,
-  icon: Icon,
-  iconLabel,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  icon?: LucideIcon;
-  iconLabel?: string;
-  disabled?: boolean;
-  onClick?: () => void;
-}) {
-  const SafeIcon = Icon || (iconLabel ? toLucideIcon(iconLabel) : undefined) || Briefcase;
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={`flex-col h-28 border-black w-full flex justify-between items-center px-3 py-2 rounded-md text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer`}
-    >
-      <div className="h-1/2 flex items-center">
-        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center shadow-sm">
-          <SafeIcon className="w-5 h-5 text-black dark:text-white" />
-        </div>
-      </div>
-      <div className="h-1/2 flex flex-col items-center justify-center text-black">
-        <span>{label}</span>
-      </div>
-    </button>
-  );
-}

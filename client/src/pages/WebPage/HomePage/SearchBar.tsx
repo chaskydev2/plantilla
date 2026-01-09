@@ -8,6 +8,7 @@ import { ProfessionService } from "@/core/services/profession/profession.service
 import { MapPickerSection } from "./components/MapPickerSection";
 import { QuickLocations } from "./components/QuickLocations";
 import { toLucideIcon } from "./utils/iconUtils";
+import { useTranslation } from "react-i18next";
 // Minimal typings for Google Places to avoid using any
 type PlacesPrediction = { description: string; place_id: string };
 type PlacesAutocompleteService = {
@@ -17,28 +18,26 @@ type PlacesAutocompleteService = {
   ) => void;
 };
 type AddressComponent = { long_name: string; short_name: string; types: string[] };
-type GeocoderResult = { address_components: AddressComponent[]; formatted_address: string };
-type Geocoder = {
+type MinimalGeocoderResult = {
+  address_components: AddressComponent[];
+  formatted_address: string;
+  geometry?: {
+    location: {
+      lat: () => number;
+      lng: () => number;
+    };
+  };
+};
+type MinimalGeocodeRequest = { location: { lat: number; lng: number } } | { address: string };
+type MinimalGeocodeCallback = (results: MinimalGeocoderResult[] | null, status: string) => void;
+type MinimalGeocoder = {
   geocode: (
-    request: { location: { lat: number; lng: number } } | { address: string },
-    callback: (results: GeocoderResult[] | null, status: string) => void
+    request: MinimalGeocodeRequest,
+    callback: MinimalGeocodeCallback
   ) => void;
 };
 
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        Geocoder: new () => Geocoder;
-        places?: {
-          AutocompleteService: new () => PlacesAutocompleteService;
-          AutocompleteSessionToken: new () => unknown;
-        };
-      };
-    };
-    __gmapsLoadingPromise?: Promise<void>;
-  }
-}
+// Only declare global Window interface once in the project to avoid duplicate property errors.
 
 type SearchBarProps = { isLoading: boolean };
 
@@ -54,6 +53,7 @@ const quickLocations = [
 
 
 export default function SearchBar({ isLoading }: SearchBarProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [openLocation, setOpenLocation] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -63,7 +63,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const autocompleteServiceRef = useRef<PlacesAutocompleteService | null>(null);
   const sessionTokenRef = useRef<unknown | null>(null);
-  const geocoderRef = useRef<Geocoder | null>(null);
+  const geocoderRef = useRef<MinimalGeocoder | null>(null);
 
   const [queryService, setQueryService] = useState<string>("");
   const [queryLocation, setQueryLocation] = useState<string>("");
@@ -194,57 +194,20 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   // Ensure Google Places is available when opening the location popup
   useEffect(() => {
     if (!openLocation) return;
-
-    const ensurePlaces = async () => {
-      const w = window;
-      // Already available
-      if (w.google && w.google.maps && w.google.maps.places) {
-        if (!autocompleteServiceRef.current) {
-          autocompleteServiceRef.current = new w.google.maps.places.AutocompleteService();
-        }
-        if (!sessionTokenRef.current) {
-          sessionTokenRef.current = new w.google.maps.places.AutocompleteSessionToken();
-        }
-        if (!geocoderRef.current && w.google.maps.Geocoder) {
-          geocoderRef.current = new w.google.maps.Geocoder();
-        }
-        return;
+    const w = window;
+    if (w.google && w.google.maps && w.google.maps.places) {
+      if (!autocompleteServiceRef.current) {
+        autocompleteServiceRef.current = new w.google.maps.places.AutocompleteService();
       }
-
-      // Try to load script if API key exists
-      const key = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
-      if (!key) {
-        // If no key but script already present, do nothing; else show hint
-        setLocationError("Google Maps API not loaded");
-        return;
+      if (!sessionTokenRef.current) {
+        sessionTokenRef.current = new w.google.maps.places.AutocompleteSessionToken();
       }
-
-      // Avoid duplicate loads
-      if (!w.__gmapsLoadingPromise) {
-        w.__gmapsLoadingPromise = new Promise<void>((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&v=weekly`;
-          script.async = true;
-          script.onload = () => resolve();
-          script.onerror = (e) => reject(e);
-          document.head.appendChild(script);
-        });
+      if (!geocoderRef.current && w.google.maps.Geocoder) {
+        geocoderRef.current = new w.google.maps.Geocoder() as unknown as MinimalGeocoder;
       }
-      try {
-        await w.__gmapsLoadingPromise;
-        if (w.google && w.google.maps && w.google.maps.places) {
-          autocompleteServiceRef.current = new w.google.maps.places.AutocompleteService();
-          sessionTokenRef.current = new w.google.maps.places.AutocompleteSessionToken();
-          if (!geocoderRef.current && w.google.maps.Geocoder) {
-            geocoderRef.current = new w.google.maps.Geocoder();
-          }
-        }
-      } catch {
-        setLocationError("Failed to load Google Maps");
-      }
-    };
-
-    ensurePlaces();
+      return;
+    }
+    setLocationError("Google Maps API not loaded");
   }, [openLocation]);
 
   const ensureMapsAvailable = async () => {
@@ -321,7 +284,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
     setQueryLatLng({ lat, lng });
     const w = window;
     if (!geocoderRef.current && w.google && w.google.maps && w.google.maps.Geocoder) {
-      geocoderRef.current = new w.google.maps.Geocoder();
+      geocoderRef.current = new w.google.maps.Geocoder() as unknown as MinimalGeocoder;
     }
 
     const geo = geocoderRef.current;
@@ -407,7 +370,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
     const w = window;
     const maps = w.google!.maps as any;
     if (!geocoderRef.current) {
-      geocoderRef.current = new maps.Geocoder();
+      geocoderRef.current = new maps.Geocoder() as MinimalGeocoder;
     }
 
     const geo = geocoderRef.current;
@@ -480,7 +443,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
       const w = window;
       if (w.google && w.google.maps) {
         if (!geocoderRef.current && w.google.maps.Geocoder) {
-          geocoderRef.current = new w.google.maps.Geocoder();
+          geocoderRef.current = new w.google.maps.Geocoder() as unknown as MinimalGeocoder;
         }
         return;
       }
@@ -498,14 +461,14 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
       try {
         await w.__gmapsLoadingPromise;
         if (w.google && w.google.maps && w.google.maps.Geocoder) {
-          geocoderRef.current = new w.google.maps.Geocoder();
+          geocoderRef.current = new w.google.maps.Geocoder() as unknown as MinimalGeocoder;
         }
       } catch {
         // ignore, we'll fallback
       }
     };
 
-    const applyAddress = (results: GeocoderResult[] | null, status: string, lat?: number, lng?: number) => {
+    const applyAddress = (results: MinimalGeocoderResult[] | null, status: string, lat?: number, lng?: number) => {
       if (status !== "OK" || !Array.isArray(results) || results.length === 0) {
         setQueryLocation("Current location");
         setOpenLocation(false);
@@ -605,11 +568,11 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
         className="flex w-full max-w-9xl items-center rounded-full p-1 pr-2 shadow-2xl bg-white border border-gray-200"
       >
         {/* Service select */}
-        <div aria-label="Select a service" className="relative flex">
+        <div aria-label={t('searchBar.serviceAriaLabel', 'Select a service')} className="relative flex">
           <Plus aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
           <input
-            placeholder="¿En qué podemos ayudarte?"
-            aria-label="Select a service"
+            placeholder={t('searchBar.servicePlaceholder', 'What service do you need?')}
+            aria-label={t('searchBar.serviceAriaLabel', 'Select a service')}
             ref={inputRef}
             value={queryService}
             onFocus={() => {
@@ -634,8 +597,8 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
           <Tag className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
           <input
             type="text"
-            aria-label="Describe libremente tu necesidad"
-            placeholder="Ej. ayudante de cocina experto"
+            aria-label={t('searchBar.tagsAriaLabel', 'Describe your need')}
+            placeholder={t('searchBar.tagsPlaceholder', 'E.g. expert kitchen helper')}
             value={queryTags}
             onChange={(e) => setQueryTags(e.target.value)}
             className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#1A1B16] placeholder-gray-500 bg-transparent"
@@ -655,9 +618,13 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
               setOpenLocation(true);
             }}
             type="text"
-            aria-label="Enter your ZIP code or city"
-            placeholder="Ciudad, calle o código postal"
-            value={queryLocation}
+            aria-label={t('searchBar.locationAriaLabel', 'Enter your ZIP code or city')}
+            placeholder={t('searchBar.locationPlaceholder', 'City, street or ZIP code')}
+            value={
+              queryLatLng && queryLocation.trim()
+                ? `${queryLocation} (Lat: ${queryLatLng.lat.toFixed(5)}, Lng: ${queryLatLng.lng.toFixed(5)})`
+                : queryLocation
+            }
             onChange={(e) => {
               setQueryLocation(e.target.value);
               setQueryLatLng(null);
@@ -667,20 +634,20 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
           />
         </div>
 
-        {/* Botón buscar profesional con validación */}
+        {/* Search professional button with validation */}
         <Link
           to={findProHref}
           onClick={handleSearchClick}
           className="inline-flex items-center bg-[#1A1B16] hover:bg-[#2A2B26] text-white font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1A1B16] focus:ring-offset-white"
         >
-          <span>Buscar un profesional</span>
+          <span>{t('searchBar.searchButton', 'Find a professional')}</span>
           <Search className="ml-2 size-4 text-white" />
         </Link>
       </motion.div>
-      {/* Mensaje de error si no hay ubicación */}
+      {/* Error message if no location */}
       {locationRequiredError && (
         <div className="mt-2 text-center text-sm text-red-600 font-semibold animate-pulse">
-          {locationRequiredError}
+          {t('searchBar.locationRequiredError', locationRequiredError)}
         </div>
       )}
       {open && rect && typeof document !== "undefined"
@@ -752,9 +719,33 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
                           <DropdownItem
                             key={p.place_id}
                             label={p.description}
-                            onClick={() => {
-                              setQueryLocation(p.description);
-                              setQueryLatLng(null);
+                            onClick={async () => {
+                              // Fetch lat/lng for the selected prediction using geocoder
+                              let latLng = null;
+                              let formatted = p.description;
+                              const w = window;
+                              if (w.google && w.google.maps && w.google.maps.Geocoder) {
+                                if (!geocoderRef.current) {
+                                  geocoderRef.current = new w.google.maps.Geocoder() as unknown as MinimalGeocoder;
+                                }
+                                const geo = geocoderRef.current;
+                                if (geo) {
+                                  await new Promise<void>((resolve) => {
+                                    geo?.geocode({ address: p.description }, (results, status) => {
+                                      if (status === "OK" && Array.isArray(results) && results.length > 0) {
+                                        const geometry = results[0].geometry?.location;
+                                        if (geometry) {
+                                          latLng = { lat: geometry.lat(), lng: geometry.lng() };
+                                          formatted = `${results[0].formatted_address} (Lat: ${geometry.lat().toFixed(5)}, Lng: ${geometry.lng().toFixed(5)})`;
+                                        }
+                                      }
+                                      resolve(void 0);
+                                    });
+                                  });
+                                }
+                              }
+                              setQueryLocation(formatted);
+                              setQueryLatLng(latLng);
                               setOpenLocation(false);
                             }}
                           />
@@ -795,9 +786,33 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
                           <div className="text-xs font-semibold text-gray-600 mb-1">Quick locations</div>
                           <QuickLocations
                             locations={quickLocations}
-                            onPick={(loc) => {
-                              setQueryLocation(loc);
-                                setQueryLatLng(null);
+                            onPick={async (loc) => {
+                              // Fetch lat/lng for the selected location using geocoder
+                              let latLng = null;
+                              let formatted = loc;
+                              const w = window;
+                              if (w.google && w.google.maps && w.google.maps.Geocoder) {
+                                if (!geocoderRef.current) {
+                                  geocoderRef.current = new w.google.maps.Geocoder() as unknown as MinimalGeocoder;
+                                }
+                                const geo = geocoderRef.current;
+                                if (geo) {
+                                  await new Promise<void>((resolve) => {
+                                    geo?.geocode({ address: loc }, (results, status) => {
+                                      if (status === "OK" && Array.isArray(results) && results.length > 0) {
+                                        const geometry = results[0].geometry?.location;
+                                        if (geometry) {
+                                          latLng = { lat: geometry.lat(), lng: geometry.lng() };
+                                          formatted = `${results[0].formatted_address} (Lat: ${geometry.lat().toFixed(5)}, Lng: ${geometry.lng().toFixed(5)})`;
+                                        }
+                                      }
+                                      resolve(void 0);
+                                    });
+                                  });
+                                }
+                              }
+                              setQueryLocation(formatted);
+                              setQueryLatLng(latLng);
                               setOpenLocation(false);
                             }}
                           />
@@ -822,6 +837,20 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
             document.body
           )
         : null}
+
+      {/* MODAL: Getting your location */}
+      {locationFetching && typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#1E1E17]/80 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl px-8 py-6 flex flex-col items-center">
+              <MapPin className="mb-2 size-8 text-[#1A1B16] animate-bounce" />
+              <span className="text-lg font-semibold text-[#1A1B16]">Getting your location…</span>
+              <span className="text-sm text-gray-500 mt-2">Please wait.</span>
+            </div>
+          </div>,
+          document.body
+        )
+      }
     </div>
   );
 }
@@ -891,8 +920,11 @@ function DropdownItemGeneral({
           <SafeIcon className="w-5 h-5 text-black dark:text-white" />
         </div>
       </div>
+
+      
       <div className="h-1/2 flex flex-col items-center justify-center text-black">
         <span>{label}</span>
+         <span>{label}</span>
       </div>
     </button>
   );

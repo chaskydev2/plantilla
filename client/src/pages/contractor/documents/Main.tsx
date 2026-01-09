@@ -45,6 +45,7 @@ const AttributeContractor: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
+      setIsProcessing; 
       const userId = getUserIdFromLocalStorage();
       if (!userId) {
         setItems([]);
@@ -229,7 +230,6 @@ const AttributeContractor: React.FC = () => {
         setViewItem={setViewItem}
         fetchItems={fetchData}
         isProcessing={isProcessing}
-        setIsProcessing={setIsProcessing}
       />
     </div>
   );

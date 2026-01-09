@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { getFullInfo, updateAllFields } from '@/core/services/contractor/contractor.service';
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+// Para Autocomplete
 import Modal from "@/components/modal/Modal";
 
 // Puedes ajustar los tipos según tu backend
@@ -99,6 +100,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
       setLoading(true);
       setError(null);
       try {
+        fullInfo;
         const res = await getFullInfo(initialData.user_id);
         console.log("Full contractor info:", res);
         if (res && res.data) {
@@ -128,7 +130,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           setMapPosition([latitude, longitude]);
           setForm((prev) => ({ ...prev, lat: latitude, lng: longitude }));
         },
-        (err) => {
+        () => {
           // Si falla, usar Cochabamba como fallback
           const cochabambaLat = -17.3895;
           const cochabambaLng = -66.1568;
@@ -149,7 +151,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           setMapPosition([latitude, longitude]);
           setForm((prev) => ({ ...prev, lat: latitude, lng: longitude }));
         },
-        (err) => {
+        () => {
           setError('No se pudo obtener la ubicación actual.');
         },
         { enableHighAccuracy: true }
@@ -177,11 +179,89 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
     }
   };
 
+
   // Google Maps API key from Vite env
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY || "",
+    libraries: ["places"],
   });
+
+
+  // Autocompletado manual usando la API REST de Google Places
+  const [manualSearch, setManualSearch] = useState("");
+  const [manualSuggestions, setManualSuggestions] = useState<any[]>([]);
+  const [manualLoading, setManualLoading] = useState(false);
+
+  const handleManualInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setManualSearch(e.target.value);
+    if (e.target.value.length < 3) {
+      setManualSuggestions([]);
+      return;
+    }
+    setManualLoading(true);
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+          e.target.value
+        )}&types=geocode&language=es&key=${apiKey}`
+      );
+      const data = await res.json();
+      setManualSuggestions(data.predictions || []);
+    } catch {
+      setManualSuggestions([]);
+    } finally {
+      setManualLoading(false);
+    }
+  };
+
+  const handleManualSelect = async (description: string, placeId: string) => {
+    setManualSearch(description);
+    setManualSuggestions([]);
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${apiKey}&language=es`
+      );
+      const data = await res.json();
+      const location = data.result?.geometry?.location;
+      const address_components = data.result?.address_components || [];
+      // Extraer campos relevantes
+      const getComponent = (type: string) => {
+        const comp = address_components.find((c: any) => c.types.includes(type));
+        return comp ? comp.long_name : "";
+      };
+      const getShortComponent = (type: string) => {
+        const comp = address_components.find((c: any) => c.types.includes(type));
+        return comp ? comp.short_name : "";
+      };
+      const address_line1 = getComponent("route")
+        ? `${getComponent("street_number")} ${getComponent("route")}`.trim()
+        : getComponent("route") || getComponent("street_address") || "";
+      const city = getComponent("locality") || getComponent("sublocality") || getComponent("administrative_area_level_2") || "";
+      const state_code = getShortComponent("administrative_area_level_1");
+      const preferred_zip = getComponent("postal_code");
+      const country_code = getShortComponent("country");
+
+      if (location) {
+        setMapPosition([location.lat, location.lng]);
+        setForm((prev) => ({
+          ...prev,
+          lat: location.lat,
+          lng: location.lng,
+          address_line1,
+          city,
+          state_code,
+          preferred_zip,
+          country_code,
+          address_components,
+        }));
+      }
+    } catch {
+      setError("No se pudo obtener la ubicación seleccionada.");
+    }
+  };
 
   // Map click handler
   const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
@@ -306,6 +386,30 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           <button type="button" className="btn btn-sm btn-secondary mb-2" onClick={handleUseCurrentLocation}>
             Usar mi ubicación actual
           </button>
+
+          {/* Buscador de direcciones alternativo */}
+          <div className="mb-2" style={{ position: "relative" }}>
+            <input
+              className="input input-bordered w-full"
+              placeholder="Buscar dirección o lugar..."
+              value={manualSearch}
+              onChange={handleManualInput}
+            />
+            {manualLoading && <div className="text-xs text-gray-400">Buscando...</div>}
+            {manualSuggestions.length > 0 && (
+              <ul className="bg-white border rounded shadow max-h-48 overflow-y-auto absolute z-50 w-full">
+                {manualSuggestions.map((sug) => (
+                  <li
+                    key={sug.place_id}
+                    className="px-3 py-2 cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleManualSelect(sug.description, sug.place_id)}
+                  >
+                    {sug.description}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           {loadError && (
             <div className="alert alert-error my-2">
               Error al cargar Google Maps. Verifica tu conexión o la API Key.
@@ -340,7 +444,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
               <span className="font-medium">País:</span> {form.country_code ?? ""}
             </div>
           </div>
-          <small className="text-gray-500 block mt-1">Haz click en el mapa para seleccionar la ubicación.</small>
+          <small className="text-gray-500 block mt-1">Haz click en el mapa o busca una dirección para seleccionar la ubicación.</small>
         </div>
         <label>
           Teléfono móvil

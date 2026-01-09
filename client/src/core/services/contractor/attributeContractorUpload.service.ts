@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '@/core/config/axios';
 import type { AxiosProgressEvent } from 'axios';
 
 export class AttributeContractorUploadService {
@@ -16,7 +16,7 @@ export class AttributeContractorUploadService {
       if (!realToken || realToken === 'undefined' || realToken === 'null') {
         throw new Error('No se encontró un token de autenticación válido (_tkn) en localStorage. Inicia sesión nuevamente.');
       }
-      const response = await axios.get(`/api/v1/attribute-contractors/by-contractor/${contractor_id}`, {
+      const response = await apiClient.get(`/v1/attribute-contractors/by-contractor/${contractor_id}`, {
         headers: {
           'Authorization': `Bearer ${realToken}`,
         },
@@ -62,9 +62,10 @@ export class AttributeContractorUploadService {
       }
     });
 
-    return axios.post('/api/v1/attribute-contractors', formData, {
+    return apiClient.post('/v1/attribute-contractors', formData, {
       headers: {
         'Authorization': `Bearer ${realToken}`,
+        'Content-Type': 'multipart/form-data',
       },
       onUploadProgress: options?.onUploadProgress,
     });
@@ -110,7 +111,7 @@ export class AttributeContractorUploadService {
     formData.append('value', file);
 
     try {
-      const response = await axios.post(`/api/v1/attribute-contractors/${id}/update-document`, formData, {
+      const response = await apiClient.post(`/v1/attribute-contractors/${id}/update-document`, formData, {
         headers: {
           'Authorization': `Bearer ${realToken}`,
           'Content-Type': 'multipart/form-data',

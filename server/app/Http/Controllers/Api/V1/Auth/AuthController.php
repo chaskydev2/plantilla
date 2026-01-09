@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Http\Resources\Role\RoleCollection;
 use App\Http\Resources\Role\RoleResource;
 use Spatie\Permission\Models\Role;
+use App\Models\Profession;
 use App\Http\Requests\Role\StoreRoleRequest;
 use App\Http\Requests\Role\UpdateRoleRequest;
 use App\Models\HomeownerProfile;
@@ -113,6 +114,7 @@ class AuthController extends Controller
         return $this->_generateTokenAndResponse_($user);
     }
 
+
     public function registerContractor(RegisterContractorRequest $request): JsonResponse | AuthResource
     {
         try {
@@ -159,16 +161,64 @@ class AuthController extends Controller
                 
                 $contractor = Contractor::create($contractorData);
 
-                // TODO: Habilitar cuando existan las tablas pivot
-                // Asociar categorías si existen
+                // Asociar categorías si existen (mantengo comentado hasta tener reglas claras)
                 // if ($request->has('categories') && is_array($request->categories)) {
                 //     $contractor->categories()->attach($request->categories);
                 // }
 
-                // Asociar profesiones si existen
-                // if ($request->has('professions') && is_array($request->professions)) {
-                //     $contractor->professions()->attach($request->professions);
-                // }
+                // Asociar profesiones si existen. Se acepta:
+                // - un arreglo de IDs: [1,2]
+                // - un arreglo de objetos: [{"id":2,"name":"Plumbing"}, {"name":"HVAC"}]
+                // - un arreglo de nombres: ["Plumbing","HVAC"]
+                if ($request->has('professions') && is_array($request->professions)) {
+                    $professionIds = [];
+
+                    foreach ($request->professions as $p) {
+                        // ID directo
+                        if (is_int($p) || (is_string($p) && ctype_digit($p))) {
+                            $professionIds[] = (int) $p;
+                            continue;
+                        }
+
+                        // Array/object with id or name
+                        if (is_array($p) || is_object($p)) {
+                            $item = (array) $p;
+
+                            if (!empty($item['id']) && is_numeric($item['id'])) {
+                                $professionIds[] = (int) $item['id'];
+                                continue;
+                            }
+
+                            if (!empty($item['name'])) {
+                                $name = trim($item['name']);
+                                if ($name !== '') {
+                                    $profession = Profession::firstOrCreate(
+                                        ['name' => $name],
+                                        ['slug' => Str::slug($name)]
+                                    );
+                                    $professionIds[] = $profession->id;
+                                    continue;
+                                }
+                            }
+                        }
+
+                        // String with name
+                        if (is_string($p) && $p = trim($p)) {
+                            $profession = Profession::firstOrCreate(
+                                ['name' => $p],
+                                ['slug' => Str::slug($p)]
+                            );
+                            $professionIds[] = $profession->id;
+                        }
+                    }
+
+                    // Keep only existing profession ids
+                    $validIds = Profession::whereIn('id', array_unique($professionIds))->pluck('id')->toArray();
+
+                    if (!empty($validIds)) {
+                        $contractor->professions()->sync($validIds);
+                    }
+                }
 
                 // Asignar rol de contractor por defecto
                 $contractorRole = Role::where('name', 'contractor')->first();
@@ -220,3 +270,6 @@ class AuthController extends Controller
         return $licenseNumber;
     }
 }
+
+
+

@@ -51,6 +51,51 @@ class ContractorResource extends JsonResource
                 'has_driving_license' => $this->has_driving_license,
                 'driving_license_category' => $this->driving_license_category,
             ],
+            'team' => [
+                'leaders' => $this->whenLoaded('teamLeaders', function () {
+                    return $this->teamLeaders->map(function ($leader) {
+                        return [
+                            'user_id' => $leader->user_id,
+                            'company_name' => $leader->company_name,
+                            'city' => $leader->city,
+                            'name' => $leader->user?->name,
+                            'status' => $leader->pivot->status ?? null,
+                            'compania' => $leader->pivot->compania ?? null,
+                        ];
+                    });
+                }),
+                'members' => $this->whenLoaded('teamMembers', function () {
+                    return $this->teamMembers->map(function ($member) {
+                        return [
+                            'user_id' => $member->user_id,
+                            'company_name' => $member->company_name,
+                            'city' => $member->city,
+                            'name' => $member->user?->name,
+                            'status' => $member->pivot->status ?? null,
+                            'compania' => $member->pivot->compania ?? null,
+                        ];
+                    });
+                }),
+            ],
+            'jobs' => $this->whenLoaded('jobsCreator', function () {
+                return $this->jobsCreator->map(function ($job) {
+                    return [
+                        'id' => $job->id,
+                        'title' => $job->title,
+                        'description' => $job->description,
+                        'location' => $job->location,
+                        'service_type' => $job->service_type,
+                        'image_url' => $job->image_url,
+                        'url' => $job->url,
+                        'amount_paid' => $job->amount_paid,
+                        'is_active' => $job->is_active,
+                        'comment' => $job->comment,
+                        'job_date' => $job->job_date?->format('Y-m-d'),
+                        'created_at' => $job->created_at?->format('Y-m-d H:i:s'),
+                        'updated_at' => $job->updated_at?->format('Y-m-d H:i:s'),
+                    ];
+                });
+            }),
             'professions' => ProfessionResource::collection($this->whenLoaded('professions')),
             'tags' => TagResource::collection($this->whenLoaded('tags')),
             'contract' => [

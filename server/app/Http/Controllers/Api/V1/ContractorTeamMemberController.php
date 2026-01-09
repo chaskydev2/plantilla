@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+
+
 class ContractorTeamMemberController extends Controller
 {
     public function index(Request $request): JsonResponse
@@ -45,6 +47,65 @@ class ContractorTeamMemberController extends Controller
             'data' => $data,
         ], Response::HTTP_OK);
     }
+
+
+    public function updateStatus(Request $request, int $memberUserId): JsonResponse
+    {
+        $validated = $request->validate([
+            'leader_user_id' => ['required', 'integer'],
+            'status' => ['required', 'in:pending,active,inactive'],
+        ]);
+
+        $pivot = ContractorTeamMember::where('member_user_id', $memberUserId)
+            ->where('leader_user_id', $validated['leader_user_id'])
+            ->firstOrFail();
+
+        $pivot->status = $validated['status'];
+        $pivot->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado actualizado correctamente',
+            'data' => $pivot->only(['leader_user_id', 'member_user_id', 'status', 'compania']),
+        ], Response::HTTP_OK);
+    }
+
+    public function indexByMember(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'member_user_id' => 'required|integer',
+        ]);
+
+        $query = ContractorTeamMember::with(['leader.user', 'member.user'])
+            ->where('member_user_id', $validated['member_user_id']);
+
+        $data = $query->get(['leader_user_id', 'member_user_id', 'status', 'compania'])->map(function ($pivot) {
+            return [
+                'leader_user_id' => $pivot->leader_user_id,
+                'member_user_id' => $pivot->member_user_id,
+                'status' => $pivot->status,
+                'compania' => $pivot->compania,
+                'leader' => $pivot->leader ? [
+                    'user_id' => $pivot->leader->user_id,
+                    'company_name' => $pivot->leader->company_name,
+                    'city' => $pivot->leader->city,
+                    'name' => $pivot->leader->user?->name,
+                ] : null,
+                'member' => $pivot->member ? [
+                    'user_id' => $pivot->member->user_id,
+                    'company_name' => $pivot->member->company_name,
+                    'city' => $pivot->member->city,
+                    'name' => $pivot->member->user?->name,
+                ] : null,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ], Response::HTTP_OK);
+    }
+
 
     public function store(StoreContractorTeamMemberRequest $request): JsonResponse
     {

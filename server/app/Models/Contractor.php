@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contractor extends Model
 {
@@ -148,6 +149,12 @@ class Contractor extends Model
         return $this->belongsToMany(Tag::class, 'contractor_tag', 'contractor_user_id', 'tag_id', 'user_id');
     }
 
+    public function messageThreads(): HasMany
+    {
+        return $this->hasMany(ContractorMessageThread::class, 'contractor_user_id', 'user_id')
+            ->orderByDesc('last_message_at');
+    }
+
     // Team relationships (self-referential)
     public function teamMembers()
     {
@@ -158,7 +165,7 @@ class Contractor extends Model
             'member_user_id',
             'user_id',
             'user_id'
-        );
+        )->withPivot('status', 'compania');
     }
 
     public function teamLeaders()
@@ -170,7 +177,12 @@ class Contractor extends Model
             'leader_user_id',
             'user_id',
             'user_id'
-        );
+        )->withPivot('status', 'compania');
+    }
+
+    public function jobsCreator()
+    {
+        return $this->hasMany(JobContractor::class, 'id_creator', 'user_id');
     }
 
     // Scopes
@@ -319,5 +331,10 @@ class Contractor extends Model
     public function attributeContractors()
     {
         return $this->hasMany(AttributeContractor::class, 'contractor_id', 'id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(ContractorMessage::class, 'contractor_user_id', 'user_id');
     }
 }
