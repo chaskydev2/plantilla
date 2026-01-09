@@ -20,7 +20,7 @@ const columns = [
   },
   {
     key: 'reference_name',
-    header: 'Nombre de la referencia',
+    header: 'Reference Name',
     render: (item: IWorkReference) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.reference_name}</div>
     ),
@@ -28,7 +28,7 @@ const columns = [
   },
   {
     key: 'company',
-    header: 'Institución o Empresa',
+    header: 'Company Name',
     render: (item: IWorkReference) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.company}</div>
     ),
@@ -36,7 +36,7 @@ const columns = [
   },
   {
     key: 'position',
-    header: 'Cargo o puesto',
+    header: 'Position',
     render: (item: IWorkReference) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.position}</div>
     ),
@@ -44,7 +44,7 @@ const columns = [
   },
   {
     key: 'phone',
-    header: 'Celular o teléfono',
+    header: 'Phone',
     render: (item: IWorkReference) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.phone}</div>
     ),
@@ -52,7 +52,7 @@ const columns = [
   },
   {
     key: 'email',
-    header: 'Correo electrónico',
+    header: 'Email',
     render: (item: IWorkReference) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.email}</div>
     ),
@@ -60,7 +60,7 @@ const columns = [
   },
   {
     key: 'additional_notes',
-    header: 'Notas adicionales',
+    header: 'Additional Notes',
     render: (item: IWorkReference) => (
       <div className="text-sm text-gray-600 dark:text-gray-300">{item.additional_notes}</div>
     ),
@@ -115,8 +115,8 @@ export default function UserWorkReferenceCard() {
 
   const confirmDelete = (item: IWorkReference) => {
     openDialog(
-      'Confirmar eliminación',
-      `¿Estás seguro que deseas eliminar el ${item.reference_name}?`,
+      'Confirm Deletion',
+      `Are you sure you want to delete the reference ${item.reference_name}?`,
       () => handleDelete(item),
       'danger'
     );
@@ -129,10 +129,10 @@ export default function UserWorkReferenceCard() {
   const handleDelete = async (item: IWorkReference) => {
     try {
       const response = await WorkReferenceService.remove(user?.id, item.id);
-      toastify.success(response?.message || 'Item eliminado');
+      toastify.success(response?.message || 'Reference deleted');
       fetchItems();
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
+      console.error('Error deleting reference:', error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -141,13 +141,13 @@ export default function UserWorkReferenceCard() {
 
   const actions = [
     {
-      label: 'Editar',
+      label: 'Edit',
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IWorkReference) => handleEdit(item),
       variant: 'primary' as const,
     },
     {
-      label: 'Eliminar',
+      label: 'Delete',
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IWorkReference) => confirmDelete(item),
       variant: 'danger' as const,
@@ -165,7 +165,7 @@ export default function UserWorkReferenceCard() {
           }}
         >
           <Plus className="w-5 h-5" />
-          Agregar
+          Add
         </button>
       </div>
       <div className="relative w-full sm:w-64">
@@ -174,7 +174,7 @@ export default function UserWorkReferenceCard() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="input input-bordered w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -187,7 +187,7 @@ export default function UserWorkReferenceCard() {
     <div className="grid grid-cols-12">
       <div className="col-span-12">
         <DataTable
-          title="Referencias laborales"
+          title="Work References"
           data={items as IWorkReference[]}
           columns={columns}
           actions={actions}
@@ -220,7 +220,7 @@ export default function UserWorkReferenceCard() {
             onCancel={closeDialog}
             isProcessing={isProcessing}
             variant={dialogConfig.variant}
-            confirmText={dialogConfig.variant === 'danger' ? 'Eliminar' : 'Restaurar'}
+            confirmText={dialogConfig.variant === 'danger' ? 'Delete' : 'Confirm'}
           />
         )}
       </div>

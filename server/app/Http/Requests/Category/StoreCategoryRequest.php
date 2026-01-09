@@ -32,8 +32,15 @@ class StoreCategoryRequest extends FormRequest
             ]);
         }
 
-        // Si se proporciona parent_id como 0 o string vacío, convertir a null
-        if ($this->has('parent_id') && ($this->parent_id === '0' || $this->parent_id === '' || $this->parent_id === 0)) {
+        // Si se proporciona parent_id como 0, string vacío o texto indicando sin padre, convertir a null
+        if ($this->has('parent_id') && (
+            $this->parent_id === '0' || 
+            $this->parent_id === '' || 
+            $this->parent_id === 0 ||
+            $this->parent_id === 'No Parent Category (Root)' ||
+            $this->parent_id === 'null' ||
+            $this->parent_id === 'undefined'
+        )) {
             $this->merge(['parent_id' => null]);
         }
     }

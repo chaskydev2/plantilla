@@ -29,7 +29,7 @@ const columns = [
   },
   {
     key: "name",
-    header: "Nombre",
+    header: "Name",
     render: (item: IItemResource) => (
       <div className="font-bold">{item.name}</div>
     ),
@@ -47,10 +47,10 @@ const columns = [
     key: "role",
     header: "Roles",
     render: (item: IItemResource) => {
-      // Manejar múltiples roles
+      // Handle multiple roles
       const roles = (item as any).roles || [];
       if (roles.length === 0) {
-        return <span className="badge badge-secondary">Sin rol</span>;
+        return <span className="badge badge-secondary">No role</span>;
       }
       return (
         <div className="flex flex-wrap gap-1">
@@ -65,21 +65,21 @@ const columns = [
   },
   {
     key: "status",
-    header: "Estado",
+    header: "Status",
     render: (item: IItemResource) => (
       <span className="badge badge-success">
-        {item.deleted_id == null ? "Activo" : "Inactivo"}
+        {item.deleted_id == null ? "Active" : "Inactive"}
       </span>
     ),
   },
   {
     key: "edit_profile",
-    header: "Perfil actualizado",
+    header: "Profile Updated",
     render: (item: IItemResource) =>
       item.edit_profile ? (
-        <span className="badge badge-success">Actualizado</span>
+        <span className="badge badge-success">Updated</span>
       ) : (
-        <span className="badge badge-warning">Pendiente</span>
+        <span className="badge badge-warning">Pending</span>
       ),
   },
 ];
@@ -130,8 +130,8 @@ export default function UserList() {
   const [filters, setFilters] = useState<FilterConfig[]>([
     {
       key: "role",
-      label: "Filtrar por rol",
-      options: [{ value: "", label: "Todos" }],
+      label: "Filter by role",
+      options: [{ value: "", label: "All" }],
       currentValue: "",
     },
   ]);
@@ -145,19 +145,19 @@ export default function UserList() {
     getAllPermissions();
   }, []);
 
-  // Imprimir usuarios por consola cuando cambien
+  // Print users to console when they change
   useEffect(() => {
     if (items && items.length > 0) {
-      console.log("===== TODOS LOS USUARIOS =====");
+      console.log("===== ALL USERS =====");
       console.log(items);
-      console.log("===== DETALLE DE CADA USUARIO =====");
+      console.log("===== USER DETAILS =====");
       items.forEach((user, index) => {
         const typedUser = user as IItemResource;
-        console.log(`Usuario ${index + 1}:`, typedUser);
+        console.log(`User ${index + 1}:`, typedUser);
         console.log(`- ID: ${typedUser.id}`);
-        console.log(`- Nombre: ${typedUser.name}`);
+        console.log(`- Name: ${typedUser.name}`);
         console.log(`- Email: ${typedUser.email}`);
-        console.log(`- Roles:`, (typedUser as any).roles || 'Sin roles');
+        console.log(`- Roles:`, (typedUser as any).roles || 'No roles');
         console.log("----------------------------");
       });
     }
@@ -172,7 +172,7 @@ export default function UserList() {
     setFilters((prev) => [
       {
         ...prev[0],
-        options: [{ value: "", label: "Todos" }, ...rolOptions],
+        options: [{ value: "", label: "All" }, ...rolOptions],
       },
     ]);
     setRoles(res.data);
@@ -204,8 +204,8 @@ export default function UserList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar al usuario ${item.name}?`,
+      "Confirm Deletion",
+      `Are you sure you want to delete user ${item.name}?`,
       () => handleDelete(item),
       "danger"
     );
@@ -213,8 +213,8 @@ export default function UserList() {
 
   const confirmRestore = (item: IItemResource) => {
     openDialog(
-      "Confirmar restauración",
-      `¿Estás seguro que deseas restaurar al usuario ${item.name}?`,
+      "Confirm Restoration",
+      `Are you sure you want to restore user ${item.name}?`,
       () => handleRestore(item)
     );
   };
@@ -222,10 +222,10 @@ export default function UserList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || "User deleted");
       fetchItems();
     } catch (error) {
-      console.error("Error al eliminar usuario:", error);
+      console.error("Error deleting user:", error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -236,10 +236,10 @@ export default function UserList() {
     setIsProcessing(true);
     try {
       const response = await ItemService.restore(item.id);
-      toastify.success(response?.message || "Item restaurado");
+      toastify.success(response?.message || "User restored");
       fetchItems();
     } catch (error) {
-      console.error("Error al restaurar usuario:", error);
+      console.error("Error restoring user:", error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -248,7 +248,7 @@ export default function UserList() {
 
   const actions = [
     {
-      label: "Ver perfil",
+      label: "View Profile",
       icon: <EyeIcon className="w-4 h-4" />,
       onClick: (item: IItemResource) => navigate(`/admin/usuarios/${item.id}`),
       variant: "primary" as const,
@@ -256,7 +256,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_ver"),
     },
     {
-      label: "Editar",
+      label: "Edit",
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -264,7 +264,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_editar"),
     },
     {
-      label: "Eliminar",
+      label: "Delete",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -272,7 +272,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_eliminar"),
     },
     {
-      label: "Restaurar",
+      label: "Restore",
       icon: <RotateCw className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmRestore(item),
       variant: "primary" as const,
@@ -293,7 +293,7 @@ export default function UserList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            Add User
           </button>
         </WithPermission>
         
@@ -304,7 +304,7 @@ export default function UserList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar usuarios..."
+          placeholder="Search users..."
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -315,7 +315,7 @@ export default function UserList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Usuarios" />
+      <PageBreadcrumb pageTitle="Users" />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -351,7 +351,7 @@ export default function UserList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"}
+          confirmText={dialogConfig.variant === "danger" ? "Delete" : "Restore"}
         />
       )}
     </div>

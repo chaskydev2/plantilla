@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Contractor\StoreContractorRequest;
 use App\Http\Requests\Contractor\UpdateContractorRequest;
 use App\Http\Resources\ContractorResource;
+use App\Http\Resources\ContractorCollection;
 use App\Models\Contractor;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -50,7 +51,7 @@ class ContractorController extends Controller
         }
 
         // Location-based search
-        if ($request->filled(['lat', 'lng'])) {
+        if ($request->filled('near_location')) {
             $radius = $request->filled('radius') ? (float) $request->radius : 50;
             $query->withinRadius((float) $request->lat, (float) $request->lng, $radius);
         }

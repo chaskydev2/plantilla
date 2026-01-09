@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
-import Logo from "@/assets/images/CTB-LOGO.png";
+import LogoUrl from "@/assets/images/LOGO GUD.svg?url";
 import {
   LayoutDashboard,
   Users,
@@ -23,7 +23,11 @@ import {
   Share2,
   BarChart2,
   Briefcase,
-  Tag
+  Tag,
+  FolderOpen,
+  Home,
+  CheckCircle,
+  AlertTriangle
 } from "lucide-react";
 import { useSidebar } from "@/core/context/SidebarContext";
 import classNames from "classnames";
@@ -49,6 +53,19 @@ const navItems: MenuItem[] = [
     name: "Dashboard",
     path: "/admin",
   },
+  // 🏠 HOMEOWNER SPECIFIC ITEMS
+  {
+    name: "Completed Jobs",
+    icon: <CheckCircle className="w-5 h-5" />,
+    path: "/admin/completed-jobs",
+    // Esta ruta será visible solo para homeowners
+  },
+  {
+    name: "Claims Submitted",
+    icon: <AlertTriangle className="w-5 h-5" />,
+    path: "/admin/claims-submitted", 
+    // Esta ruta será visible solo para homeowners
+  },
   {
     name: "Usuarios",
     icon: <Users className="w-5 h-5" />,
@@ -59,6 +76,18 @@ const navItems: MenuItem[] = [
         path: "/admin/usuarios",
         icon: <List className="w-4 h-4" />,
         permissions: ["usuario_listar"]
+      },
+      {
+        name: "Trabajadores",
+        path: "/admin/trabajadores",
+        icon: <Users className="w-4 h-4" />,
+      //  permissions: ["trabajador_listar"]
+      },
+      {
+        name: "Homeowners",
+        path: "/admin/homeowners",
+        icon: <Home className="w-4 h-4" />,
+        //permissions: ["homeowner_listar"]
       },
       {
         name: "Roles",
@@ -91,6 +120,12 @@ const navItems: MenuItem[] = [
         icon: <Calendar className="w-4 h-4" />,
         permissions: ["evento_listar"]
       },
+      {
+        name: "Cursos",
+        path: "/admin/cursos",
+        icon: <BookOpen className="w-4 h-4" />,
+        permissions: ["curso_listar"]
+      },
     ],
   },
   
@@ -114,7 +149,7 @@ const navItems: MenuItem[] = [
     ],
   },
   {
-    name: "Profesions",
+    name: "Profesiones",
     icon: <Briefcase className="w-5 h-5" />,
     //permissions: ["profesion_listar", "etiqueta_listar"],
     subItems: [
@@ -130,23 +165,27 @@ const navItems: MenuItem[] = [
         icon: <Tag className="w-4 h-4" />,
       //  permissions: ["etiqueta_listar"]
       },
-    ],
-  },
-  {
-    name: "Requerimientos",
-    icon: <Briefcase className="w-5 h-5" />,
-    //permissions: ["profesion_listar"],
-    subItems: [
       {
-        name: "Lista de Requerimientos",
-        path: "/admin/atributes",
-        icon: <Briefcase className="w-4 h-4" />,
-      //  permissions: ["profesion_listar"]
+        name: "Categorías",
+        path: "/admin/categories",
+        icon: <FolderOpen className="w-4 h-4" />,
+      //  permissions: ["categoria_listar"]
       },
     ],
   },
-
-
+  {
+    name: "Atributos",
+    icon: <Clipboard className="w-5 h-5" />,
+    //permissions: ["atributo_listar"],
+    subItems: [
+      {
+        name: "Lista de Atributos",
+        path: "/admin/atributes",
+        icon: <Clipboard className="w-4 h-4" />,
+      //  permissions: ["atributo_listar"]
+      },
+    ],
+  },
 ];
 
 const webItems: MenuItem[] = [
@@ -155,7 +194,7 @@ const webItems: MenuItem[] = [
     icon: <Globe className="w-5 h-5" />,
     permissions: ["historia_listar", "contacto_listar", "principio_listar", "valor_moral_listar", 
       "directiva_listar", "requisito_listar", "acuerdo_listar", "consulta_listar", "pregunta_frecuente_listar", "red_social_listar", 
-      "banner_listar", "red_social_listar"],
+      "banner_listar", "comunicado_listar"],
     subItems: [
       {
         name: "Historia",
@@ -180,12 +219,6 @@ const webItems: MenuItem[] = [
         path: "/admin/valores_morales",
         icon: <Star className="w-4 h-4" />,
         permissions: ["valor_moral_listar"]
-      },
-      { 
-        name: "Directiva", 
-        path: "/admin/directiva",
-        icon: <Users className="w-4 h-4" />,
-        permissions: ["directiva_listar"]
       },
       { 
         name: "Requisitos", 
@@ -223,19 +256,37 @@ const webItems: MenuItem[] = [
         icon: <Share2 className="w-4 h-4" />,
         permissions: ["red_social_listar"]
       },
+      { 
+        name: "Comunicados", 
+        path: "/admin/comunicados",
+        icon: <MessageSquare className="w-4 h-4" />,
+        permissions: ["comunicado_listar"]
+      },
     ],
   },
 ];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
-  const { hasAnyPermission } = useAuth();
+  const { hasAnyPermission, hasRole } = useAuth();
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
+  const isActive = useCallback((path: string) => {
+    // Exacta coincidencia para rutas
+    if (location.pathname === path) return true;
+    
+    // Para rutas con parámetros dinámicos como /admin/usuarios/:id
+    if (path.includes(':')) {
+      const pathPattern = path.replace(/:[^\/]+/g, '[^/]+');
+      const regex = new RegExp(`^${pathPattern}$`);
+      return regex.test(location.pathname);
+    }
+    
+    return false;
+  }, [location.pathname]);
 
   useEffect(() => {
     let submenuMatched = false;
@@ -250,13 +301,62 @@ const AppSidebar: React.FC = () => {
             }
           });
         }
+        // También verificar si la ruta principal coincide
+        else if (nav.path && isActive(nav.path)) {
+          submenuMatched = true;
+        }
       });
     };
 
     checkItems(navItems, "main");
     checkItems(webItems, "web");
 
-    if (!submenuMatched) setOpenSubmenu(null);
+    // Solo cerrar submenus si no hay coincidencias
+    if (!submenuMatched) {
+      // Mantener abierto el submenu si estamos en una ruta relacionada
+      const currentPath = location.pathname;
+      let shouldKeepOpen = false;
+      
+      // Verificar si estamos en una ruta que debería mantener un submenu abierto
+      if (currentPath.startsWith('/admin/usuarios') || 
+          currentPath.startsWith('/admin/roles') || 
+          currentPath.startsWith('/admin/permisos') ||
+          currentPath.startsWith('/admin/trabajadores') ||
+          currentPath.startsWith('/admin/homeowners')) {
+        setOpenSubmenu({ type: "main", index: 2 }); // Index del submenu "Usuarios"
+        shouldKeepOpen = true;
+      } else if (currentPath.startsWith('/admin/tipo_eventos') || 
+                 currentPath.startsWith('/admin/eventos') ||
+                 currentPath.startsWith('/admin/cursos')) {
+        setOpenSubmenu({ type: "main", index: 3 }); // Index del submenu "Eventos"
+        shouldKeepOpen = true;
+      } else if (currentPath.startsWith('/admin/montlypay')) {
+        setOpenSubmenu({ type: "main", index: 4 }); // Index del submenu "Pagos"
+        shouldKeepOpen = true;
+      } else if (currentPath.startsWith('/admin/profesiones') || 
+                 currentPath.startsWith('/admin/etiquetas') ||
+                 currentPath.startsWith('/admin/categories')) {
+        setOpenSubmenu({ type: "main", index: 5 }); // Index del submenu "Profesiones"
+        shouldKeepOpen = true;
+      } else if (currentPath.startsWith('/admin/historias') || 
+                 currentPath.startsWith('/admin/contactos') ||
+                 currentPath.startsWith('/admin/principios') ||
+                 currentPath.startsWith('/admin/valores_morales') ||
+                 currentPath.startsWith('/admin/requisitos') ||
+                 currentPath.startsWith('/admin/acuerdos') ||
+                 currentPath.startsWith('/admin/consultas') ||
+                 currentPath.startsWith('/admin/preguntas_frecuentes') ||
+                 currentPath.startsWith('/admin/banners') ||
+                 currentPath.startsWith('/admin/redes_sociales') ||
+                 currentPath.startsWith('/admin/comunicados')) {
+        setOpenSubmenu({ type: "web", index: 0 }); // Index del submenu "LANDING PAGE"
+        shouldKeepOpen = true;
+      }
+      
+      if (!shouldKeepOpen) {
+        setOpenSubmenu(null);
+      }
+    }
   }, [location, isActive]);
 
   useEffect(() => {
@@ -274,7 +374,21 @@ const AppSidebar: React.FC = () => {
 
   const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
     return items
-      .filter(item => !item.permissions || hasAnyPermission(item.permissions))
+      .filter(item => {
+        // ✅ Dashboard siempre visible para todos los usuarios autenticados
+        if (item.name === "Dashboard") return true;
+        
+        // 🏠 Elementos específicos para homeowners
+        if (item.name === "Completed Jobs" || item.name === "Claims Submitted") {
+          return hasRole("homeowner");
+        }
+        
+        // � El resto de rutas solo para usuarios con rol de admin
+        if (!hasRole("admin")) return false;
+        
+        // ✅ Si es admin, aplicar filtro de permisos normal
+        return !item.permissions || hasAnyPermission(item.permissions);
+      })
       .map(item => ({
         ...item,
         subItems: item.subItems ? filterMenuItems(item.subItems) : undefined
@@ -282,6 +396,10 @@ const AppSidebar: React.FC = () => {
       .filter(item => item.path || (item.subItems && item.subItems.length > 0));
   };
 
+  // 🔐 RESTRICCIÓN DE ACCESO POR ROLES:
+  // - Dashboard: Visible para todos los usuarios autenticados
+  // - Completed Jobs & Claims Submitted: Solo para homeowners
+  // - Resto de rutas: Solo para admins (con filtros de permisos)
   const filteredNavItems = filterMenuItems(navItems);
   const filteredWebItems = filterMenuItems(webItems);
 
@@ -404,7 +522,7 @@ const AppSidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? (
             "GU"
           ) : (
-            <img src={Logo} alt="Logo" width={32} height={32} />
+            <img src={LogoUrl} alt="Logo" width={32} height={32} />
           )}
         </Link>
       </div>

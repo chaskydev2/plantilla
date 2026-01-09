@@ -20,7 +20,7 @@ const columns = [
   },
   {
     key: 'skill_name',
-    header: 'Nombre de la habilidad técnica',
+    header: 'Technical Skill Name',
     render: (item: ITechnicalSkill) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.skill_name}</div>
     ),
@@ -28,7 +28,7 @@ const columns = [
   },
   {
     key: 'skill_level',
-    header: 'Nivel de habilidad técnica',
+    header: 'Skill Level',
     render: (item: ITechnicalSkill) => (
       <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{item.skill_level}</div>
     ),
@@ -36,7 +36,7 @@ const columns = [
   },
   {
     key: 'description',
-    header: 'Descripción',
+    header: 'Description',
     render: (item: ITechnicalSkill) => (
       <div className="text-sm text-gray-600 dark:text-gray-300">{item.description}</div>
     ),
@@ -46,12 +46,12 @@ const columns = [
 const tableFilters = [
   {
     key: 'type',
-    label: 'Filtrar por tipo de habilidad',
+    label: 'Filter by skill type',
     options: [
-      { value: '', label: 'Todos' },
+      { value: '', label: 'All' },
       { value: 'software', label: 'Software' },
-      { value: 'equipment', label: 'Equipos' },
-      { value: 'technical', label: 'Habilidad Técnica' },
+      { value: 'equipment', label: 'Equipment' },
+      { value: 'technical', label: 'Technical Skill' },
     ],
   },
 ];
@@ -105,8 +105,8 @@ export default function UserWorkExperienceCard() {
 
   const confirmDelete = (item: ITechnicalSkill) => {
     openDialog(
-      'Confirmar eliminación',
-      `¿Estás seguro que deseas eliminar el ${item.skill_name}?`,
+      'Confirm Deletion',
+      `Are you sure you want to delete ${item.skill_name}?`,
       () => handleDelete(item),
       'danger'
     );
@@ -119,10 +119,10 @@ export default function UserWorkExperienceCard() {
   const handleDelete = async (item: ITechnicalSkill) => {
     try {
       const response = await TechnicalSkillService.remove(user?.id, item.id);
-      toastify.success(response?.message || 'Item eliminado');
+      toastify.success(response?.message || 'Skill deleted');
       fetchItems();
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
+      console.error('Error deleting skill:', error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -131,13 +131,13 @@ export default function UserWorkExperienceCard() {
 
   const actions = [
     {
-      label: 'Editar',
+      label: 'Edit',
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: ITechnicalSkill) => handleEdit(item),
       variant: 'primary' as const,
     },
     {
-      label: 'Eliminar',
+      label: 'Delete',
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: ITechnicalSkill) => confirmDelete(item),
       variant: 'danger' as const,
@@ -155,7 +155,7 @@ export default function UserWorkExperienceCard() {
           }}
         >
           <Plus className="w-5 h-5" />
-          Agregar
+          Add
         </button>
       </div>
       <div className="relative w-full sm:w-64">
@@ -164,7 +164,7 @@ export default function UserWorkExperienceCard() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="input input-bordered w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -177,7 +177,7 @@ export default function UserWorkExperienceCard() {
     <div className="grid grid-cols-12">
       <div className="col-span-12">
         <DataTable
-          title="Habilidades Técnicas"
+          title="Technical Skills"
           data={items as ITechnicalSkill[]}
           columns={columns}
           filters={tableFilters}
@@ -212,7 +212,7 @@ export default function UserWorkExperienceCard() {
             onCancel={closeDialog}
             isProcessing={isProcessing}
             variant={dialogConfig.variant}
-            confirmText={dialogConfig.variant === 'danger' ? 'Eliminar' : 'Restaurar'}
+            confirmText={dialogConfig.variant === 'danger' ? 'Delete' : 'Confirm'}
           />
         )}
       </div>

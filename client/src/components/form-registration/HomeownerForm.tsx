@@ -3,12 +3,22 @@ import type { FormData, FormValidationErrors } from "./types";
 import { fieldCls, labelCls, borderPrimary } from "./utils";
 import ErrorText from "./ErrorText";
 import PasswordInput from "./PasswordInput";
+import EmailVerification from "../registration-form/EmailVerification";
 
 interface HomeownerFormProps {
   formData: Extract<FormData, { userType: "ownerHome" }>;
   errors: FormValidationErrors;
   submitted: boolean;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  // Email verification props
+  showEmailVerification?: boolean;
+  verificationCode?: string;
+  setVerificationCode?: (code: string) => void;
+  verificationError?: string;
+
+  loading?: boolean;
+  sendVerificationEmail?: (email: string) => void;
+  onGoBackToForm?: () => void;
 }
 
 const HomeownerForm: React.FC<HomeownerFormProps> = ({
@@ -16,7 +26,47 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
   errors,
   submitted,
   handleChange,
+  // Email verification props with defaults
+  showEmailVerification = false,
+  verificationCode = "",
+  setVerificationCode = () => {},
+  verificationError = "",
+
+  loading = false,
+  sendVerificationEmail = () => {},
+  onGoBackToForm = () => {},
 }) => {
+  
+  // Handle going back to form
+  const handleGoBack = () => {
+    onGoBackToForm();
+  };
+
+  // Handle resending email
+  const handleResendEmail = () => {
+    sendVerificationEmail(formData.email);
+  };
+
+  // If showing email verification, render that instead
+  if (showEmailVerification) {
+    return (
+      <EmailVerification
+        email={formData.email}
+        verificationCode={verificationCode}
+        setVerificationCode={setVerificationCode}
+        verificationError={verificationError}
+
+        loading={loading}
+        onSubmit={(e) => {
+          e.preventDefault();
+          // The parent component should handle this through the form submission
+        }}
+        onResendEmail={handleResendEmail}
+        onGoBack={handleGoBack}
+      />
+    );
+  }
+
   return (
     <>
       <div className="grid md:grid-cols-2 gap-6">

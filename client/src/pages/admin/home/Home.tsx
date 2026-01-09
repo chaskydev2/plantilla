@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import useAuth from "@/core/hooks/useAuth";
 
 // Dashboard Statistics Component
 const StatCard = ({ title, value, change, changeType, icon, bgColor }: {
@@ -55,8 +56,28 @@ const UserItem = ({ name, role, avatar, status }: {
   </div>
 );
 
+// Under Construction Component
+const UnderConstruction = () => (
+  <div className="min-h-96 flex items-center justify-center">
+    <div className="text-center p-8">
+      <div className="text-6xl mb-6">🚧</div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Under Construction</h2>
+      <p className="text-gray-600 mb-6 max-w-md">
+        This section is currently being built. Please check back later for updates.
+      </p>
+      <div className="flex justify-center space-x-2">
+        <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce"></div>
+        <div className="w-2 h-2 bg-stone-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+        <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+      </div>
+    </div>
+  </div>
+);
+
 export default function Dashboard() {
-  const [stats, setStats] = useState({
+  const { hasRole } = useAuth();
+  
+  const [stats] = useState({
     earnings: { current: '$34,542', previous: '$26,845' },
     newWorkers: 1247,
     newHomeowners: 892,
@@ -76,7 +97,9 @@ export default function Dashboard() {
     <div>
       <PageBreadcrumb pageTitle="Dashboard" />
       
-      <div className="space-y-6">
+      {/* 🔐 RESTRICCIÓN: Solo usuarios con rol "admin" pueden ver el dashboard completo */}
+      {hasRole('admin') ? (
+        <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Earnings Card */}
@@ -371,7 +394,10 @@ export default function Dashboard() {
             ↑ Export Data
           </button>
         </div>
-      </div>
+        </div>
+      ) : (
+        <UnderConstruction />
+      )}
     </div>
   );
 }

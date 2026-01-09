@@ -30,7 +30,8 @@ use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
 use App\Http\Controllers\Api\V1\TagController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Api\V1\HomeownerProfileController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\AttributeController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,8 @@ Route::prefix('/v1')
         Route::post('login', [AuthController::class, 'login']);
         
         Route::post('register/homeowner', [AuthController::class, 'registerHomeowner']);
+        
+        Route::post('register/contractor', [AuthController::class, 'registerContractor']);
         
         Route::get('agreements/all', [AgreementController::class, 'all']);
 
@@ -155,7 +158,7 @@ Route::prefix('/v1')
 
             Route::apiResource('payment', PaymentController::class);
 
-            // Contractor routes
+            // Contractor routes (también accesible como trabajadores)
             Route::get('contractors/stats', [ContractorController::class, 'stats']);
             Route::get('contractors/status/{status}', [ContractorController::class, 'byStatus']);
             Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
@@ -163,6 +166,15 @@ Route::prefix('/v1')
             Route::patch('contractors/{contractor}/reject', [ContractorController::class, 'reject']);
             Route::patch('contractors/{contractor}/suspend', [ContractorController::class, 'suspend']);
             Route::apiResource('contractors', ContractorController::class);
+            
+            // Trabajadores routes (alias para contractors)
+            Route::get('trabajadores/stats', [ContractorController::class, 'stats']);
+            Route::get('trabajadores/status/{status}', [ContractorController::class, 'byStatus']);
+            Route::get('trabajadores/near', [ContractorController::class, 'nearLocation']);
+            Route::patch('trabajadores/{contractor}/approve', [ContractorController::class, 'approve']);
+            Route::patch('trabajadores/{contractor}/reject', [ContractorController::class, 'reject']);
+            Route::patch('trabajadores/{contractor}/suspend', [ContractorController::class, 'suspend']);
+            Route::apiResource('trabajadores', ContractorController::class);
 
             // Profession routes
             Route::get('professions/available', [ProfessionController::class, 'available']);
@@ -189,10 +201,15 @@ Route::prefix('/v1')
             Route::delete('categories/{category}/with-children', [CategoryController::class, 'destroyWithChildren']);
             Route::apiResource('categories', CategoryController::class);
 
-            // Attribute routes
+                        // Attribute routes
             Route::get('attributes/for-contractors', [AttributeController::class, 'forContractors']);
             Route::get('attributes/for-homeowners', [AttributeController::class, 'forHomeowners']);
             Route::get('attributes/statistics', [AttributeController::class, 'statistics']);
             Route::apiResource('attributes', AttributeController::class);
+
+            // Homeowner Profile routes
+            Route::get('homeowner-profiles/all', [HomeownerProfileController::class, 'all']);
+            Route::get('homeowner-profiles/stats', [HomeownerProfileController::class, 'stats']);
+             Route::apiResource('homeowner-profiles', HomeownerProfileController::class);
         });
     });
