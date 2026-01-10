@@ -228,7 +228,7 @@ const AppSidebar: React.FC = () => {
         //  permissions: ["etiqueta_listar"]
         },
         {
-          name: t("admin.sidebar.services"),
+          name: t("admin.sidebar.services", "Services"),
           path: "/admin/services",
           icon: <Wrench className="w-4 h-4" />,
         //  permissions: ["etiqueta_listar"]

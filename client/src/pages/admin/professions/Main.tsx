@@ -35,26 +35,27 @@ export default function ProfessionList() {
     {
       key: "name",
       header: t('admin.common.name'),
-      render: (item: IItemResource) => (
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                {(() => {
-                  const iconName = (item as any).icon as keyof typeof LucideIcons | undefined;
-                  const Icon = iconName && typeof LucideIcons[iconName] === "function"
-                    ? (LucideIcons[iconName] as LucideIcon)
-                    : undefined;
-                  const SafeIcon = Icon || Briefcase;
-                  return <SafeIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />;
-                })()}
+        render: (item: IItemResource) => {
+          const iconName = (item as any).icon as keyof typeof LucideIcons | undefined;
+          const Icon = iconName ? (LucideIcons[iconName] as LucideIcon) : null;
+          return (
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 flex items-center justify-center rounded border">
+                  {Icon ? (
+                    <Icon className="w-6 h-6" />
+                  ) : (
+                    <span className="text-xs">No icon</span>
+                  )}
+                </div>
               </div>
-          </div>
-          <div>
-            <div className="font-bold text-gray-900 dark:text-gray-100">{item.name}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">/{item.slug}</div>
-          </div>
-        </div>
-      ),
+              <div>
+                <div className="font-bold text-gray-900 dark:text-gray-100">{item.name}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">/{item.slug}</div>
+              </div>
+            </div>
+          );
+        },
       sortable: true,
     },
     {

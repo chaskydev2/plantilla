@@ -136,27 +136,6 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, onClose
                     )
                   )
                 ),
-                h("div", {}, h("span", { className: "font-semibold" }, "¿Puede editar perfil?"),
-                  h("label", { className: "flex items-center gap-2 ml-2" },
-                    h("input", {
-                      type: "checkbox",
-                      className: "toggle toggle-info",
-                      checked: editProfile,
-                      onChange: handleEditProfileChange,
-                      disabled: isProcessing,
-                    }),
-                    h(
-                      "span",
-                      {
-                        className:
-                          editProfile
-                            ? "badge badge-info"
-                            : "badge badge-secondary"
-                      },
-                      editProfile ? "Sí" : "No"
-                    )
-                  )
-                ),
                 h("div", {}, h("span", { className: "font-semibold" }, "Roles:"), " ", (user.roles || []).map((r: any) => r.name).join(", ")),
                 h("div", {}, h("span", { className: "font-semibold" }, "Verificado:"), " ", userInfo.verification ? "Sí" : "No"),
                 h("div", {}, h("span", { className: "font-semibold" }, "Permiso de edición:"), " ", userInfo.edit_profile ? "Sí" : "No"),
