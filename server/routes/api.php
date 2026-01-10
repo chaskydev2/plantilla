@@ -316,4 +316,5 @@ Route::prefix('/v1')
             Route::get('jobs-creator/homeowner/{homeownerId}', [JobContractorController::class, 'jobsByHomeowner']);
             Route::get('jobs-creator/statistics', [JobContractorController::class, 'statistics']);
         });
+    
     });

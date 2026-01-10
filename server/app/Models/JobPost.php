@@ -12,7 +12,7 @@ class JobPost extends Model
         'homeowner_id',
         'service_id',
         'title',
-        'description',
+        'descripti',
         'deadline',
         'status',
         'price',
