@@ -172,25 +172,25 @@ const AppSidebar: React.FC = () => {
         }
       ],
     },
-    {
-      name: t("admin.sidebar.events"),
-      icon: <Calendar className="w-5 h-5" />,
-      permissions: ["tipo_evento_listar"],
-      subItems: [
-        {
-          name: t("admin.sidebar.eventTypes"),
-          path: "/admin/tipo_eventos",
-          icon: <List className="w-4 h-4" />,
-          permissions: ["tipo_evento_listar"]
-        },
-        {
-          name: t("admin.sidebar.eventsList"),
-          path: "/admin/eventos",
-          icon: <Calendar className="w-4 h-4" />,
-          permissions: ["evento_listar"]
-        },
-      ],
-    },
+    // {
+    //   name: t("admin.sidebar.events"),
+    //   icon: <Calendar className="w-5 h-5" />,
+    //   permissions: ["tipo_evento_listar"],
+    //   subItems: [
+    //     {
+    //       name: t("admin.sidebar.eventTypes"),
+    //       path: "/admin/tipo_eventos",
+    //       icon: <List className="w-4 h-4" />,
+    //       permissions: ["tipo_evento_listar"]
+    //     },
+    //     {
+    //       name: t("admin.sidebar.eventsList"),
+    //       path: "/admin/eventos",
+    //       icon: <Calendar className="w-4 h-4" />,
+    //       permissions: ["evento_listar"]
+    //     },
+    //   ],
+    // },
     {
       name: t("admin.sidebar.payments"),
       icon: <BookOpen className="w-5 h-5" />,
@@ -381,7 +381,7 @@ const AppSidebar: React.FC = () => {
               setOpenSubmenu({ type, index });
               submenuMatched = true;
             }
-          });
+          })
         }
         // Also check whether the main route matches
         else if (nav.path && isActive(nav.path)) {

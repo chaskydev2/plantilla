@@ -67,7 +67,7 @@ export const useRegistrationForm = () => {
           toastify.success("¡Registro exitoso! Bienvenido a nuestra plataforma.");
           resetVerificationStates();
 
-          setTimeout(() => {
+          setTimeout(() => {  
             window.location.href = "/admin";
           }, 1000);
           return;
