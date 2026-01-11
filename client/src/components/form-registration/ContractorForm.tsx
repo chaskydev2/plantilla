@@ -33,7 +33,6 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
   handleMultiSelectChange,
   handleNext,
   handlePrev,
-  handleSubmit,
 }) => {
   const [professionsData, setProfessionsData] = useState<IProfession[]>([]);
   const [loadingProfessions, setLoadingProfessions] = useState(true);
@@ -349,7 +348,6 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              onClick={handleSubmit}
               className="px-7 py-3 rounded-xl border font-bold shadow-sm"
               style={{ background: "var(--color-secondary)", color: "var(--color-primary)", ...borderPrimary }}
             >

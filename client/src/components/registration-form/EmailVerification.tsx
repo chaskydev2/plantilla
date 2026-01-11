@@ -11,6 +11,8 @@ interface EmailVerificationProps {
   loading: boolean;
   onResendEmail: () => void;
   onGoBack: () => void;
+
+  // ✅ NUEVO: handler para confirmar el código y completar registro
   onConfirm: () => void;
 }
 
@@ -27,15 +29,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const canSubmit = verificationCode.trim().length === 6 && !loading;
 
   const handleCreateAccount = () => {
-    console.log("✅ Click Create Account", {
-      canSubmit,
-      verificationCode,
-      loading,
-      hasOnConfirm: !!onConfirm,
-    });
-    if (canSubmit) {
-      onConfirm();
-    }
+    if (!canSubmit) return;
+    onConfirm();
   };
 
   return (
@@ -53,10 +48,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
         <p className="text-sm" style={helpMuted}>
           We've sent a 6-digit verification code to
         </p>
-        <p
-          className="font-semibold"
-          style={{ color: "var(--color-secondary)" }}
-        >
+        <p className="font-semibold" style={{ color: "var(--color-secondary)" }}>
           {email}
         </p>
       </div>
@@ -78,6 +70,13 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
             onChange={(e) => {
               const next = e.target.value.replace(/\D/g, "").slice(0, 6);
               setVerificationCode(next);
+            }}
+            onKeyDown={(e) => {
+              // ✅ evita que Enter dispare el submit del form padre
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleCreateAccount();
+              }
             }}
             className="w-full px-4 py-3 text-center text-lg font-mono tracking-widest rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={borderPrimary}
@@ -109,11 +108,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
           </motion.button>
 
           <motion.button
-            type="button"
-            onClick={() => {
-              console.log("🟦 Button onClick fired");
-              handleCreateAccount();
-            }}
+            type="button" // ✅ NO submit
+            onClick={handleCreateAccount}
             disabled={!canSubmit}
             whileHover={canSubmit ? { scale: 1.02 } : {}}
             whileTap={canSubmit ? { scale: 0.98 } : {}}
