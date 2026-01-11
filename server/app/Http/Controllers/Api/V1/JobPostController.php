@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\File;
 
 class JobPostController extends Controller  {
 
- public function changeAprobationStatus(Request $request, $id): JsonResponse
+    public function changeAprobationStatus(Request $request, $id): JsonResponse
     {
         $request->validate([
             'status_aprobation' => ['required', 'boolean'],
@@ -35,7 +35,8 @@ class JobPostController extends Controller  {
             'data' => $jobPost
         ]);
     }
-      public function publicIndex(Request $request): JsonResponse
+    
+    public function publicIndex(Request $request): JsonResponse
     {
         $query = JobPost::with(['homeowner', 'service']);
 
@@ -218,7 +219,8 @@ class JobPostController extends Controller  {
         $perPage = $request->get('per_page', 15);
         $jobPosts = $query->paginate($perPage);
 
-        return response()->json($jobPosts);
+        // Usar una Resource para cumplir el tipo de retorno
+        return \App\Http\Resources\JobPostResource::collection($jobPosts);
     }
 
     public function byHomeowner(Request $request, int $homeowner): JsonResponse
@@ -359,11 +361,16 @@ class JobPostController extends Controller  {
                 $data['image_path'] = $newImage;
             }
 
-            $jobPost->update($data);
+            // Actualizar y guardar cada campo individualmente
+            foreach ($data as $key => $value) {
+                $jobPost->$key = $value;
+                $jobPost->save();
+            }
             $jobPost->load(['homeowner', 'service']);
             return response()->json([
                 'message' => 'Publicación actualizada exitosamente',
-                'data' => $jobPost
+                'data' => $jobPost , 
+                 'datasent' => $request
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([

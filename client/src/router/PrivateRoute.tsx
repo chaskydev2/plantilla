@@ -20,7 +20,6 @@ const PrivateRoute = () => {
     "/admin/permisos": ["permiso_listar"] as IPermission[],
     "/admin/roles/:id/permisos": ["rol_permiso_listar"] as IPermission[],
     "/admin/comunicados": ["comunicado_listar"] as IPermission[],
-    "/admin/tipo_eventos": ["tipo_evento_listar"] as IPermission[],
     "/admin/eventos": ["evento_listar"] as IPermission[],
     "/admin/cursos": ["curso_listar"] as IPermission[],
     "/admin/montlypay": null, // TODO: Add pago_listar permission

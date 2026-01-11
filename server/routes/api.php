@@ -44,13 +44,16 @@ use App\Http\Controllers\Api\V1\ContractorTeamMemberController;
 use App\Http\Controllers\Api\V1\ContractorMessageController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\AttributeHomeownerController;
+use App\Http\Controllers\ReviewController;
 
 use Illuminate\Support\Facades\Route;
+
 
 Route::prefix('/v1')
     ->name('v1.')
     ->group(function () {
-        
+        // Rutas pública
+       
         Route::get('trabajadores/near', [ContractorController::class, 'nearLocation']);
         Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
 
@@ -111,7 +114,8 @@ Route::prefix('/v1')
                 Route::get('contractors/{id}/messages', [ContractorMessageController::class, 'index']);
                 Route::post('contractors/{id}/messages', [ContractorMessageController::class, 'store']);
         
-
+              Route::post('reviews', [ReviewController::class, 'store']);
+          
                  
          Route::middleware(['auth:api'])->group(function () {
 
@@ -323,11 +327,11 @@ Route::prefix('/v1')
             Route::get('jobs-creator/creator/{creatorId}', [JobContractorController::class, 'jobsByCreator']);
             Route::get('jobs-creator/homeowner/{homeownerId}', [JobContractorController::class, 'jobsByHomeowner']);
             Route::get('jobs-creator/statistics', [JobContractorController::class, 'statistics']);
-
-            // Ruta para eliminar uno o varios job posts
+              // Ruta para eliminar uno o varios job posts
             Route::delete('job-posts/destroy-many', [JobPostController::class, 'destroyMany']);
             // Cambiar status_aprobation de un JobPost
-            Route::patch('job-posts/{id}/aprobation', [JobPostController::class, 'changeAprobationStatus']);
+           Route::post('job-posts/{id}/aprobation', [JobPostController::class, 'changeAprobationStatus']); 
+        
         });
     
     });

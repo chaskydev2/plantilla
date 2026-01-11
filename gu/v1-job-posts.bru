@@ -1,0 +1,30 @@
+meta {
+  name: /v1/job-posts
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/api/job-posts/22/aprobation
+  body: json
+  auth: bearer
+}
+
+headers {
+  status_aprobation: true
+}
+
+auth:bearer {
+  token: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMTliNmI5Yi1iMGQ1LTcwMWUtYWZjYS1kNjFiNDgwMGVjMzQiLCJqdGkiOiJhYzAyZWQ4ZTMyNzRmMDgwYmU0MWI4YWEzNDJiZjkwYzVlNzA2MGE0YjNiNGE5MjQyZjFhZWY0MjJiMDk4ODBiYTdkYjYzMDIyZTI3OGFkNCIsImlhdCI6MTc2ODE1NjAxMS4xNDU5LCJuYmYiOjE3NjgxNTYwMTEuMTQ1OTExLCJleHAiOjE3OTk2OTIwMTEuMDM4NzA5LCJzdWIiOiIyOCIsInNjb3BlcyI6W119.aeSEzeZAEd0e2Il3KbySo9JddbG4N24aRuzlNBrRR6KYUO1A70iP8aLFFWYfSHve9zT2Pm07wC_EudCRdCDdwM64gRrXwCM55uu7oao7PpLGfWQd32kCFiLsozA_0yaKnXbHlQ9WbpKzIDlWTu03y-kJ3tkclg_Bd2RV-sRLK3I5J3xvPjaaHAJx2nVaXlulM-Dan8qXLC44h_CvNqn93_XIpU8tMXTo9Mh8Rfyh2AuRPo2r28-wgDDE37ChKdTa9QiLjclq1HhtbHZLSiKeCVnSBqm0b2ZERZMdwOj2rwMFxMHqZeKXdsuBLUmsNgALcSdzejWxTpqejqOxMIxlCZpl6y_k1350i7tknj3gWoWs4b7WYyMHtGEwzqgvYqndxxOR9-_e7ZSxIndVDS4oXJO1TakSyssDwHLMlyoN8YOm6PJLl1yO5XLw8Si5wpGNaqaCb0rEI-OM453KXcy-pTpBLBm02hnQw8zXRIv_kryKStdvCScaVc6nuh0d1ZIvHWik_PYp3fetF47D5i59qbEjbkZynimJKRudy3ztxk_D7wP99_bltODblgrjRJjHlcO01RhHiIvaGX3LqHlOhTZwGGEwt8SUWzg72B0-8LvqF8Th2Y6myLa9NsYzI2WDRQXijcACVYiuiATBkPKXGIZyG3JQwntd_zuVvYR6q1Y
+}
+
+body:json {
+  {
+    "status_aprobation": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

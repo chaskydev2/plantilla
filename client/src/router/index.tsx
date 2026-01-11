@@ -23,8 +23,6 @@ import RolPage from "@/pages/admin/roles/Main";
 import RolPermissionPage from "@/pages/admin/roles/permissions/Main";
 import PermissionPage from "@/pages/admin/permissions/Main";
 import AnnouncementPage from "@/pages/admin/announcements/Main";
-import EventTypePage from "@/pages/admin/event-types/Main";
-import EventPage from "@/pages/admin/events/Main";
 import CoursePage from "@/pages/admin/courses/Main";
 import PaymentPage from "@/pages/admin/monthlypay/Main";
 import PaymentReport from "@/pages/admin/monthlypay/Report";
@@ -151,8 +149,6 @@ export default function App() {
               <Route path="/admin/roles/:id/permisos" element={<RolPermissionPage />} />
               <Route path="/admin/permisos" element={<PermissionPage />} />
               <Route path="/admin/comunicados" element={<AnnouncementPage />} />
-              <Route path="/admin/tipo_eventos" element={<EventTypePage />} />
-              <Route path="/admin/eventos" element={<EventPage />} />
               <Route path="/admin/cursos" element={<CoursePage />} />
               <Route path="/admin/montlypay" element={<PaymentPage />} />
               <Route path="/admin/montlypayreport" element={<PaymentReport />} />

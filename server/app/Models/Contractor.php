@@ -24,7 +24,7 @@ class Contractor extends Model
         'license_number',
         'is_insured',
         'service_area',
-        'average_rating',
+        'average_rating', // Importante: Este campo almacenará el promedio
         'state_code',
         'country_code',
         'lat',
@@ -335,6 +335,22 @@ class Contractor extends Model
 
     public function messages()
     {
-        return $this->hasMany(ContractorMessage::class, 'contractor_user_id', 'user_id');
+        return $this->hasMany(ContractorMessageThread::class, 'contractor_user_id', 'user_id');
+    }
+
+    public function reviews()
+    {
+    
+        return $this->hasMany(Review::class, 'contractor_id', 'user_id');
+    }
+
+    public function updateAverageRating()
+    {
+        
+        $avg = $this->reviews()->avg('rating');
+        
+      
+        $this->average_rating = round($avg, 2);
+        $this->save();
     }
 }

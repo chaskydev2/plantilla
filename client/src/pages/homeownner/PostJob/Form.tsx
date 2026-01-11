@@ -244,9 +244,19 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
   const handleSubmit = async (data: any) => {
     setBackendError(null);
     try {
+      // No filtrar status, solo filtrar undefined
       const cleanData = Object.fromEntries(
-        Object.entries(data).filter(([key, value]) => value !== undefined && key !== 'status')
+        Object.entries(data).filter(([key, value]) => value !== undefined)
       );
+
+      // Convertir price y service_id a número si es posible
+      if (cleanData.price !== undefined && cleanData.price !== null && cleanData.price !== '') {
+        cleanData.price = Number(cleanData.price);
+      }
+      if (cleanData.service_id !== undefined && cleanData.service_id !== null && cleanData.service_id !== '') {
+        cleanData.service_id = Number(cleanData.service_id);
+      }
+
       // Obtener homeowner_id desde localStorage user_data
       try {
         const userDataRaw = localStorage.getItem('user_data');
@@ -258,6 +268,7 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
           }
         }
       } catch {}
+
       // Normalizar deadline: si está vacío, poner null; si tiene valor, asegurar formato YYYY-MM-DD
       if (!cleanData.deadline || cleanData.deadline === '') {
         cleanData.deadline = null;
@@ -272,18 +283,24 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
       } else {
         cleanData.deadline = null;
       }
+
       // Valor por defecto para currency si está vacío o null
       if (!cleanData.currency || cleanData.currency === '') {
         cleanData.currency = 'MXN';
       }
+
       normalizeImage(cleanData, isEditing, initialData || undefined);
       // No enviar image si es undefined
       if (cleanData.image === undefined) {
         delete cleanData.image;
       }
+
       let result;
       if (isEditing && initialData && initialData.id) {
+        console.log('Preparing to update job post ID:', cleanData);
+        console.log('Updating job post ID:', initialData.id);
         result = await updateJobPost(cleanData, initialData);
+        console.log('Updating job post with data:', cleanData, result);
       } else {
         result = await createJobPost(cleanData, initialData);
       }
@@ -346,21 +363,6 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
                 valueKey="id"
                 labelKey="name"
                 placeholder="Select status"
-              />
-              <SelectField
-                name="city"
-                label="City"
-                options={[
-                  { id: 'Mexico City', name: 'Mexico City' },
-                  { id: 'Guadalajara', name: 'Guadalajara' },
-                  { id: 'Monterrey', name: 'Monterrey' },
-                  { id: 'Puebla', name: 'Puebla' },
-                  { id: 'Tijuana', name: 'Tijuana' },
-                  { id: 'Other', name: 'Other' },
-                ]}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Select city"
               />
             </div>
             <div className="mt-6">

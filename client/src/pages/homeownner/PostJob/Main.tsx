@@ -8,7 +8,7 @@ import { toastify } from "@/core/utils/toastify";
 
 import useAuth from "@/core/hooks/useAuth";
 import Form from "./Form";
-import { getJobPostsByHomeowner, deleteJobPosts } from '@/core/services/jobPost.service';
+import { getJobPostsByHomeowner, deleteJobPostById } from '@/core/services/jobPost.service';
 
 // Get API base URL from env
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -227,7 +227,7 @@ export default function JobPostList() {
   const handleDelete = async (item: JobPost) => {
     setIsProcessing(true);
     try {
-      const res = await deleteJobPosts([item.id]);
+      const res = await deleteJobPostById(item.id);
       if (res.success) {
         toastify.success(res.message || `Post "${item.title}" deleted successfully.`);
         fetchItems();

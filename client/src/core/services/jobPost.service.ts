@@ -1,11 +1,4 @@
-// Get all job posts (admin)
-export const getAllJobPosts = async () => {
-  const url = `${API_BASE_URL}/v1/job-posts`;
-  const res = await axios.get(url);
-  return res.data;
-};
-// Eliminar múltiples job posts por IDs
-
+// Change aprobation status for a job post
 import type { JobPost } from '@/pages/homeownner/PostJob/Main';
 import axios from '@/core/config/axios';
 
@@ -15,32 +8,65 @@ export interface IJobPostRequest {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+
+export const changeJobPostAprobationStatus = async (
+  jobPostId: number,
+  status_aprobation: boolean
+): Promise<any> => {
+  //const url = `${API_BASE_URL}/job-posts/${jobPostId}/aprobation`;
+    const url = `${API_BASE_URL}/v1/job-posts/${jobPostId}/aprobation`;
+    const res = await axios.post(url, { status_aprobation });
+  console.log('Response from changeJobPostAprobationStatus:', res);
+  
+  return res.data;
+};
+
+
 const buildJobPostFormData = (data: any, initialData?: JobPost | null) => {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
-    if (key === 'image') return; // Handled separately
-    if (value === undefined || value === null) return;
-    // Ignore if it's an empty object
+    if (key === 'image') return; // Handled separately below
+    if (key === 'remove_image') {
+      if (value) formData.append('remove_image', '1');
+      return;
+    }
+    // Permitir null y string vacía, solo omitir undefined
+    if (value === undefined) return;
+    // Si es un objeto vacío (excepto File/Blob), omitir
     if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Blob)) return;
-    // If it's a Blob, add it
+    // Si es Blob, agregar
     if (value instanceof Blob) {
       formData.append(key, value);
       return;
     }
-    // If it's string, number or boolean, add as string
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      formData.append(key, String(value));
+    // Si es string, number o boolean, agregar como string (permitir null y '')
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null) {
+      formData.append(key, value === null ? '' : String(value));
     }
   });
-  formData.append('homeowner_id', initialData?.homeowner_id?.toString() || '1');
-  // Image
-  if (data.image && Array.isArray(data.image) && data.image[0] && typeof data.image[0] !== 'object') {
-    // If it's a string, don't add it
-  } else if (data.image && Array.isArray(data.image) && data.image[0] instanceof File) {
+  // homeowner_id: solo agregar si no está en data
+  if (!('homeowner_id' in data)) {
+    formData.append('homeowner_id', initialData?.homeowner_id?.toString() || '1');
+  }
+  // Imagen
+  if (data.image && Array.isArray(data.image) && data.image[0] instanceof File) {
     formData.append('image', data.image[0]);
+  } else if (data.image === null) {
+    // Si image es null explícito, enviar para eliminar
+    formData.append('image', '');
   }
   return formData;
 };
+
+
+// Get all job posts (admin)
+export const getAllJobPosts = async () => {
+  const url = `${API_BASE_URL}/v1/job-posts`;
+  const res = await axios.get(url);
+  console.log('Response from getAllJobPosts:', res);
+  return res.data;
+};
+
 
 export const deleteJobPosts = async (ids: number[]): Promise<any> => {
   const url = `${API_BASE_URL}/v1/job-posts/destroy-many`;
@@ -66,7 +92,7 @@ export const createJobPost = async (
   initialData?: JobPost | null
 ): Promise<any> => {
   const formData = buildJobPostFormData(data, initialData);
-  console.log('FormData entries for createJobPost:', formData);
+  console.log('FormData entries for createJobPost:', data);
   const url = `${API_BASE_URL}/v1/job-posts`;
   const res = await axios.post(url, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -74,17 +100,36 @@ export const createJobPost = async (
   return res.data;
 };
 
-
+export const deleteJobPostById = async (id: number): Promise<any> => {
+  const url = `${API_BASE_URL}/v1/job-posts/${id}`;
+  const res = await axios.delete(url);
+  return res.data;
+};
 
 
 export const updateJobPost = async (
   data: IJobPostRequest,
   initialData: JobPost
 ): Promise<any> => {
+  console.log('Data received for updateJobPost:', data);
   const formData = buildJobPostFormData(data, initialData);
+  // Loguear el contenido real de formData
+  if (formData && typeof formData.forEach === 'function') {
+    console.log('FormData to be sent (key => value):');
+    formData.forEach((value, key) => {
+      if (value instanceof File) {
+        console.log(`${key} => [File] name: ${value.name}, type: ${value.type}, size: ${value.size}`);
+      } else {
+        console.log(`${key} =>`, value);
+      }
+    });
+  }
+  // Laravel: para PUT con multipart/form-data, usar POST y _method=PUT
+  formData.append('_method', 'PUT');
   const url = `${API_BASE_URL}/v1/job-posts/${initialData.id}`;
-  const res = await axios.put(url, formData, {
+  const res = await axios.post(url, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+  console.log('Response from updateJobPost:', res);
   return res.data;
 };

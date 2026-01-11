@@ -1,6 +1,7 @@
 import React from "react";
 import type { FormSectionProps } from "./types";
 import { HomeownerForm, ContractorForm } from "../form-registration";
+import type { FormData } from "../form-registration/types";
 
 const FormSection: React.FC<FormSectionProps> = ({
   userType,
@@ -14,7 +15,7 @@ const FormSection: React.FC<FormSectionProps> = ({
   handleNext,
   handlePrev,
   handleSubmit,
-  // Email verification props
+
   showEmailVerification,
   verificationCode,
   setVerificationCode,
@@ -22,30 +23,44 @@ const FormSection: React.FC<FormSectionProps> = ({
 
   sendVerificationEmail,
   onGoBackToForm,
+  onConfirmEmail,
 }) => {
+  // ✅ defaults para evitar undefined (porque en types.ts son opcionales)
+  const safeShowEmailVerification = !!showEmailVerification;
+  const safeVerificationCode = verificationCode ?? "";
+  const safeSetVerificationCode = setVerificationCode ?? (() => {});
+  const safeVerificationError = verificationError ?? "";
+  const safeSendVerificationEmail = sendVerificationEmail ?? (() => {});
+  const safeOnGoBackToForm = onGoBackToForm ?? (() => {});
+  const safeOnConfirmEmail = onConfirmEmail ?? (() => {});
+
   return (
     <>
       {userType === "ownerHome" ? (
         <HomeownerForm
-          formData={formData as Extract<FormSectionProps['formData'], { userType: "ownerHome" }>}
+          formData={formData as Extract<FormData, { userType: "ownerHome" }>}
           errors={errors}
           submitted={submitted}
           handleChange={handleChange}
-          showEmailVerification={showEmailVerification}
-          verificationCode={verificationCode}
-          setVerificationCode={setVerificationCode}
-          verificationError={verificationError}
-
-          loading={loading}
-          sendVerificationEmail={sendVerificationEmail}
-          onGoBackToForm={onGoBackToForm}
+          showEmailVerification={safeShowEmailVerification}
+          verificationCode={safeVerificationCode}
+          setVerificationCode={safeSetVerificationCode}
+          verificationError={safeVerificationError}
+          loading={!!loading}
+          sendVerificationEmail={safeSendVerificationEmail}
+          onGoBackToForm={safeOnGoBackToForm}
+          // onConfirmEmail={safeOnConfirmEmail}
+          onConfirmEmail={() => {
+            console.log("🔥 FormSection onConfirmEmail fired");
+            onConfirmEmail?.();
+          }}
         />
       ) : (
         <ContractorForm
-          formData={formData as Extract<FormSectionProps['formData'], { userType: "contractor" }>}
+          formData={formData as Extract<FormData, { userType: "contractor" }>}
           errors={errors}
           submitted={submitted}
-          loading={loading}
+          loading={!!loading}
           step={step}
           handleChange={handleChange}
           handleMultiSelectChange={handleMultiSelectChange}

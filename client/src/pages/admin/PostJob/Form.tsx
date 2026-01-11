@@ -11,7 +11,7 @@ import type { JobPost as JobPostBase } from './Main';
 type JobPost = JobPostBase & {
   status_aprobation?: boolean;
 };
-import { createJobPost, updateJobPost } from '@/core/services/jobPost.service';
+import { createJobPost, updateJobPost, changeJobPostAprobationStatus } from '@/core/services/jobPost.service';
 import 'react-toastify/dist/ReactToastify.css';
 
 import axios from 'axios';
@@ -31,11 +31,11 @@ function StatusSwitch() {
   );
 }
 
-// StatusAprobationSwitch component for toggling status_aprobation
+// StatusAprobationSwitch component for toggling status_aprobation (boolean switch)
 function StatusAprobationSwitch({ jobPostId, initialValue, onChanged }: {
-  jobPostId: any;
-  initialValue: any;
-  onChanged?: any;
+  jobPostId: number;
+  initialValue: boolean;
+  onChanged?: (val: boolean) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [aprobation, setAprobation] = useState(!!initialValue);
@@ -43,16 +43,16 @@ function StatusAprobationSwitch({ jobPostId, initialValue, onChanged }: {
   const handleToggle = async () => {
     setLoading(true);
     try {
-      const res = await axios.patch(
-        `/job-posts/${jobPostId}/aprobation`,
-        { status_aprobation: !aprobation }
-      );
-      if (res.data && res.data.success) {
+
+      const res = await changeJobPostAprobationStatus(jobPostId, !aprobation);
+      console.log('Response from changeJobPostAprobationStatus:', res);
+      if (res && res.success) {
         setAprobation(!aprobation);
         toast.success('Aprobation status updated');
         if (onChanged) onChanged(!aprobation);
       } else {
-        toast.error(res.data.message || 'Error updating aprobation status');
+        console.log('Error response from changeJobPostAprobationStatus:', res);
+        toast.error(res?.message || 'Error updating aprobation status');
       }
     } catch (err) {
       toast.error('Network error');
@@ -61,19 +61,30 @@ function StatusAprobationSwitch({ jobPostId, initialValue, onChanged }: {
   };
 
   return (
-    <button
-      type="button"
-      className={`px-4 py-2 rounded ${aprobation ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-      onClick={handleToggle}
-      disabled={loading}
-    >
-      {aprobation ? 'Approved' : 'Not Approved'}
-    </button>
+    <label className="flex items-center gap-2 cursor-pointer select-none">
+      <span className="font-semibold">Aprobation Status:</span>
+      <div className="relative">
+        <input
+          type="checkbox"
+          checked={aprobation}
+          onChange={handleToggle}
+          disabled={loading}
+          className="sr-only peer"
+        />
+        <div
+          className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-green-500 transition-colors duration-200 ${loading ? 'opacity-50' : ''}`}
+        ></div>
+        <div
+          className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${aprobation ? 'translate-x-5' : ''}`}
+        ></div>
+      </div>
+      <span className={`ml-2 text-sm ${aprobation ? 'text-green-600' : 'text-gray-500'}`}>{aprobation ? 'Approved' : 'Not Approved'}</span>
+    </label>
   );
 }
 
 /* =========================
-   Yup Schema
+  Yup Schema
 ========================= */
 const jobPostSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -96,7 +107,7 @@ const jobPostSchema = Yup.object({
 
 
 /* =========================
-   GoogleMapPicker
+  GoogleMapPicker
 ========================= */
 function GoogleMapPicker() {
   const { setValue, watch } = useFormContext();
@@ -221,7 +232,7 @@ function GoogleMapPicker() {
 }
 
 /* =========================
-   Imagen logic (FIXED)
+  Image logic (FIXED)
 ========================= */
 const normalizeImage = (
   cleanData: any,
@@ -238,7 +249,7 @@ const normalizeImage = (
   }
 };
 
-// Componente principal del formulario
+// Main form component
 interface FormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -251,10 +262,9 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
   const [serviceOptions, setServiceOptions] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
-    // Traer los servicios creados desde la API
+    // Fetch created services from the API
     import('@/core/services/service/service.service').then(({ ServiceService }) => {
       ServiceService.getAllServices().then((res: any) => {
-
         if (res?.data) {
           setServiceOptions(res.data);
         }
@@ -308,18 +318,18 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
       const cleanData = Object.fromEntries(
         Object.entries(data).filter(([key, value]) => value !== undefined && key !== 'status')
       );
-      // Obtener homeowner_id desde localStorage user_data
+      // Get homeowner_id from localStorage user_data
       try {
         const userDataRaw = localStorage.getItem('user_data');
         if (userDataRaw) {
           const userData = JSON.parse(userDataRaw);
           if (userData?.id) {
             cleanData.homeowner_id = Number(userData.id);
-            console.log('homeowner_id enviado:', cleanData.homeowner_id);
+            console.log('homeowner_id sent:', cleanData.homeowner_id);
           }
         }
       } catch {}
-      // Normalizar deadline: si está vacío, poner null; si tiene valor, asegurar formato YYYY-MM-DD
+      // Normalize deadline: if empty, set to null; if has value, ensure YYYY-MM-DD format
       if (!cleanData.deadline || cleanData.deadline === '') {
         cleanData.deadline = null;
       } else if (typeof cleanData.deadline === 'string') {
@@ -333,12 +343,12 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
       } else {
         cleanData.deadline = null;
       }
-      // Valor por defecto para currency si está vacío o null
+      // Default value for currency if empty or null
       if (!cleanData.currency || cleanData.currency === '') {
         cleanData.currency = 'MXN';
       }
       normalizeImage(cleanData, isEditing, initialData || undefined);
-      // No enviar image si es undefined
+      // Do not send image if undefined
       if (cleanData.image === undefined) {
         delete cleanData.image;
       }
@@ -368,7 +378,7 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Editar publicación' : 'Nueva publicación'} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Edit Post' : 'New Post'} size="lg">
       {/* ToastContainer should be rendered once in your app, ideally in App.tsx. If not, you can add it here for local usage: */}
       {/* <ToastContainer /> */}
       <FormProviderWrapper
@@ -381,59 +391,30 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{backendError}</div>
         )}
         <div className="space-y-8">
-          {/* Sección principal */}
+          {/* Main section improved */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Información básica</h2>
+            <h2 className="text-xl font-bold mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField name="title" label="Title" disabled />
-              <InputField name="price" label="Price" disabled />
-              <SelectField
-                name="service_id"
-                label="Service"
-                options={serviceOptions}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Select a service"
-                disabled
-              />
-              <InputField name="deadline" label="Deadline" type="date" disabled />
-              <InputField name="currency" label="Currency" disabled />
-              {/* Status Switch */}
-              <div className="flex items-center gap-2 mt-2">
-                <label className="font-semibold">Status</label>
-                <StatusSwitch />
+              <div>
+                <div className="mb-2"><span className="font-semibold">Title:</span> {initialData?.title}</div>
+                <div className="mb-2"><span className="font-semibold">Price:</span> {initialData?.price}</div>
+                <div className="mb-2"><span className="font-semibold">Service:</span> {serviceOptions.find(opt => opt.id === initialData?.service_id)?.name || ''}</div>
+                <div className="mb-2"><span className="font-semibold">Deadline:</span> {initialData?.deadline ? new Date(initialData.deadline).toLocaleDateString() : '-'}</div>
+                <div className="mb-2"><span className="font-semibold">Currency:</span> {initialData?.currency}</div>
+                <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Status:</span> <StatusSwitch /></div>
+                <div className="mb-2 flex items-center gap-2">{initialData && (<StatusAprobationSwitch jobPostId={initialData.id} initialValue={!!initialData.status_aprobation} />)}</div>
+                <div className="mb-2"><span className="font-semibold">City:</span> {initialData?.city}</div>
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                <label className="font-semibold">Aprobation</label>
-                {initialData && (
-                  <StatusAprobationSwitch jobPostId={initialData.id} initialValue={initialData.status_aprobation} />
-                )}
+              <div>
+                <div className="mb-2"><span className="font-semibold">Description:</span></div>
+                <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 min-h-[60px]">{initialData?.description}</div>
               </div>
-              <SelectField
-                name="city"
-                label="City"
-                options={[
-                  { id: 'Mexico City', name: 'Mexico City' },
-                  { id: 'Guadalajara', name: 'Guadalajara' },
-                  { id: 'Monterrey', name: 'Monterrey' },
-                  { id: 'Puebla', name: 'Puebla' },
-                  { id: 'Tijuana', name: 'Tijuana' },
-                  { id: 'Other', name: 'Other' },
-                ]}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Select city"
-                disabled
-              />
-            </div>
-            <div className="mt-6">
-              <InputField name="description" label="Description" disabled />
             </div>
           </div>
 
-          {/* Sección de ubicación */}
+          {/* Location section */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Ubicación</h2>
+            <h2 className="text-xl font-bold mb-4">Location</h2>
             {/* Location fields as read-only */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
               <InputField name="address_line1" label="Address Line 1" disabled />
@@ -446,16 +427,18 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
             </div>
           </div>
 
-          {/* Sección de imagen */}
+          {/* Image section improved */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Imagen</h2>
-            <InputFileField
-              name="image"
-              label="Imagen (opcional)"
-              helperText="Formatos: JPG, PNG (máx 4MB). Deja vacío para mantener o quita para remover."
-              accept="image/*"
-              disabled
-            />
+            <h2 className="text-xl font-bold mb-4">Image</h2>
+            {initialData?.image_path ? (
+              <img
+                src={initialData.image_path.startsWith('http') ? initialData.image_path : `${import.meta.env.VITE_API_URL?.replace(/\/$/, '') || ''}/${initialData.image_path.replace(/^\//, '')}`}
+                alt="Job image"
+                className="rounded shadow max-w-xs max-h-60 object-contain border"
+              />
+            ) : (
+              <div className="text-gray-500 italic">No image available</div>
+            )}
           </div>
         </div>
       </FormProviderWrapper>

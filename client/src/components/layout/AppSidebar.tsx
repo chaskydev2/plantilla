@@ -120,19 +120,9 @@ const AppSidebar: React.FC = () => {
           path: "/homeowner/documents",
         },
         {
-          name: t("homeowner.sidebar.jobs", "Jobs"),
-          icon: <Briefcase className="w-5 h-5" />,
-          path: "/homeowner/jobs",
-        },
-        {
           name: t("homeowner.sidebar.claims", "Claims"),
           icon: <Clipboard className="w-5 h-5" />,
-          path: "/homeowner/claims",
-        },
-        {
-          name: t("homeowner.sidebar.payments", "Payments"),
-          icon: <BarChart2 className="w-5 h-5" />,
-          path: "/homeowner/payments",
+          path: "/homeowner/under-construction",
         },
         {
           name: t("homeowner.sidebar.postJob", "Post Job"),
@@ -172,25 +162,25 @@ const AppSidebar: React.FC = () => {
         }
       ],
     },
-    {
-      name: t("admin.sidebar.events"),
-      icon: <Calendar className="w-5 h-5" />,
-      permissions: ["tipo_evento_listar"],
-      subItems: [
-        {
-          name: t("admin.sidebar.eventTypes"),
-          path: "/admin/tipo_eventos",
-          icon: <List className="w-4 h-4" />,
-          permissions: ["tipo_evento_listar"]
-        },
-        {
-          name: t("admin.sidebar.eventsList"),
-          path: "/admin/eventos",
-          icon: <Calendar className="w-4 h-4" />,
-          permissions: ["evento_listar"]
-        },
-      ],
-    },
+    // {
+    //   name: t("admin.sidebar.events"),
+    //   icon: <Calendar className="w-5 h-5" />,
+    //   permissions: ["tipo_evento_listar"],
+    //   subItems: [
+    //     {
+    //       name: t("admin.sidebar.eventTypes"),
+    //       path: "/admin/tipo_eventos",
+    //       icon: <List className="w-4 h-4" />,
+    //       permissions: ["tipo_evento_listar"]
+    //     },
+    //     {
+    //       name: t("admin.sidebar.eventsList"),
+    //       path: "/admin/eventos",
+    //       icon: <Calendar className="w-4 h-4" />,
+    //       permissions: ["evento_listar"]
+    //     },
+    //   ],
+    // },
     {
       name: t("admin.sidebar.payments"),
       icon: <BookOpen className="w-5 h-5" />,
@@ -381,7 +371,7 @@ const AppSidebar: React.FC = () => {
               setOpenSubmenu({ type, index });
               submenuMatched = true;
             }
-          });
+          })
         }
         // Also check whether the main route matches
         else if (nav.path && isActive(nav.path)) {

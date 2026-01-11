@@ -31,6 +31,7 @@ export interface FormCardProps {
   emailSent?: boolean;
   sendVerificationEmail?: (email: string) => void;
   onGoBackToForm?: () => void;
+  onConfirmEmail?: () => void;
 }
 
 export interface LoadingOverlayProps {
@@ -63,6 +64,7 @@ export interface FormSectionProps {
   emailSent?: boolean;
   sendVerificationEmail?: (email: string) => void;
   onGoBackToForm?: () => void;
+  onConfirmEmail?: () => void;
 }
 
 export interface FormFooterProps {

@@ -8,7 +8,7 @@ import { toastify } from "@/core/utils/toastify";
 
 import useAuth from "@/core/hooks/useAuth";
 import Form from "./Form";
-import { getAllJobPosts, deleteJobPosts } from '@/core/services/jobPost.service';
+import { getAllJobPosts, deleteJobPostById } from '@/core/services/jobPost.service';
 
 // Get API base URL from env
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -191,6 +191,12 @@ export default function JobPostList() {
     setIsModalOpen(true);
   };
 
+  // Only close modal and reset currentItem, do not refresh table
+  const handleFormClose = () => {
+    setIsModalOpen(false);
+    setCurrentItem(null);
+  };
+
   const confirmDelete = (item: JobPost) => {
     openDialog(
       "Delete Post",
@@ -203,7 +209,7 @@ export default function JobPostList() {
   const handleDelete = async (item: JobPost) => {
     setIsProcessing(true);
     try {
-      const res = await deleteJobPosts([item.id]);
+      const res = await deleteJobPostById(item.id);
       if (res.success) {
         toastify.success(res.message || `Post "${item.title}" deleted successfully.`);
         fetchItems();
@@ -298,10 +304,7 @@ export default function JobPostList() {
       </div>
       <Form
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setCurrentItem(null);
-        }}
+        onClose={handleFormClose}
         initialData={currentItem}
         load={fetchItems}
       />
