@@ -39,6 +39,7 @@ const CertificationRequestForm_SignupStepper: React.FC = () => {
     handleSubmit,
     sendVerificationEmail,
     goBackToForm,
+    confirmEmailAndRegister,
   } = useRegistrationForm();
 
   return (
@@ -77,6 +78,8 @@ const CertificationRequestForm_SignupStepper: React.FC = () => {
 
             sendVerificationEmail={sendVerificationEmail}
             onGoBackToForm={goBackToForm}
+
+            onConfirmEmail={confirmEmailAndRegister}
           />
       </div>
     </div>

@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\V1\ContractorTeamMemberController;
 use App\Http\Controllers\Api\V1\ContractorMessageController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\AttributeHomeownerController;
+use App\Http\Controllers\ReviewController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -107,6 +108,7 @@ Route::prefix('/v1')
                 // Mensajes hacia contractors (chat/conversación)
                 Route::get('contractors/{id}/messages', [ContractorMessageController::class, 'index']);
                 Route::post('contractors/{id}/messages', [ContractorMessageController::class, 'store']);
+                Route::post('reviews', [ReviewController::class, 'store']);
           
          Route::middleware(['auth:api'])->group(function () {
 
@@ -315,6 +317,7 @@ Route::prefix('/v1')
             Route::get('jobs-creator/creator/{creatorId}', [JobContractorController::class, 'jobsByCreator']);
             Route::get('jobs-creator/homeowner/{homeownerId}', [JobContractorController::class, 'jobsByHomeowner']);
             Route::get('jobs-creator/statistics', [JobContractorController::class, 'statistics']);
+            
         });
     
     });

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('homeowner_id');
             $table->unsignedBigInteger('attribute_id');
             $table->string('value')->nullable();
-            $table->text('coment')->default('');
+            $table->text('coment')->nullable();
             $table->boolean('status')->default(0);
             $table->timestamps();
 

@@ -27,20 +27,28 @@ const FormCard: React.FC<FormCardProps> = ({
   verificationError,
   sendVerificationEmail,
   onGoBackToForm,
+
+  onConfirmEmail, // ✅ NUEVO
 }) => {
   const contractorSteps = ["Account", "Company"];
+
   return (
     <motion.form
+      id="register-form"
       onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="relative max-w-6xl mx-auto mt-8 px-6 md:px-8"
     >
-      <div className="relative rounded-2xl border p-6 md:p-10 shadow-sm" style={{ background: "white", ...borderPrimary }}>
+      <div
+        className="relative rounded-2xl border p-6 md:p-10 shadow-sm"
+        style={{ background: "white", ...borderPrimary }}
+      >
         <LoadingOverlay loading={loading} />
         <ProgressSection userType={userType} step={step} contractorSteps={contractorSteps} />
         <div className="h-[1px] w-full mb-8" style={{ background: "rgba(0,0,0,0.06)" }} />
+
         <FormSection
           userType={userType}
           formData={formData}
@@ -59,15 +67,17 @@ const FormCard: React.FC<FormCardProps> = ({
           verificationError={verificationError}
           sendVerificationEmail={sendVerificationEmail}
           onGoBackToForm={onGoBackToForm}
+
+          onConfirmEmail={onConfirmEmail} // ✅ NUEVO
         />
-       <FormFooter
-        userType={userType}
-        loading={loading}
-        isFormMinimallyValid={isFormMinimallyValid}
-        onGoBack={onGoBackToForm || (() => {})}
-      >
-        {/* children */}
-      </FormFooter>
+
+        <FormFooter
+          userType={userType}
+          loading={loading}
+          isFormMinimallyValid={isFormMinimallyValid}
+          onGoBack={onGoBackToForm || (() => {})}
+        />
+
         <SuccessToast submitted={submitted} errors={errors} loading={loading} />
       </div>
     </motion.form>

@@ -18,6 +18,9 @@ interface ContractorChatAsideProps {
   onDraftChange: (event: ChangeEvent<HTMLInputElement>) => void;
   quickReplies?: string[];
   onQuickReplySelect?: (value: string) => void;
+  rating?: number;
+  onRatingChange?: (value: number) => void;
+  onRatingSubmit?: (rating: number) => Promise<void> | void;
 }
 
 export function ContractorChatAside({

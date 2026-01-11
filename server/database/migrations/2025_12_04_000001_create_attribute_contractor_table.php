@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('contractor_id');
             $table->unsignedBigInteger('attribute_id');
             $table->string('value')->nullable(); // Para guardar el valor/documento del atributo si aplica
-            $table->text('coment')->default(''); // Comentario asociado, por defecto vacío
+            $table->text('coment');
             $table->boolean('status')->default(0); // 0 = desactivado, 1 = activado
             $table->timestamps();
 
