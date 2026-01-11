@@ -13,6 +13,7 @@ class Profession extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_id',
         'name',
         'slug',
         'icon',
@@ -115,4 +116,10 @@ class Profession extends Model
     {
         return $this->contractors()->exists();
     }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
 }

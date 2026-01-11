@@ -16,4 +16,9 @@ class Service extends Model
         'image',
         'description',
     ];
+
+    public function professions()
+    {
+        return $this->hasOne(Profession::class);
+    }
 }
