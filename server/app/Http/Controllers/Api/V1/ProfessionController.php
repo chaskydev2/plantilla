@@ -12,16 +12,56 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\File;
 
+
 class ProfessionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    // public function index(Request $request): AnonymousResourceCollection
+    // {
+    //     $query = Profession::query();
+
+    //     // Apply search filter
+    //     if ($request->filled('search')) {
+    //         $query->search($request->search);
+    //     }
+
+    //     // Include counts if requested
+    //     if ($request->boolean('with_counts')) {
+    //         $query->withContractorsCount();
+    //     }
+
+    //     // Apply sorting
+    //     $sortBy = $request->get('sort_by', 'name');
+    //     $sortDir = $request->get('sort_dir', 'asc');
+    //     $query->sort($sortBy, $sortDir);
+
+    //     // Pagination
+    //     $perPage = $request->get('per_page', 15);
+    //     $professions = $query->paginate($perPage);
+
+    //     return ProfessionResource::collection($professions);
+    // }
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Profession::query();
 
-        // Apply search filter
+        // --- INICIO DE LO NUEVO ---
+        
+        // 1. Cargar la relación con el servicio (opcional, para optimizar)
+        $query->with('service');
+
+        // 2. Filtro por Service ID
+        // Esto captura lo que envía el buscador desde el frontend
+        if ($request->filled('service_id')) {
+            $query->where('service_id', $request->service_id);
+        }
+        
+        // --- FIN DE LO NUEVO ---
+
+        // Apply search filter (Búsqueda por texto existente)
         if ($request->filled('search')) {
             $query->search($request->search);
         }
@@ -42,6 +82,8 @@ class ProfessionController extends Controller
 
         return ProfessionResource::collection($professions);
     }
+
+
 
     /**
      * Get all professions without pagination.

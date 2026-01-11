@@ -28,6 +28,38 @@
     "title": "Only vetted professionals. Backed by our $250,000 guarantee",
     "subtitle": "All contractors are background-checked and financially screened—and if they mess up, your project is protected."
   },
+  "searchBar": {
+    "serviceAriaLabel": "Select a service",
+    "servicePlaceholder": "What service do you need?",
+    "tagsAriaLabel": "Describe your need",
+    "tagsPlaceholder": "E.g. Kitchen helper",
+    "locationAriaLabel": "Enter your ZIP code or city",
+    "locationPlaceholder": "City, street or ZIP code",
+    "searchButton": "Find a professional",
+    "location": {
+      "searching": "Searching…",
+      "noResults": "No results",
+      "useCurrentTitle": "Use current location?",
+      "useCurrentDescription": "We use your location to find nearby pros faster. You can also type a city or ZIP instead.",
+      "useMyLocation": "Use my location",
+      "getting": "Getting…",
+      "pickOnMap": "Pick on map",
+      "quickLocations": "Quick locations"
+    },
+    "modal": {
+      "gettingLocationTitle": "Getting your location…",
+      "pleaseWait": "Please wait."
+    },
+    "errors": {
+      "locationRequired": "Please select a location",
+      "gmapsNotLoaded": "Google Maps API not loaded",
+      "gmapsFailedLoad": "Failed to load Google Maps",
+      "autocompleteFailed": "Autocomplete failed",
+      "couldNotGetLocation": "We couldn't get your location. Try typing your city or ZIP.",
+      "mapCouldNotSearch": "Could not search on map",
+      "mapLocationNotFound": "Location not found"
+    }
+  },
   "services": {
     "roofing": "Roofing",
     "gutters": "Gutters",
@@ -246,10 +278,9 @@
       "consultations": "Consultations",
       "faq": "FAQ",
       "banner": "Banner",
-      "socialNetworks": "Social Networks", 
-       "jobApplicationsSection": "Job Applications",
-      "jobApplications": "Job Applications List"
-      ,
+      "socialNetworks": "Social Networks",
+      "jobApplicationsSection": "Job Applications",
+      "jobApplications": "Job Applications List",
       "documentsrequirements": "Document Requirements",
       "documentscontractors": "Contractor Documents"
     },
@@ -296,7 +327,7 @@
       "totalUsers": "Total Users",
       "comparedToLastMonth": "compared to last month",
       "thisMonth": "this month",
-      "welcome": "welcome {{name}}!" 
+      "welcome": "welcome {{name}}!"
     },
     "principles": {
       "mission": "Mission",
@@ -362,8 +393,7 @@
       "restoreSuccess": "Item restored successfully",
       "saveSuccess": "Saved successfully",
       "errorOccurred": "An error occurred"
-    }
-  ,
+    },
     "roles": {
       "title": "Roles",
       "addRole": "Add Role",
