@@ -67,7 +67,7 @@ const AppSidebar: React.FC = () => {
     },
     {
       name: t("contractor.sidebar.profile", "My Profile"),
-      icon: <Users className="w-5 h-5" />,
+      icon: <Clipboard className="w-5 h-5" />,
       path: "/admin/perfil",
     },
     {
@@ -250,11 +250,11 @@ const AppSidebar: React.FC = () => {
           path: "/admin/job-contracts",
           icon: <Clipboard className="w-4 h-4" />,
         },
-        {
-          name: t("admin.sidebar.jobPosts"),
-          path: "/admin/job-post",
-          icon: <Clipboard className="w-4 h-4" />,
-        },
+         {
+      name: t("contractor.sidebar.postJob", "Post Job"),
+      icon: <Users className="w-5 h-5" />,
+      path: "/admin/post-job",
+    },
         // Add more subItems here if needed
       ],
     },

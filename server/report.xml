@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\USUARIO\Desktop\gupaginasAmarillas\plantilla\server\phpunit.xml" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.486652">
+    <testsuite name="Feature" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.486652">
+      <testsuite name="Tests\Feature\JobPostStoreTest" file="Job Post Store (Tests\Feature\JobPostStore)" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.486652">
+        <testcase name="Store job post with minimal data" file="Job Post Store (Tests\Feature\JobPostStore)::Store job post with minimal data" class="Tests\Feature\JobPostStoreTest" classname="Tests.Feature.JobPostStoreTest" assertions="1" time="0.486652">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Store job post with minimal dataExpected response status code [201] but received 500.
+Failed asserting that 500 is identical to 201.&#13;
+at vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:45
+at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:174
+at tests\Feature\JobPostStoreTest.php:36</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

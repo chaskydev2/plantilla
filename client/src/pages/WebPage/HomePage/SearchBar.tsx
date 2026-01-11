@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, MapPin, Plus, Search, Tag } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
 import { Link } from "react-router";
@@ -663,9 +664,9 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
             >
               <div className="rounded-xl border bg-white shadow-lg p-3 overflow-y-auto">
                 {queryService === "" ? (
-                  <div className="grid grid-cols-5 gap-2 h-86">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-96 overflow-y-auto">
                     {services.slice(0, 10).map((service) => (
-                      <DropdownItemGeneral
+                      <DropdownItem
                         key={service.id}
                         label={service.name}
                         icon={service.icon}
@@ -870,62 +871,30 @@ function DropdownItem({
   disabled?: boolean;
   onClick?: () => void;
 }) {
-  const SafeIcon = icon || (iconLabel ? toLucideIcon(iconLabel) : undefined) || Briefcase;
+  // Buscar el icono por nombre como en el admin
+  const iconName = iconLabel as keyof typeof LucideIcons | undefined;
+  const Icon = iconName && LucideIcons[iconName] ? (LucideIcons[iconName] as LucideIcon) : (icon || Briefcase);
 
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`w-full flex justify-between items-center px-3 py-2 rounded-md text-sm text-left ${
-        disabled ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-      }`}
+      className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg text-base text-left transition-colors duration-150 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400/50 shadow-sm
+        ${disabled ? "text-gray-400 cursor-not-allowed bg-gray-50" : "hover:bg-blue-50 dark:hover:bg-blue-900/40 cursor-pointer bg-white"}
+      `}
     >
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center shadow-sm">
-          <SafeIcon className="w-4 h-4 text-blue-700 dark:text-blue-300" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-black">{label}</span>
-          {iconLabel && <span className="text-xs text-gray-500">{iconLabel}</span>}
-        </div>
-      </div>
-    </button>
-  );
-}
-function DropdownItemGeneral({
-  label,
-  icon: Icon,
-  iconLabel,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  icon?: LucideIcon;
-  iconLabel?: string;
-  disabled?: boolean;
-  onClick?: () => void;
-}) {
-  const SafeIcon = Icon || (iconLabel ? toLucideIcon(iconLabel) : undefined) || Briefcase;
-
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={`flex-col h-28 border-black w-full flex justify-between items-center px-3 py-2 rounded-md text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer`}
-    >
-      <div className="h-1/2 flex items-center">
-        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center shadow-sm">
-          <SafeIcon className="w-5 h-5 text-black dark:text-white" />
-        </div>
-      </div>
-
-      
-      <div className="h-1/2 flex flex-col items-center justify-center text-black">
-        <span>{label}</span>
-         <span>{label}</span>
-      </div>
+      <span className="flex items-center justify-center w-11 h-11 rounded-full bg-blue-100 dark:bg-blue-900 shadow">
+        {Icon ? (
+          <Icon className="w-6 h-6 text-black dark:text-white" />
+        ) : (
+          <Briefcase className="w-6 h-6 text-black dark:text-white" />
+        )}
+      </span>
+      <span className="flex flex-col items-start">
+        <span className="font-medium text-[#1A1B16] dark:text-white">{label}</span>
+        {iconLabel && <span className="text-xs text-gray-500 mt-0.5">{iconLabel}</span>}
+      </span>
     </button>
   );
 }

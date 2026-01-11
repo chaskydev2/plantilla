@@ -8,12 +8,12 @@ import { toastify } from "@/core/utils/toastify";
 
 import useAuth from "@/core/hooks/useAuth";
 import Form from "./Form";
-import { getJobPostsByHomeowner, deleteJobPosts } from '@/core/services/jobPost.service';
+import { getAllJobPosts, deleteJobPosts } from '@/core/services/jobPost.service';
 
 // Get API base URL from env
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 // Custom hook for pagination, sorting, and search
-function useJobPostResource(homeownerId: number | null) {
+function useJobPostResource() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, perPage: 10, total: 0 });
@@ -21,11 +21,10 @@ function useJobPostResource(homeownerId: number | null) {
   const [searchInput, setSearchInput] = useState('');
 
   const fetchItems = async (opts?: { page?: number; perPage?: number; sort?: any; search?: string }) => {
-    if (!homeownerId) return;
     setLoading(true);
     try {
-      // Simulate backend pagination, sorting, and search (replace with real API if available)
-      const data = await getJobPostsByHomeowner(homeownerId);
+      // Use admin API to get all job posts
+      const data = await getAllJobPosts();
       let filtered = data.data || [];
       if (opts?.search) {
         const s = opts.search.toLowerCase();
@@ -60,7 +59,7 @@ function useJobPostResource(homeownerId: number | null) {
   useEffect(() => {
     fetchItems({ page: 1, perPage: pagination.perPage, sort, search: searchInput });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [homeownerId]);
+  }, []);
 
   const handlePageChange = (page: number) => {
     fetchItems({ page, perPage: pagination.perPage, sort, search: searchInput });
@@ -128,7 +127,6 @@ export default function JobPostList() {
     onConfirm: () => void;
     variant: "primary" | "danger";
   } | null>(null);
-  const [homeownerId, setHomeownerId] = useState<number | null>(null);
 
   // Resource hook for pagination, sorting, search
   const {
@@ -142,29 +140,7 @@ export default function JobPostList() {
     handleLimitChange,
     handleSearch,
     fetchItems,
-  } = useJobPostResource(homeownerId);
-
-
-  // Get real homeowner_id from localStorage
-  useEffect(() => {
-    const getId = () => {
-      try {
-        const userDataRaw = localStorage.getItem('user_data');
-        if (userDataRaw) {
-          const userData = JSON.parse(userDataRaw);
-          if (userData?.id) {
-            setHomeownerId(Number(userData.id));
-            return;
-          }
-        }
-      } catch {}
-      setHomeownerId(null);
-    };
-    getId();
-    window.addEventListener('storage', getId);
-    return () => window.removeEventListener('storage', getId);
-  }, []);
-
+  } = useJobPostResource();
 
   const columns = [
     { key: "id", header: "ID", render: (item: JobPost) => <div>{item.id}</div>, sortable: true },

@@ -1,4 +1,13 @@
+// Get all job posts (admin)
+export const getAllJobPosts = async () => {
+  const url = `${API_BASE_URL}/v1/job-posts`;
+  const res = await axios.get(url);
+  return res.data;
+};
+// Eliminar múltiples job posts por IDs
+
 import type { JobPost } from '@/pages/homeownner/PostJob/Main';
+import axios from '@/core/config/axios';
 
 export interface IJobPostRequest {
   [key: string]: any;
@@ -33,28 +42,49 @@ const buildJobPostFormData = (data: any, initialData?: JobPost | null) => {
   return formData;
 };
 
+export const deleteJobPosts = async (ids: number[]): Promise<any> => {
+  const url = `${API_BASE_URL}/v1/job-posts/destroy-many`;
+  const res = await axios.delete(url, { data: { ids } });
+  return res.data;
+};
+// Obtener todos los job posts de un homeowner
+export const getJobPostsByHomeowner = async (homeownerId: number) => {
+  try {
+     const url = `${API_BASE_URL}/v1/job-posts/homeowner/${homeownerId}`;
+    const res = await axios.get(url);
+    console.log('Respuesta de getJobPostsByHomeowner:', res);
+    return res.data;
+  } catch (err) {
+    console.log('Error en getJobPostsByHomeowner:', err);
+    // Puedes personalizar el error si lo necesitas
+    throw err;
+  }
+};
 
 export const createJobPost = async (
   data: IJobPostRequest,
   initialData?: JobPost | null
-): Promise<Response> => {
+): Promise<any> => {
   const formData = buildJobPostFormData(data, initialData);
+  console.log('FormData entries for createJobPost:', formData);
   const url = `${API_BASE_URL}/v1/job-posts`;
-  return fetch(url, {
-    method: 'POST',
-    body: formData,
+  const res = await axios.post(url, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
+  return res.data;
 };
+
+
 
 
 export const updateJobPost = async (
   data: IJobPostRequest,
   initialData: JobPost
-): Promise<Response> => {
+): Promise<any> => {
   const formData = buildJobPostFormData(data, initialData);
   const url = `${API_BASE_URL}/v1/job-posts/${initialData.id}`;
-  return fetch(url, {
-    method: 'PUT',
-    body: formData,
+  const res = await axios.put(url, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
+  return res.data;
 };

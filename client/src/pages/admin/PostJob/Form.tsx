@@ -6,10 +6,71 @@ import { useFormContext } from 'react-hook-form';
 import { InputField, InputFileField, SelectField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
-import type { JobPost } from './Main';
+import type { JobPost as JobPostBase } from './Main';
+
+type JobPost = JobPostBase & {
+  status_aprobation?: boolean;
+};
 import { createJobPost, updateJobPost } from '@/core/services/jobPost.service';
-// Toast styles (if not already imported elsewhere)
 import 'react-toastify/dist/ReactToastify.css';
+
+import axios from 'axios';
+
+// StatusSwitch component for toggling status
+function StatusSwitch() {
+  const { setValue, watch } = useFormContext();
+  const status = watch('status');
+  return (
+    <button
+      type="button"
+      className={`px-4 py-2 rounded ${status === 'open' ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}
+      onClick={() => setValue('status', status === 'open' ? 'closed' : 'open')}
+    >
+      {status === 'open' ? 'Open' : 'Closed'}
+    </button>
+  );
+}
+
+// StatusAprobationSwitch component for toggling status_aprobation
+function StatusAprobationSwitch({ jobPostId, initialValue, onChanged }: {
+  jobPostId: any;
+  initialValue: any;
+  onChanged?: any;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [aprobation, setAprobation] = useState(!!initialValue);
+
+  const handleToggle = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.patch(
+        `/job-posts/${jobPostId}/aprobation`,
+        { status_aprobation: !aprobation }
+      );
+      if (res.data && res.data.success) {
+        setAprobation(!aprobation);
+        toast.success('Aprobation status updated');
+        if (onChanged) onChanged(!aprobation);
+      } else {
+        toast.error(res.data.message || 'Error updating aprobation status');
+      }
+    } catch (err) {
+      toast.error('Network error');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <button
+      type="button"
+      className={`px-4 py-2 rounded ${aprobation ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+      onClick={handleToggle}
+      disabled={loading}
+    >
+      {aprobation ? 'Approved' : 'Not Approved'}
+    </button>
+  );
+}
 
 /* =========================
    Yup Schema
@@ -324,8 +385,8 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
             <h2 className="text-xl font-bold mb-4">Información básica</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField name="title" label="Title" />
-              <InputField name="price" label="Price" />
+              <InputField name="title" label="Title" disabled />
+              <InputField name="price" label="Price" disabled />
               <SelectField
                 name="service_id"
                 label="Service"
@@ -333,20 +394,21 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
                 valueKey="id"
                 labelKey="name"
                 placeholder="Select a service"
+                disabled
               />
-              <InputField name="deadline" label="Deadline" type="date" />
-              <InputField name="currency" label="Currency" />
-              <SelectField
-                name="status"
-                label="Status"
-                options={[
-                  { id: 'open', name: 'Open' },
-                  { id: 'closed', name: 'Closed' },
-                ]}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Select status"
-              />
+              <InputField name="deadline" label="Deadline" type="date" disabled />
+              <InputField name="currency" label="Currency" disabled />
+              {/* Status Switch */}
+              <div className="flex items-center gap-2 mt-2">
+                <label className="font-semibold">Status</label>
+                <StatusSwitch />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <label className="font-semibold">Aprobation</label>
+                {initialData && (
+                  <StatusAprobationSwitch jobPostId={initialData.id} initialValue={initialData.status_aprobation} />
+                )}
+              </div>
               <SelectField
                 name="city"
                 label="City"
@@ -361,17 +423,27 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
                 valueKey="id"
                 labelKey="name"
                 placeholder="Select city"
+                disabled
               />
             </div>
             <div className="mt-6">
-              <InputField name="description" label="Description" />
+              <InputField name="description" label="Description" disabled />
             </div>
           </div>
 
           {/* Sección de ubicación */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
             <h2 className="text-xl font-bold mb-4">Ubicación</h2>
-            <GoogleMapPicker />
+            {/* Location fields as read-only */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+              <InputField name="address_line1" label="Address Line 1" disabled />
+              <InputField name="address_line2" label="Address Line 2" disabled />
+              <InputField name="city" label="City" disabled />
+              <InputField name="state_code" label="State" disabled />
+              <InputField name="postal_code" label="Postal Code" disabled />
+              <input type="hidden" name="lat" />
+              <input type="hidden" name="lng" />
+            </div>
           </div>
 
           {/* Sección de imagen */}
@@ -382,6 +454,7 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
               label="Imagen (opcional)"
               helperText="Formatos: JPG, PNG (máx 4MB). Deja vacío para mantener o quita para remover."
               accept="image/*"
+              disabled
             />
           </div>
         </div>

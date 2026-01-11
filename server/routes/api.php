@@ -58,6 +58,9 @@ Route::prefix('/v1')
         
         Route::get('services/first-fifteen', [ServiceController::class, 'firstFifteen']);
         Route::get('services/all', [ServiceController::class, 'all']);
+
+        // Ruta pública para ver todas las publicaciones de job posts
+        Route::get('job-posts/public', [JobPostController::class, 'publicIndex']);
         
         Route::post('register/homeowner', [AuthController::class, 'registerHomeowner']);
         
@@ -107,8 +110,13 @@ Route::prefix('/v1')
                 // Mensajes hacia contractors (chat/conversación)
                 Route::get('contractors/{id}/messages', [ContractorMessageController::class, 'index']);
                 Route::post('contractors/{id}/messages', [ContractorMessageController::class, 'store']);
-          
+        
+
+                 
          Route::middleware(['auth:api'])->group(function () {
+
+         
+            Route::apiResource('job-posts', JobPostController::class);
 
             Route::post('me', [AuthController::class, 'me']);
 
@@ -134,7 +142,7 @@ Route::prefix('/v1')
             Route::apiResource('job-applications', JobApplicationController::class);
             Route::apiResource('job-contracts', JobContractController::class);
             Route::get('job-posts/homeowner/{homeowner}', [JobPostController::class, 'byHomeowner']);
-            Route::apiResource('job-posts', JobPostController::class);
+
            
             
             Route::delete('users/{id}/force', [UserController::class, 'forceDelete']);
@@ -315,6 +323,11 @@ Route::prefix('/v1')
             Route::get('jobs-creator/creator/{creatorId}', [JobContractorController::class, 'jobsByCreator']);
             Route::get('jobs-creator/homeowner/{homeownerId}', [JobContractorController::class, 'jobsByHomeowner']);
             Route::get('jobs-creator/statistics', [JobContractorController::class, 'statistics']);
+
+            // Ruta para eliminar uno o varios job posts
+            Route::delete('job-posts/destroy-many', [JobPostController::class, 'destroyMany']);
+            // Cambiar status_aprobation de un JobPost
+            Route::patch('job-posts/{id}/aprobation', [JobPostController::class, 'changeAprobationStatus']);
         });
     
     });
