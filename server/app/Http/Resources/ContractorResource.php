@@ -20,6 +20,8 @@ class ContractorResource extends JsonResource
         return [
             'user_id' => $this->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
+            'team_members' => $this->whenLoaded('teamMembers'),
+            'jobs' => $this->whenLoaded('jobs'),
             'company_info' => [
                 'company_name' => $this->company_name,
                 'license_number' => $this->license_number,

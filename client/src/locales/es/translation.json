@@ -27,6 +27,38 @@
     "title": "Solo profesionales verificados. Respaldados por nuestra garantía de $250,000",
     "subtitle": "Todos los contratistas pasan verificaciones de antecedentes y controles financieros — y si fallan, tu proyecto queda protegido."
   },
+  "searchBar": {
+    "serviceAriaLabel": "Selecciona un servicio",
+    "servicePlaceholder": "¿Qué servicio necesitas?",
+    "tagsAriaLabel": "Describe tu necesidad",
+    "tagsPlaceholder": "Ej. Ayudante de cocina",
+    "locationAriaLabel": "Ingresa tu código postal o ciudad",
+    "locationPlaceholder": "Ciudad, calle o código postal",
+    "searchButton": "Buscar profesional",
+    "location": {
+      "searching": "Buscando…",
+      "noResults": "Sin resultados",
+      "useCurrentTitle": "¿Usar ubicación actual?",
+      "useCurrentDescription": "Usamos tu ubicación para encontrar profesionales cercanos más rápido. También puedes escribir tu ciudad o ZIP.",
+      "useMyLocation": "Usar mi ubicación",
+      "getting": "Obteniendo…",
+      "pickOnMap": "Elegir en el mapa",
+      "quickLocations": "Ubicaciones rápidas"
+    },
+    "modal": {
+      "gettingLocationTitle": "Obteniendo ubicación…",
+      "pleaseWait": "Por favor espera."
+    },
+    "errors": {
+      "locationRequired": "Selecciona tu ubicación",
+      "gmapsNotLoaded": "Google Maps API no cargó",
+      "gmapsFailedLoad": "Fallo al cargar Google Maps",
+      "autocompleteFailed": "Autocomplete falló",
+      "couldNotGetLocation": "No pudimos obtener tu ubicación. Intenta escribir tu ciudad o ZIP.",
+      "mapCouldNotSearch": "No pudimos buscar en el mapa",
+      "mapLocationNotFound": "Ubicación no encontrada"
+    }
+  },
   "services": {
     "roofing": "Techos",
     "gutters": "Canaletas",
@@ -247,8 +279,7 @@
       "banner": "Banner",
       "socialNetworks": "Redes Sociales",
       "jobApplicationsSection": "Solicitudes",
-      "jobApplications": "Solicitudes de Trabajo"
-      ,
+      "jobApplications": "Solicitudes de Trabajo",
       "documentsrequirements": "Requisitos de Documentos",
       "documentscontractors": "Documentos de Contratistas"
     },
@@ -361,8 +392,7 @@
       "restoreSuccess": "Elemento restaurado exitosamente",
       "saveSuccess": "Guardado exitosamente",
       "errorOccurred": "Ocurrió un error"
-    }
-  ,
+    },
     "roles": {
       "title": "Roles",
       "addRole": "Agregar Rol",

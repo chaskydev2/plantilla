@@ -390,6 +390,10 @@ class ContractorController extends Controller
             'tags',
             'attributeContractors.attribute',
 
+
+            'teamMembers.user', 
+            'jobs',
+
             // Relaciones del usuario asociado
             'user.roles',
             'user.academicTrainings',
