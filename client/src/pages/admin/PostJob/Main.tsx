@@ -212,7 +212,8 @@ export default function JobPostList() {
       const res = await deleteJobPostById(item.id);
       if (res.success) {
         toastify.success(res.message || `Post "${item.title}" deleted successfully.`);
-        fetchItems();
+        // Always refresh table after delete, reset to first page
+        await fetchItems({ page: 1, perPage: pagination.perPage, sort, search: searchInput });
       } else {
         toastify.error(res.message || 'Error deleting post.');
       }

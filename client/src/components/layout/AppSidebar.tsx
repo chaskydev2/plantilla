@@ -481,8 +481,8 @@ const AppSidebar: React.FC = () => {
   const showContractorMenu = user && user.role_name === "contractor" && (user as any).verification === true;
   const filteredContractorItems = showContractorMenu ? contractorItems : [];
 
-  // Homeowner menu (always visible for homeowner role)
-  const showHomeownerMenu = user && user.role_name === "homeowner";
+  // Homeowner menu: only show if homeowner and verification === true
+  const showHomeownerMenu = user && user.role_name === "homeowner" && (user as any).verification === true;
   const filteredHomeownerItems = showHomeownerMenu ? homeownerItems : [];
 
   const handleSubmenuToggle = (index: number, menuType: "main" | "web") => {

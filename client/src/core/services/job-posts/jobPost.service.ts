@@ -1,3 +1,4 @@
+
 import axios from '@/core/config/axios';
 import type { IApiResponse, IPagination, IPaginationRequest } from '@/core/types/IApi';
 
@@ -36,7 +37,64 @@ const toPagination = (payload: JobPostListResponse): IPagination => {
   };
 };
 
+// --- IMAGE HANDLING HELPERS (copied from ServiceService) ---
+const mimeToExtension = (mime: string) => {
+  if (mime.includes('jpeg')) return 'jpg';
+  if (mime.includes('png')) return 'png';
+  if (mime.includes('webp')) return 'webp';
+  return 'bin';
+};
+
+const dataUrlToFile = (dataUrl: string, baseName: string) => {
+  const [header, data] = dataUrl.split(',');
+  const match = header.match(/data:(.*?);base64/);
+  const mime = match?.[1] || 'application/octet-stream';
+  const binary = atob(data);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  const ext = mimeToExtension(mime);
+  const fileName = `${baseName}.${ext}`;
+  return new File([bytes], fileName, { type: mime });
+};
+
+const appendFileField = (formData: FormData, key: 'image', value?: string | File | null) => {
+  if (value === undefined || value === null || value === '') return;
+  if (value instanceof File) {
+    formData.append(key, value);
+    return;
+  }
+  if (typeof value === 'string' && value.startsWith('data:')) {
+    const file = dataUrlToFile(value, key);
+    formData.append(key, file);
+    return;
+  }
+  // If value is a string (URL), do not append (keep existing image)
+};
+
+const buildFormData = (request: any, options?: { includeRemoveFlags?: boolean }) => {
+  const formData = new FormData();
+  Object.entries(request).forEach(([key, value]) => {
+    if (key === 'image') {
+      // Only append image if it's File or data URL, not empty string or URL string
+      appendFileField(formData, 'image', value as string | File | null);
+    } else if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+  if (options?.includeRemoveFlags && request.remove_image) {
+    formData.append('remove_image', '1');
+  }
+  return formData;
+};
+
 export const jobPostService = {
+  async getPublicJobPosts(): Promise<any[]> {
+    const response = await axios.get('/v1/job-posts/public');
+    return response.data?.data || [];
+  },
   async getAllPaginated(
     params: IPaginationRequest = {},
     config: { signal?: AbortSignal } = {}
@@ -45,10 +103,8 @@ export const jobPostService = {
       params: toApiParams(params),
       ...config,
     });
-
     const payload: JobPostListResponse = response.data ?? {};
     const data = Array.isArray(payload.data) ? payload.data : [];
-
     return {
       success: true,
       data,
@@ -57,19 +113,24 @@ export const jobPostService = {
       },
     };
   },
-
   async remove(id: number) {
     const response = await axios.delete(`/v1/job-posts/${id}`);
     return response.data;
   },
-
   async create(data: any) {
-    const response = await axios.post('/v1/job-posts', data);
+    // Always use FormData for image upload
+    const formData = buildFormData(data);
+    const response = await axios.post('/v1/job-posts', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
-
   async update(id: number, data: any) {
-    const response = await axios.put(`/v1/job-posts/${id}`, data);
+    // Always use FormData for image upload, include remove_image flag
+    const formData = buildFormData(data, { includeRemoveFlags: true });
+    const response = await axios.put(`/v1/job-posts/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 };

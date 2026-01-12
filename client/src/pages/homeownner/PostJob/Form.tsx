@@ -295,14 +295,33 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
         delete cleanData.image;
       }
 
+      // --- Mejor manejo de imagen tipo File, igual que ServiceModal ---
+      let payload: any = { ...cleanData };
+      // Si la imagen es un File, se envía como tal (FormData)
+      if (cleanData.image instanceof File) {
+        const formData = new FormData();
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === 'image' && value instanceof File) {
+            formData.append('image', value);
+          } else if (value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+        payload = formData;
+      } else if (cleanData.image === '' || cleanData.image === null) {
+        // Si la imagen es string vacía o null, enviar remove_image
+        payload.image = null;
+        payload.remove_image = true;
+      } else if (typeof cleanData.image === 'string') {
+        // Si la imagen es string (url previa), no enviar nada (mantener)
+        delete payload.image;
+      }
+
       let result;
       if (isEditing && initialData && initialData.id) {
-        console.log('Preparing to update job post ID:', cleanData);
-        console.log('Updating job post ID:', initialData.id);
-        result = await updateJobPost(cleanData, initialData);
-        console.log('Updating job post with data:', cleanData, result);
+        result = await updateJobPost(payload, initialData);
       } else {
-        result = await createJobPost(cleanData, initialData);
+        result = await createJobPost(payload, initialData);
       }
       console.log('API result:', result);
       if (result && result.message && result.data) {

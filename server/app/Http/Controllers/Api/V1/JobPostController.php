@@ -38,7 +38,8 @@ class JobPostController extends Controller  {
     
     public function publicIndex(Request $request): JsonResponse
     {
-        $query = JobPost::with(['homeowner', 'service']);
+        $query = JobPost::with(['homeowner.user', 'service'])
+            ->where('status_aprobation', true);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -370,7 +371,7 @@ class JobPostController extends Controller  {
             return response()->json([
                 'message' => 'Publicación actualizada exitosamente',
                 'data' => $jobPost , 
-                 'datasent' => $request
+                 'datasent' => $request->all
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
@@ -476,6 +477,11 @@ class JobPostController extends Controller  {
             return null;
         }
 
+        // Soporte para imagen base64
+        if ($request->filled('image') && is_string($request->image) && str_starts_with($request->image, 'data:image/')) {
+            return $this->saveBase64Image($request->image, $currentPath);
+        }
+
         if (!$request->hasFile('image')) {
             return '__keep';
         }
@@ -496,6 +502,38 @@ class JobPostController extends Controller  {
         $file->move($directory, $filename);
 
         return 'assets/job-posts/' . $filename;
+    }
+    /**
+     * Guarda una imagen enviada como base64 y retorna la ruta relativa.
+     */
+    public function saveBase64Image(string $base64Image, ?string $currentPath = null): ?string
+    {
+        // Eliminar imagen anterior si existe
+        if ($currentPath) {
+            $this->deleteImageIfExists($currentPath);
+        }
+
+        if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+            $data = substr($base64Image, strpos($base64Image, ',') + 1);
+            $type = strtolower($type[1]); // jpg, png, gif
+
+            $data = base64_decode($data);
+            if ($data === false) {
+                return null;
+            }
+
+            $directory = public_path('assets/job-posts');
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            $filename = uniqid('job_post_') . '.' . $type;
+            $filePath = $directory . DIRECTORY_SEPARATOR . $filename;
+            file_put_contents($filePath, $data);
+
+            return 'assets/job-posts/' . $filename;
+        }
+        return null;
     }
 
     private function deleteImageIfExists(?string $path): void

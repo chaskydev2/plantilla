@@ -306,4 +306,19 @@ class JobController extends Controller
 
         return response()->json(['success' => true, 'data' => $stats]);
     }
+
+    public function activate(Request $request, $id): JsonResponse
+        {
+            $request->validate([
+                'is_active' => ['required', 'boolean'],
+            ]);
+            $job = Job::findOrFail($id);
+            $job->is_active = $request->boolean('is_active');
+            $job->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'Job actualizado correctamente',
+                'data' => $job,
+            ]);
+        }
 }

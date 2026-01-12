@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\Api\V1\AnnouncementController;
@@ -330,8 +331,8 @@ Route::prefix('/v1')
               // Ruta para eliminar uno o varios job posts
             Route::delete('job-posts/destroy-many', [JobPostController::class, 'destroyMany']);
             // Cambiar status_aprobation de un JobPost
-           Route::post('job-posts/{id}/aprobation', [JobPostController::class, 'changeAprobationStatus']); 
-        
+            Route::post('job-posts/{id}/aprobation', [JobPostController::class, 'changeAprobationStatus']); 
+            Route::patch('jobs/{id}/activate', [JobController::class, 'activate']);
         });
     
     });
