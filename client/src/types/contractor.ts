@@ -1,5 +1,30 @@
 export type Maybe<T> = T | null | undefined;
 
+// --- NUEVAS INTERFACES (AGREGADAS) ---
+
+export interface TeamMember {
+  id: number;
+  name: string;
+  role?: string | null;
+  photo_url?: string | null;
+  // Agregamos esto para soportar cuando la foto viene del usuario vinculado
+  user?: {
+    profile_photo_url?: string | null;
+  };
+}
+
+export interface ContractorJob {
+  id: number;
+  title: string;
+  description?: string | null;
+  budget?: number | string | null;
+  status?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+// -------------------------------------
+
 export interface Profession {
   id: number;
   name: string;
@@ -153,6 +178,10 @@ export interface ContractorFullInfo {
   professions?: Profession[];
   tags?: Tag[];
   user?: ContractorUser;
+
+  // --- CAMPOS NUEVOS AGREGADOS ---
+  team_members?: TeamMember[];
+  jobs?: ContractorJob[];
 }
 
 export interface NearbyContractorCard {

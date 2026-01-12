@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Users, Briefcase} from "lucide-react";
 
 // Servicios
 import { ContractorService } from "@/core/services/contractor/contractor.service";
@@ -176,7 +176,6 @@ export default function ContractorProfilePage() {
     setMessageDraft(event.target.value);
   };
 
-  // --- 🚀 HANDLER DEL RATING (NUEVO) ---
   const handleRatingSubmit = async (ratingValue: number) => {
     if (!contractor) return;
 
@@ -244,23 +243,100 @@ export default function ContractorProfilePage() {
             </div>
           </div>
 
-          {/* Cuerpo: Info Principal + Chat/Rating */}
+          
           <div className="grid gap-6 border-b border-[#1E1E17]/8 bg-white px-4 py-8 sm:px-6 lg:grid-cols-2 lg:items-start lg:px-10">
+           {/* --- COLUMNA IZQUIERDA: Perfil + Equipo + Trabajos --- */}
+          <div className="flex flex-col gap-8">
             
-            {/* Componente que muestra las estrellas (se actualizará solo al cambiar 'contractor') */}
+            {/* 1. Información Principal (Bio, Status, etc) */}
             <ContractorPrimaryInfo contractor={contractor} profile={profile} />
 
+            {/* 2. SECCIÓN: NUESTRO EQUIPO */}
+            {contractor?.team_members && contractor.team_members.length > 0 && (
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
+                  <Users className="h-5 w-5" />
+                  Nuestro Equipo
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {contractor.team_members.map((member: any) => (
+                    <div key={member.id} className="flex items-center gap-4 rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100">
+                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gray-300">
+                        {member.photo_url ? (
+                          <img src={member.photo_url} alt={member.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-lg font-bold text-gray-500">
+                            {member.name?.substring(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#1E1E17]">{member.name}</p>
+                        <p className="text-sm text-gray-600">{member.role || "Especialista"}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3. SECCIÓN: TRABAJOS RECIENTES */}
+            {contractor?.jobs && contractor.jobs.length > 0 && (
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
+                  <Briefcase className="h-5 w-5" />
+                  Trabajos Recientes
+                </h3>
+                <div className="space-y-4">
+                  {contractor.jobs.map((job: any) => (
+                    <div key={job.id} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h4 className="text-lg font-semibold leading-tight text-[#1E1E17]">{job.title}</h4>
+                          {job.description && (
+                            <p className="mt-1 line-clamp-2 text-sm text-gray-600">{job.description}</p>
+                          )}
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              job.status === 'Completado' ? 'bg-green-100 text-green-800' :
+                              job.status === 'En progreso' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {job.status || "Proyecto"}
+                            </span>
+                            {job.created_at && (
+                              <span className="rounded-full border border-gray-100 bg-gray-50 px-2.5 py-0.5 text-xs text-gray-500">
+                                {new Date(job.created_at).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {job.budget && (
+                          <div className="shrink-0 text-right">
+                            <span className="block text-lg font-bold text-[#1E1E17]">${Number(job.budget).toLocaleString()}</span>
+                            <span className="text-xs text-gray-500">Presupuesto</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* --- COLUMNA DERECHA: Chat (Sticky) --- */}
+          <div className="sticky top-4">
             <ContractorChatAside
               messages={chatMessages}
               messageDraft={messageDraft}
               onSubmit={handleSendMessage}
               onDraftChange={handleDraftChange}
-
-              // Pasamos las props de Rating
               rating={currentRating}
               onRatingChange={setCurrentRating}
               onRatingSubmit={handleRatingSubmit}
             />
+          </div>
           </div>
 
           {/* Contractors Cercanos */}
