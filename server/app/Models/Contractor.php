@@ -180,7 +180,7 @@ class Contractor extends Model
         )->withPivot('status', 'compania');
     }
 
-    public function jobsCreator()
+    public function jobs()
     {
         return $this->hasMany(JobContractor::class, 'id_creator', 'user_id');
     }
@@ -330,7 +330,7 @@ class Contractor extends Model
 
     public function attributeContractors()
     {
-        return $this->hasMany(AttributeContractor::class, 'contractor_id', 'id');
+        return $this->hasMany(AttributeContractor::class, 'contractor_id', 'user_id');
     }
 
     public function messages()

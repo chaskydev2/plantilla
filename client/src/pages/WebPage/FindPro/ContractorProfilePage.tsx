@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, Users, Briefcase} from "lucide-react";
+import { ArrowLeft, Users, Briefcase } from "lucide-react";
 
 // Servicios
 import { ContractorService } from "@/core/services/contractor/contractor.service";
@@ -45,8 +45,8 @@ export default function ContractorProfilePage() {
   const [nearbyLoading, setNearbyLoading] = useState(false);
   const [nearbyError, setNearbyError] = useState<string | null>(null);
 
-  // Estado de Rating (Visual)
-  const [currentRating, setCurrentRating] = useState(0); // <--- NUEVO ESTADO
+  // Estado de Rating
+  const [currentRating, setCurrentRating] = useState(0);
 
   // ViewModel
   const profile = useMemo<ContractorProfileViewModel | null>(
@@ -178,27 +178,21 @@ export default function ContractorProfilePage() {
 
   const handleRatingSubmit = async (ratingValue: number) => {
     if (!contractor) return;
-
-    // Aseguramos obtener el ID correcto del usuario contractor
     const targetUserId = contractor.user_id ?? contractor.user?.id ?? Number(id);
 
     try {
-      // 1. Enviamos la calificación al Backend
       await ReviewService.create({
         contractor_id: targetUserId,
         rating: ratingValue,
       });
 
-      // 2. Notificamos éxito
       alert("Thanks! Your rating has been submitted.");
 
-      // 3. ACTUALIZACIÓN EN TIEMPO REAL
-      // Volvemos a pedir la info del contractor para que el promedio se actualice en pantalla
       if (id) {
         const updatedResponse = await ContractorService.getFullInfo(id);
         const api = updatedResponse as IApiResponse<ContractorFullInfo>;
         if (api.success && api.data) {
-          setContractor(api.data); // ¡Esto actualiza las estrellas del perfil automáticamente!
+          setContractor(api.data);
         }
       }
 
@@ -242,101 +236,102 @@ export default function ContractorProfilePage() {
               </Link>
             </div>
           </div>
-
           
+          {/* Grid Principal de 2 Columnas */}
           <div className="grid gap-6 border-b border-[#1E1E17]/8 bg-white px-4 py-8 sm:px-6 lg:grid-cols-2 lg:items-start lg:px-10">
-           {/* --- COLUMNA IZQUIERDA: Perfil + Equipo + Trabajos --- */}
-          <div className="flex flex-col gap-8">
             
-            {/* 1. Información Principal (Bio, Status, etc) */}
-            <ContractorPrimaryInfo contractor={contractor} profile={profile} />
+            {/* --- COLUMNA IZQUIERDA: Solo Info Principal --- */}
+            <div>
+              <ContractorPrimaryInfo contractor={contractor} profile={profile} />
+            </div>
 
-            {/* 2. SECCIÓN: NUESTRO EQUIPO */}
-            {contractor?.team_members && contractor.team_members.length > 0 && (
+            {/* --- COLUMNA DERECHA: Chat + Equipo + Trabajos --- */}
+            <div className="flex flex-col gap-6">
+              
+              {/* 1. CHAT (Arriba en la columna derecha) */}
+              <ContractorChatAside
+                messages={chatMessages}
+                messageDraft={messageDraft}
+                onSubmit={handleSendMessage}
+                onDraftChange={handleDraftChange}
+                rating={currentRating}
+                onRatingChange={setCurrentRating}
+                onRatingSubmit={handleRatingSubmit}
+              />
+
+              {/* 2. SECCIÓN: NUESTRO EQUIPO (Debajo del chat) */}
               <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
                   <Users className="h-5 w-5" />
                   Nuestro Equipo
                 </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {contractor.team_members.map((member: any) => (
-                    <div key={member.id} className="flex items-center gap-4 rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100">
-                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gray-300">
-                        {member.photo_url ? (
-                          <img src={member.photo_url} alt={member.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-lg font-bold text-gray-500">
-                            {member.name?.substring(0, 2).toUpperCase()}
-                          </div>
-                        )}
+                {contractor?.team_members && contractor.team_members.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                    {contractor.team_members.map((member: any) => (
+                      <div key={member.id} className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gray-300">
+                          {member.user?.profile_photo_url || member.photo_url ? (
+                            <img 
+                              src={member.user?.profile_photo_url || member.photo_url} 
+                              alt={member.name} 
+                              className="h-full w-full object-cover" 
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-sm font-bold text-gray-500">
+                              {member.name?.substring(0, 2).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold text-[#1E1E17] text-sm">{member.name}</p>
+                          <p className="truncate text-xs text-gray-600">{member.role || "Especialista"}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-[#1E1E17]">{member.name}</p>
-                        <p className="text-sm text-gray-600">{member.role || "Especialista"}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm italic text-gray-400">No hay miembros de equipo registrados.</p>
+                )}
               </div>
-            )}
 
-            {/* 3. SECCIÓN: TRABAJOS RECIENTES */}
-            {contractor?.jobs && contractor.jobs.length > 0 && (
+              {/* 3. SECCIÓN: TRABAJOS RECIENTES (Debajo del equipo) */}
               <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
                   <Briefcase className="h-5 w-5" />
                   Trabajos Recientes
                 </h3>
-                <div className="space-y-4">
-                  {contractor.jobs.map((job: any) => (
-                    <div key={job.id} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <h4 className="text-lg font-semibold leading-tight text-[#1E1E17]">{job.title}</h4>
-                          {job.description && (
-                            <p className="mt-1 line-clamp-2 text-sm text-gray-600">{job.description}</p>
-                          )}
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              job.status === 'Completado' ? 'bg-green-100 text-green-800' :
-                              job.status === 'En progreso' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {job.status || "Proyecto"}
-                            </span>
-                            {job.created_at && (
-                              <span className="rounded-full border border-gray-100 bg-gray-50 px-2.5 py-0.5 text-xs text-gray-500">
-                                {new Date(job.created_at).toLocaleDateString()}
+                {contractor?.jobs && contractor.jobs.length > 0 ? (
+                  <div className="space-y-4">
+                    {contractor.jobs.map((job: any) => (
+                      <div key={job.id} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-base font-semibold leading-tight text-[#1E1E17]">{job.title}</h4>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                                job.status === 'Completado' ? 'bg-green-100 text-green-800' :
+                                job.status === 'En progreso' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {job.status || "Proyecto"}
                               </span>
-                            )}
+                            </div>
                           </div>
+                          {job.budget && (
+                            <div className="shrink-0 text-left sm:text-right">
+                              <span className="block text-base font-bold text-[#1E1E17]">${Number(job.budget).toLocaleString()}</span>
+                            </div>
+                          )}
                         </div>
-                        {job.budget && (
-                          <div className="shrink-0 text-right">
-                            <span className="block text-lg font-bold text-[#1E1E17]">${Number(job.budget).toLocaleString()}</span>
-                            <span className="text-xs text-gray-500">Presupuesto</span>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm italic text-gray-400">No hay trabajos registrados aún.</p>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* --- COLUMNA DERECHA: Chat (Sticky) --- */}
-          <div className="sticky top-4">
-            <ContractorChatAside
-              messages={chatMessages}
-              messageDraft={messageDraft}
-              onSubmit={handleSendMessage}
-              onDraftChange={handleDraftChange}
-              rating={currentRating}
-              onRatingChange={setCurrentRating}
-              onRatingSubmit={handleRatingSubmit}
-            />
-          </div>
+            </div>
           </div>
 
           {/* Contractors Cercanos */}
