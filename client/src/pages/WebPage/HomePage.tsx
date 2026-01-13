@@ -23,6 +23,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SearchBar from "./HomePage/SearchBar";
+import { JobContractService } from '@/core/services/job-contracts/jobContract.service';
+import type { IJobContract } from '@/core/types/IJobContract';
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -88,6 +90,44 @@ const HomePage = () => {
   };
 
   // removed: getAnnouncements
+
+  // Extiende el tipo para los contratos recientes
+  interface IJobContractExtended extends IJobContract {
+    creator?: any;
+    contractor?: any;
+    image_url?: string;
+    title?: string;
+    location?: string;
+    created_at?: string;
+  }
+
+  const [latestContracts, setLatestContracts] = useState<IJobContractExtended[]>([]);
+  const [contractsLoading, setContractsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLatestContracts() {
+      setContractsLoading(true);
+      try {
+        const res = await JobContractService.getAllPaginated({ limit: 3, sort_by: 'id', sort_dir: 'desc' });
+        console.log(res);
+        setLatestContracts(Array.isArray(res.data) ? res.data.slice(0, 3) : []);
+      } catch (err) {
+        console.log('Error fetching latest contracts:', err);
+        setLatestContracts([]);
+      } finally {
+        setContractsLoading(false);
+      }
+    }
+    fetchLatestContracts();
+  }, []);
+
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+  function getJobImageUrl(image?: string | null): string {
+    if (!image) return '/images/default-service.jpg';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    // Quitar cualquier /api o api al inicio
+    return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
 
   return (
     <div className="flex flex-col">
@@ -361,121 +401,72 @@ const HomePage = () => {
               <p className="text-center text-gray-600 mt-3 mb-10">
                 See actual claims we've paid to protect homeowners like you.
               </p>
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {/* Card 1 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
-                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400&auto=format&fit=crop"
-                      alt="Neighborhood"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
-                    "I was charged $4K after my contractor shut down. GU took care of it"
-                  </h3>
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-3 text-gray-400" />
-                    </div>
-                    <span className="font-semibold text-gray-700 text-sm md:text-base">Ben & Susan Smith</span>
-                  </div>
-                  <div className="mt-auto">
-                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
-                      <li className="flex items-center gap-2">
-                        <MapPin className="size-4 text-gray-400" /> Oklahoma, OK
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Wrench className="size-4 text-gray-400" /> Roofing
-                      </li>
-                    </ul>
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
-                        <CalendarDays className="size-4 text-gray-400" /> Jan 2023
-                      </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
-                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Card 2 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
-                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1400&auto=format&fit=crop"
-                      alt="Home exterior"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
-                    "A contractor destroyed my siding, but GU paid $15K to fix it"
-                  </h3>
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-3 text-gray-400" />
-                    </div>
-                    <span className="font-semibold text-gray-700 text-sm md:text-base">Brandy Oberg</span>
-                  </div>
-                  <div className="mt-auto">
-                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
-                      <li className="flex items-center gap-2">
-                        <MapPin className="size-4 text-gray-400" /> Minnesota, MN
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Wrench className="size-4 text-gray-400" /> Roofing
-                      </li>
-                    </ul>
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
-                        <CalendarDays className="size-4 text-gray-400" /> Apr 2022
-                      </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
-                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Card 3 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
-                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1585842378054-ee2e52f94ba3?q=80&w=1400&auto=format&fit=crop"
-                      alt="Roof repair"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
-                    "A contractor damaged my roof. GU paid $8K to replace it"
-                  </h3>
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-3 text-gray-400" />
-                    </div>
-                    <span className="font-semibold text-gray-700 text-sm md:text-base">Lisa Brown</span>
-                  </div>
-                  <div className="mt-auto">
-                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
-                      <li className="flex items-center gap-2">
-                        <MapPin className="size-4 text-gray-400" /> New York, NY
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Wrench className="size-4 text-gray-400" /> Roofing
-                      </li>
-                    </ul>
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
-                        <CalendarDays className="size-4 text-gray-400" /> Jun 2024
-                      </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
-                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
+                {contractsLoading ? (
+                  <div className="col-span-3 text-center py-10 text-gray-400">Loading...</div>
+                ) : (
+                  <div className="col-span-3 text-center py-10 text-gray-400"></div>
+                )}
+                {contractsLoading ? (
+                  <div className="col-span-3 text-center py-10 text-gray-400">Loading...</div>
+                ) : latestContracts.length === 0 ? (
+                  <div className="col-span-3 text-center py-10 text-gray-400">No recent payouts found.</div>
+                ) : (
+                  latestContracts.map((contract) => {
+                    // Adaptar a la nueva estructura de datos
+                    const contractor = contract.creator || contract.contractor || {};
+                    const professions = contractor.contractor?.professions || [];
+                    const mainProfession = professions.length > 0 ? professions[0].name : 'Profession';
+                    const imageUrl = getJobImageUrl(contract.image_url);
+                    return (
+                      <article key={contract.id} className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                        <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
+                          <img
+                            src={imageUrl}
+                            alt={contract.title || 'Job'}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
+                          {contract.title || 'Job payout'}
+                        </h3>
+                        <div className="flex items-center gap-2.5 mb-2.5">
+                          <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
+                            <User className="size-3 text-gray-400" />
+                          </div>
+                          <span className="font-semibold text-gray-700 text-sm md:text-base">
+                            {contractor.name || 'Contractor'}
+                          </span>
+                        </div>
+                        <div className="text-xs text-primary font-semibold mb-2">{mainProfession}</div>
+                        <div className="text-xs text-gray-500 mb-2">
+                          {contractor.email && <div>Email: {contractor.email}</div>}
+                          {contractor.mobile_number && <div>Phone: {contractor.mobile_number}</div>}
+                          {contractor.contractor?.company_name && <div>Company: {contractor.contractor.company_name}</div>}
+                        </div>
+                        <div className="mt-auto">
+                          <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
+                            <li className="flex items-center gap-2">
+                              <MapPin className="size-4 text-gray-400" /> {contract.location || 'Location'}
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Wrench className="size-4 text-gray-400" /> {mainProfession}
+                            </li>
+                          </ul>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
+                              <CalendarDays className="size-4 text-gray-400" />
+                              {contract.created_at ? new Date(contract.created_at).toLocaleDateString() : ''}
+                            </div>
+                            <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
+                              <ArrowRightIcon className="size-4 text-[#1A1B16]" />
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })
+                )}
               </div>
             </div>
           </section>

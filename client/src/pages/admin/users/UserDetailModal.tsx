@@ -19,14 +19,12 @@ const h = React.createElement;
 const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, onClose, onStatusChange }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [localStatus, setLocalStatus] = useState<number>(user?.verification ? 1 : 0);
-  const [editProfile, setEditProfile] = useState<boolean>(!!user?.edit_profile);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loadingInfo, setLoadingInfo] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     setLocalStatus(user?.verification ? 1 : 0);
-    setEditProfile(!!user?.edit_profile);
     if (user && isOpen) {
       setLoadingInfo(true);
       getUserInformation(user.id)
@@ -60,24 +58,6 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, onClose
     } catch (err: any) {
       toastify.error(err?.response?.data?.message || err?.message || "Error al cambiar estado");
       setLocalStatus(newStatus === 1 ? 0 : 1); // revert
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Handler para el checkbox de editar perfil (solo cambia el estado local, aquí puedes agregar lógica para guardar en backend si lo deseas)
-  const handleEditProfileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setEditProfile(checked);
-    setIsProcessing(true);
-    try {
-      // Llama al servicio para actualizar el estado de edit_profile
-      const { updateEditProfileStatus } = require('@/core/services/user/user.service');
-      await updateEditProfileStatus(user.id, checked);
-      toastify.success("Permiso de edición actualizado");
-    } catch (err: any) {
-      toastify.error(err?.response?.data?.message || err?.message || "Error al cambiar permiso de edición");
-      setEditProfile(!checked); // revertir si falla
     } finally {
       setIsProcessing(false);
     }

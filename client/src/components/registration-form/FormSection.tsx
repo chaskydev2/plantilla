@@ -32,7 +32,6 @@ const FormSection: React.FC<FormSectionProps> = ({
   const safeVerificationError = verificationError ?? "";
   const safeSendVerificationEmail = sendVerificationEmail ?? (() => {});
   const safeOnGoBackToForm = onGoBackToForm ?? (() => {});
-  const safeOnConfirmEmail = onConfirmEmail ?? (() => {});
 
   return (
     <>

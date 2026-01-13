@@ -246,7 +246,7 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
     try {
       // No filtrar status, solo filtrar undefined
       const cleanData = Object.fromEntries(
-        Object.entries(data).filter(([key, value]) => value !== undefined)
+        Object.entries(data).filter(([_, value]) => value !== undefined)
       );
 
       // Convertir price y service_id a número si es posible

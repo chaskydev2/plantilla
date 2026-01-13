@@ -1,5 +1,8 @@
-import { useMemo, useState } from 'react';
+import { getAllServices } from '@/core/services/service/service.service';
+import ServiceSelectField from './ServiceSelectField';
+import { useMemo, useState, useEffect } from 'react';
 import { InputField, TextAreaField } from '@/components/form-field';
+
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
 import type {
@@ -71,7 +74,7 @@ const ProfessionModal = ({
   const isEditing = mode === 'edit';
   const isViewing = mode === 'view';
 
-  type FormValues = (ICreateRequest | IUpdateRequest) & { icon?: string };
+  type FormValues = (ICreateRequest | IUpdateRequest) & { icon?: string; service_id?: string };
 
   const defaultValues: FormValues = (isEditing || isViewing)
     ? {
@@ -79,13 +82,38 @@ const ProfessionModal = ({
         slug: initialData?.slug || '',
         icon: (initialData as any)?.icon || '',
         description: initialData?.description || '',
+        service_id: (initialData as any)?.service_id || '',
       }
     : {
         name: '',
         slug: '',
         icon: '',
         description: '',
+        service_id: '',
       };
+
+  // Servicios para el select
+  const [services, setServices] = useState<Array<{ id: string; name: string }>>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+
+  // Importa la función getAllServices desde donde esté definida
+  // import { getAllServices } from '@/core/services/service.service';
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoadingServices(true);
+      try {
+        // Consumir el servicio getAllServices
+        const response = await getAllServices();
+        // Asume que la data está en response.data
+        setServices((response.data || []).map((s: any) => ({ id: String(s.id), name: s.name })));
+      } catch (e) {
+        setServices([]);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const handleSubmit = async (data: FormValues) => {
     if (isViewing) return;
@@ -100,6 +128,7 @@ const ProfessionModal = ({
         toastify.success(response.message || 'Profession updated successfully');
       } else {
         const response = await ItemService.create(cleanData as ICreateRequest);
+        console.log(cleanData);
         toastify.success(response.message || 'Profession created successfully');
       }
 
@@ -114,6 +143,8 @@ const ProfessionModal = ({
       );
     }
   };
+
+  // Eliminado: useFormContext fuera del FormProviderWrapper. El control se obtiene dentro de FormContent.
 
   return (
     <Modal
@@ -147,6 +178,14 @@ const ProfessionModal = ({
             label="Description"
             rows={4}
             readOnly={isViewing}
+          />
+
+          {/* ServiceSelectField como campo normal de react-hook-form */}
+          <ServiceSelectField
+            name="service_id"
+            options={services}
+            loading={loadingServices}
+            disabled={isViewing}
           />
 
           <div>

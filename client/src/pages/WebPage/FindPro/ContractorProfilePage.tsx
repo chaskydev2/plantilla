@@ -263,7 +263,7 @@ export default function ContractorProfilePage() {
               <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
                   <Users className="h-5 w-5" />
-                  Nuestro Equipo
+                  Our Team
                 </h3>
                 {contractor?.team_members && contractor.team_members.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
@@ -284,13 +284,13 @@ export default function ContractorProfilePage() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-semibold text-[#1E1E17] text-sm">{member.name}</p>
-                          <p className="truncate text-xs text-gray-600">{member.role || "Especialista"}</p>
+                          <p className="truncate text-xs text-gray-600">{member.role || "Specialist"}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm italic text-gray-400">No hay miembros de equipo registrados.</p>
+                  <p className="text-sm italic text-gray-400">No team members registered.</p>
                 )}
               </div>
 
@@ -298,7 +298,7 @@ export default function ContractorProfilePage() {
               <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
                   <Briefcase className="h-5 w-5" />
-                  Trabajos Recientes
+                  Recent Jobs
                 </h3>
                 {contractor?.jobs && contractor.jobs.length > 0 ? (
                   <div className="space-y-4">
@@ -313,7 +313,7 @@ export default function ContractorProfilePage() {
                                 job.status === 'En progreso' ? 'bg-blue-100 text-blue-800' :
                                 'bg-gray-100 text-gray-800'
                               }`}>
-                                {job.status || "Proyecto"}
+                                {job.status === 'Completado' ? 'Completed' : job.status === 'En progreso' ? 'In Progress' : job.status || 'Project'}
                               </span>
                             </div>
                           </div>
@@ -327,7 +327,7 @@ export default function ContractorProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm italic text-gray-400">No hay trabajos registrados aún.</p>
+                  <p className="text-sm italic text-gray-400">No jobs registered yet.</p>
                 )}
               </div>
 

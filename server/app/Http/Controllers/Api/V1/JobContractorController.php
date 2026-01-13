@@ -15,6 +15,22 @@ class JobContractorController extends Controller
     /**
      * Display a listing of jobs with filters
      */
+
+
+      public function latestTen(): JsonResponse
+    {
+        $contracts = JobContractor::with(['creator.contractor.professions', 'homeowner'])
+            ->where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        return response()->json([
+            'message' => 'Últimos 10 contratos activos',
+            'data' => $contracts
+        ]);
+    }
+
+
     public function index(Request $request): JsonResponse
     {
         $query = JobContractor::with(['creator', 'homeowner']);

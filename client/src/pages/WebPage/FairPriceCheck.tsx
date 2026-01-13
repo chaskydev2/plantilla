@@ -1,9 +1,6 @@
-
-
 import React, { useEffect, useState } from 'react';
+import { FaBriefcase, FaMapMarkerAlt, FaDollarSign, FaRegCalendarAlt, FaUser, FaEnvelope, FaPhone, FaTag, FaEye, FaBookmark } from 'react-icons/fa';
 import { jobPostService } from '@/core/services/job-posts/jobPost.service';
-
-type JobCategory = string;
 
 type JobPost = {
   id: number;
@@ -106,35 +103,66 @@ const FairPriceCheck: React.FC = () => {
     setCurrentPage(1);
   }, [search, category]);
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<JobPost | null>(null);
+
   return (
     <div
       className="min-h-screen"
       style={{ background: 'var(--color-primary)', color: 'var(--color-secondary)' }}
     >
+      {/* Modal for job details */}
+      {showModal && selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1E17]/80 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+              onClick={() => setShowModal(false)}
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+              <FaTag className="w-5 h-5" /> {selectedJob.title}
+            </h2>
+            <p className="mb-2 text-gray-700 flex items-center gap-2">
+              <FaBriefcase className="w-4 h-4" /> {selectedJob.description}
+            </p>
+            <div className="mb-2 flex items-center gap-2">
+              <FaUser className="w-4 h-4" /> {selectedJob.homeowner?.user?.name || ''}
+            </div>
+            <div className="mb-2 flex items-center gap-2">
+              <FaEnvelope className="w-4 h-4" /> {selectedJob.homeowner?.user?.email || ''}
+            </div>
+            <div className="mb-2 flex items-center gap-2">
+              <FaPhone className="w-4 h-4" /> {selectedJob.homeowner?.user?.mobile_number || selectedJob.homeowner?.user?.phone_number || ''}
+            </div>
+            <div className="mb-2 flex items-center gap-2">
+              <FaMapMarkerAlt className="w-4 h-4" /> {selectedJob.city || selectedJob.address_line1 || ''}
+            </div>
+            <div className="mb-2 flex items-center gap-2">
+              <FaDollarSign className="w-4 h-4" /> {selectedJob.price ? `${selectedJob.price} ${selectedJob.currency || ''}` : ''}
+            </div>
+            <div className="mb-2 flex items-center gap-2">
+              <FaRegCalendarAlt className="w-4 h-4" /> {selectedJob.deadline ? new Date(selectedJob.deadline).toLocaleDateString() : ''}
+            </div>
+            {selectedJob.image_path && (
+              <img src={getImageUrl(selectedJob.image_path)} alt="Job" className="rounded-lg mt-2 w-full object-cover" />
+            )}
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 space-y-10">
         <header className="rounded-3xl bg-white shadow-xl border border-[rgba(0,0,0,0.05)] px-6 py-10 sm:px-10 sm:py-12">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.1)] bg-[rgba(0,0,0,0.04)] px-2 py-0.5 tracking-[0.18em] uppercase text-[0.6rem] font-semibold text-[rgba(0,0,0,0.65)]">
+          <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
+            <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.1)] bg-[rgba(0,0,0,0.04)] px-2 py-0.5 tracking-[0.18em] uppercase text-[0.7rem] font-bold text-[var(--color-secondary)]">
               Homeowner Job Feed
             </span>
           </div>
-          <h1 className="mt-6 text-4xl font-bold tracking-tight text-[var(--color-secondary)] sm:text-5xl">
-            Discover Fair-Priced Projects Posted by Homeowners
+          <h1 className="mt-2 text-3xl sm:text-4xl font-bold tracking-tight text-[var(--color-secondary)]">
+            Fair-Priced Projects
           </h1>
-          <p className="mt-4 text-base text-[rgba(0,0,0,0.65)] sm:text-lg">
-            Browse verified jobs across trades, compare real homeowner expectations, and reach out to the opportunities that match your crew and schedule.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-1 text-xs text-[rgba(0,0,0,0.7)]">
-            <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-2 py-0.5">
-              <span className="size-1.5 rounded-full bg-[var(--color-primary)]" /> Fresh leads added hourly
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-2 py-0.5">
-              <span className="size-1.5 rounded-full bg-[rgba(0,0,0,0.75)]" /> Transparent homeowner briefs
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-2 py-0.5">
-              <span className="size-1.5 rounded-full bg-white" /> Fair-price budget ranges
-            </span>
-          </div>
+          
           {/* Search bars */}
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <input
@@ -199,42 +227,54 @@ const FairPriceCheck: React.FC = () => {
                           : 'from-gray-400 to-gray-700'
                       } px-2 py-0.5 text-xs font-semibold text-white shadow-lg shadow-[rgba(0,0,0,0.2)]`}
                     >
+                      <FaBriefcase className="w-4 h-4 mr-1" />
                       <span className="drop-shadow">{job.service?.name || 'Servicio'}</span>
                     </div>
                   </div>
 
                   <div className="space-y-2 px-2 pb-2 pt-2">
                     <div className="flex flex-wrap items-center justify-between gap-1">
-                      <h2 className="text-xs font-semibold text-[var(--color-secondary)] line-clamp-1">{job.title}</h2>
-                      <span className="rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-[rgba(0,0,0,0.6)]">
+                      <h2 className="text-xs font-semibold text-[var(--color-secondary)] line-clamp-1 flex items-center gap-1">
+                        <FaTag className="w-4 h-4 mr-1" />
+                        {job.title}
+                      </h2>
+                      <span className="rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-[rgba(0,0,0,0.6)] flex items-center gap-1">
+                        <FaRegCalendarAlt className="w-3 h-3 mr-1" />
                         {job.deadline ? new Date(job.deadline).toLocaleDateString() : ''}
                       </span>
                     </div>
-                    <p className="text-[10px] text-[rgba(0,0,0,0.65)] line-clamp-1">
+                    <p className="text-[10px] text-[rgba(0,0,0,0.65)] line-clamp-1 flex items-center gap-1">
+                      <FaBriefcase className="w-3 h-3 mr-1" />
                       {job.description}
                     </p>
                     <dl className="grid gap-1 text-[10px] text-[rgba(0,0,0,0.75)] sm:grid-cols-2">
-                      <div>
+                      <div className="flex items-center gap-1">
+                        <FaUser className="w-3 h-3 mr-1" />
                         <dt className="text-[8px] uppercase tracking-wide text-[rgba(0,0,0,0.45)]">Nombre</dt>
                         <dd className="font-semibold text-[var(--color-secondary)]">{job.homeowner?.user?.name || ''}</dd>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-1">
+                        <FaEnvelope className="w-3 h-3 mr-1" />
                         <dt className="text-[8px] uppercase tracking-wide text-[rgba(0,0,0,0.45)]">Email</dt>
                         <dd>{job.homeowner?.user?.email || ''}</dd>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-1">
+                        <FaPhone className="w-3 h-3 mr-1" />
                         <dt className="text-[8px] uppercase tracking-wide text-[rgba(0,0,0,0.45)]">Teléfono</dt>
                         <dd>{job.homeowner?.user?.mobile_number || job.homeowner?.user?.phone_number || ''}</dd>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-1">
+                        <FaMapMarkerAlt className="w-3 h-3 mr-1" />
                         <dt className="text-[8px] uppercase tracking-wide text-[rgba(0,0,0,0.45)]">Location</dt>
                         <dd>{job.city || job.address_line1 || ''}</dd>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-1">
+                        <FaDollarSign className="w-3 h-3 mr-1" />
                         <dt className="text-[8px] uppercase tracking-wide text-[rgba(0,0,0,0.45)]">Budget</dt>
                         <dd>{job.price ? `${job.price} ${job.currency || ''}` : ''}</dd>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-1">
+                        <FaRegCalendarAlt className="w-3 h-3 mr-1" />
                         <dt className="text-[8px] uppercase tracking-wide text-[rgba(0,0,0,0.45)]">Deadline</dt>
                         <dd>{job.deadline ? new Date(job.deadline).toLocaleDateString() : ''}</dd>
                       </div>
@@ -242,11 +282,13 @@ const FairPriceCheck: React.FC = () => {
                     <div className="flex flex-wrap gap-0.5">
                       {job.service && 'slug' in job.service && job.service.slug && (
                         <span className="inline-flex items-center rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-1.5 py-0.5 text-[9px] text-[rgba(0,0,0,0.6)]">
+                          <FaTag className="w-3 h-3 mr-1" />
                           {job.service.slug}
                         </span>
                       )}
                       {job.status && (
                         <span className="inline-flex items-center rounded-full border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.04)] px-1.5 py-0.5 text-[9px] text-[rgba(0,0,0,0.6)]">
+                          <FaBriefcase className="w-3 h-3 mr-1" />
                           {job.status}
                         </span>
                       )}
@@ -256,14 +298,17 @@ const FairPriceCheck: React.FC = () => {
                         type="button"
                         className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shadow-md transition hover:shadow-lg"
                         style={{ background: 'var(--color-secondary)' }}
+                        onClick={() => { setSelectedJob(job); setShowModal(true); }}
                       >
+                        <FaEye className="w-4 h-4 mr-1" />
                         View
                       </button>
                       <button
                         type="button"
-                        className="text-[10px] font-semibold underline-offset-4 transition hover:underline"
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold underline-offset-4 transition hover:underline"
                         style={{ color: 'var(--color-secondary)' }}
                       >
+                        <FaBookmark className="w-4 h-4 mr-1" />
                         Save
                       </button>
                     </div>

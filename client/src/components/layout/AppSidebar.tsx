@@ -6,7 +6,6 @@ import  Logo from "@/assets/images/LOGO GUD.svg?url";
 import {
   LayoutDashboard,
   Users,
-  Calendar,
   BookOpen,
   Globe,
   History,
@@ -231,21 +230,15 @@ const AppSidebar: React.FC = () => {
       // Puedes agregar permisos si lo necesitas
       subItems: [
         {
-          name: t("admin.sidebar.jobApplications"),
-          path: "/admin/job-applications",
+          name: t("admin.sidebar.jobContracts","Jobs of Contractors"),
+          path: "/admin/job",
           icon: <Clipboard className="w-4 h-4" />,
         },
         {
-          name: t("admin.sidebar.jobContracts"),
-          path: "/admin/job-contracts",
-          icon: <Clipboard className="w-4 h-4" />,
-        },
-         {
-      name: t("contractor.sidebar.postJob", "Post Job"),
-      icon: <Users className="w-5 h-5" />,
-      path: "/admin/post-job",
-    },
-        // Add more subItems here if needed
+          name: t("contractor.sidebar.postJob", "Post Job"),
+          icon: <Users className="w-5 h-5" />,
+          path: "/admin/post-job",
+        }
       ],
     },
     {

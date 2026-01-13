@@ -56,9 +56,9 @@ class JobController extends Controller
         }
 
         // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDir = $request->get('sort_dir', 'desc');
-        $query->sort($sortBy, $sortDir);
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortDir = $request->get('sort_dir', 'desc');
+            $query->orderBy($sortBy, $sortDir);
 
         // Pagination
         $perPage = $request->get('per_page', 15);

@@ -84,6 +84,8 @@ import PostJob from "@/pages/homeownner/PostJob/Main";
 
 import PostJobAdmin from "@/pages/admin/PostJob/Main";
 
+import JobAdmin from "@/pages/admin/jobs/Main";
+
 import Services from "@/pages/WebPage/Services";
 
 import LoaderScreen from "@/components/common/LoaderScreen";
@@ -195,6 +197,8 @@ export default function App() {
 
              
               <Route path="/admin/post-job" element={<PostJobAdmin/>} />
+              
+              <Route path="/admin/job" element={<JobAdmin/>} />
 
               {/* CONTRACTOR SPECIFIC ROUTES */}
               <Route path="/contractor/perfil" element={<UserProfiles />} />
@@ -223,6 +227,8 @@ export default function App() {
               <Route path="/homeowner/payments" element={<PaymentPage/>} />
               <Route path="/homeowner/perfil" element={<UserProfiles/>} />
 
+
+              <Route path="/admin/job" element={<JobAdmin/>} />
 
               {/* Note: Add contractor-specific routes here when components are created */}
               {/* <Route path="/admin/contractor/proyectos" element={<ContractorProjectsPage />} /> */}

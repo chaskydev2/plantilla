@@ -1,3 +1,21 @@
+export const getAllCreatorJobs = async (
+  params?: JobFilters,
+  config: { signal?: AbortSignal } = {}
+): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/jobs-creator', { params, ...config });
+  const api = res.data;
+  return {
+    success: api.success !== undefined ? api.success : true,
+    data: Array.isArray(api.data) ? api.data : (Array.isArray(api.results) ? api.results : []),
+    meta: api.meta && api.meta.pagination
+      ? { pagination: api.meta.pagination }
+      : api.pagination
+      ? { pagination: api.pagination }
+      : undefined,
+    message: api.message,
+    errors: api.errors,
+  };
+};
 import axios from '@/core/config/axios';
 import type { IApiResponse, IPaginationRequest } from '@/core/types/IApi';
 import type { IJobCreateRequest, IJobUpdateRequest } from '@/core/types/IJob';
@@ -20,7 +38,20 @@ export const getAllPaginated = async (
   config: { signal?: AbortSignal } = {}
 ): Promise<IApiResponse> => {
   const res = await axios.get('/v1/jobs', { params, ...config });
-  return res.data;
+  console.log(res);
+  // Adaptar la respuesta para que siempre tenga success, data y meta.pagination
+  const api = res.data;
+  return {
+    success: api.success !== undefined ? api.success : true,
+    data: Array.isArray(api.data) ? api.data : (Array.isArray(api.results) ? api.results : []),
+    meta: api.meta && api.meta.pagination
+      ? { pagination: api.meta.pagination }
+      : api.pagination
+      ? { pagination: api.pagination }
+      : undefined,
+    message: api.message,
+    errors: api.errors,
+  };
 };
 
 export const createWithFile = async (
@@ -78,12 +109,13 @@ export const get = async (id: number): Promise<IApiResponse> => {
 };
 
 export const remove = async (id: number): Promise<IApiResponse> => {
-  const res = await axios.delete(`/v1/jobs/${id}`);
+  const res = await axios.delete(`/v1/jobs-creator/${id}`);
   return res.data;
 };
 
 export const JobService = {
   getAllPaginated,
+  getAllCreatorJobs,
   create,
   createWithFile,
   update,

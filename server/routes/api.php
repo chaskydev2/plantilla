@@ -65,6 +65,8 @@ Route::prefix('/v1')
 
         // Ruta pública para ver todas las publicaciones de job posts
         Route::get('job-posts/public', [JobPostController::class, 'publicIndex']);
+        // Últimos 10 contratos de trabajo (API pública)
+        Route::get('job-contracts/latest', [JobContractorController::class, 'latestTen']);
         
         Route::post('register/homeowner', [AuthController::class, 'registerHomeowner']);
         
@@ -301,6 +303,7 @@ Route::prefix('/v1')
             Route::get('attribute-contractors/by-user/{userId}', [AttributeContractorController::class, 'byUser']);
         
             Route::patch('attribute-contractors/{id}/status', [AttributeContractorController::class, 'updateStatus']);
+            
             Route::patch('attribute-contractors/{id}/comentario', [AttributeContractorController::class, 'updateComentario']);                
             
             Route::patch('users/{id}/edit-profile', [UserController::class, 'updateEditProfileStatus']);
@@ -328,11 +331,15 @@ Route::prefix('/v1')
             Route::get('jobs-creator/creator/{creatorId}', [JobContractorController::class, 'jobsByCreator']);
             Route::get('jobs-creator/homeowner/{homeownerId}', [JobContractorController::class, 'jobsByHomeowner']);
             Route::get('jobs-creator/statistics', [JobContractorController::class, 'statistics']);
-              // Ruta para eliminar uno o varios job posts
+             
+            
+            // Ruta para eliminar uno o varios job posts
             Route::delete('job-posts/destroy-many', [JobPostController::class, 'destroyMany']);
             // Cambiar status_aprobation de un JobPost
             Route::post('job-posts/{id}/aprobation', [JobPostController::class, 'changeAprobationStatus']); 
             Route::patch('jobs/{id}/activate', [JobController::class, 'activate']);
+            Route::apiResource('jobs', JobController::class);
+        
         });
     
     });

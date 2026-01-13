@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { Search, Plus, Trash2, Edit } from "lucide-react";
 import DataTable from "@/components/table/DataTable";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toastify } from "@/core/utils/toastify";
-
-import useAuth from "@/core/hooks/useAuth";
 import Form from "./Form";
 import { getJobPostsByHomeowner, deleteJobPostById } from '@/core/services/jobPost.service';
 
@@ -115,9 +112,6 @@ export type JobPost = {
 };
 
 export default function JobPostList() {
-  const { t } = useTranslation();
-  const { hasPermission } = useAuth();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<JobPost | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -248,14 +242,14 @@ export default function JobPostList() {
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: JobPost) => handleEdit(item),
       variant: "primary" as const,
-      show: (item: JobPost) => true,
+      show: () => true,
     },
     {
       label: "Delete",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: JobPost) => confirmDelete(item),
       variant: "danger" as const,
-      show: (item: JobPost) => true,
+      show: () => true,
     },
   ];
 

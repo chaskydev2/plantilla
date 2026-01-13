@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { useFormContext } from 'react-hook-form';
 
-import { InputField, InputFileField, SelectField } from '@/components/form-field';
+import { InputField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
 import type { JobPost as JobPostBase } from './Main';
@@ -14,7 +14,7 @@ type JobPost = JobPostBase & {
 import { createJobPost, updateJobPost, changeJobPostAprobationStatus } from '@/core/services/jobPost.service';
 import 'react-toastify/dist/ReactToastify.css';
 
-import axios from 'axios';
+// axios removed (unused)
 
 // StatusSwitch component for toggling status
 function StatusSwitch() {
@@ -103,133 +103,6 @@ const jobPostSchema = Yup.object({
   lng: Yup.number().nullable(),
   image: Yup.mixed().nullable(),
 });
-
-
-
-/* =========================
-  GoogleMapPicker
-========================= */
-function GoogleMapPicker() {
-  const { setValue, watch } = useFormContext();
-  const lat = watch('lat');
-  const lng = watch('lng');
-
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<any>(null);
-  const markerInstance = useRef<any>(null);
-
-  const [mapLoaded, setMapLoaded] = useState(false);
-
-  const fetchAddress = async (lat: number, lng: number) => {
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-      );
-      const data = await res.json();
-
-      if (data.status === 'OK') {
-        const result = data.results[0];
-
-        let address_line1 = '';
-        let address_line2 = '';
-        let city = '';
-        let state_code = '';
-        let postal_code = '';
-
-        result.address_components.forEach((comp: any) => {
-          if (comp.types.includes('street_number')) address_line1 = comp.long_name + ' ';
-          if (comp.types.includes('route')) address_line1 += comp.long_name;
-          if (comp.types.includes('sublocality')) address_line2 = comp.long_name;
-          if (comp.types.includes('locality')) city = comp.long_name;
-          if (comp.types.includes('administrative_area_level_1')) state_code = comp.short_name;
-          if (comp.types.includes('postal_code')) postal_code = comp.long_name;
-        });
-
-        setValue('address_line1', address_line1);
-        setValue('address_line2', address_line2);
-        setValue('city', city);
-        setValue('state_code', state_code);
-        setValue('postal_code', postal_code);
-      }
-    } catch {}
-  };
-
-  useEffect(() => {
-    if (window.google?.maps) {
-      setMapLoaded(true);
-      return;
-    }
-
-    if (document.getElementById('google-maps')) return;
-
-    const script = document.createElement('script');
-    script.id = 'google-maps';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
-    script.async = true;
-    script.onload = () => setMapLoaded(true);
-    document.body.appendChild(script);
-  }, []);
-
-  useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return;
-
-    const center = {
-      lat: typeof lat === 'number' ? lat : 19.432608,
-      lng: typeof lng === 'number' ? lng : -99.133209,
-    };
-
-    if (!mapInstance.current) {
-      mapInstance.current = new window.google.maps.Map(mapRef.current, {
-        center,
-        zoom: 12,
-      });
-
-      markerInstance.current = new window.google.maps.Marker({
-        map: mapInstance.current,
-        position: center,
-        draggable: true,
-      });
-
-      markerInstance.current.addListener('dragend', (e: any) => {
-        const newLat = e.latLng.lat();
-        const newLng = e.latLng.lng();
-        setValue('lat', newLat);
-        setValue('lng', newLng);
-        fetchAddress(newLat, newLng);
-      });
-
-      mapInstance.current.addListener('click', (e: any) => {
-        markerInstance.current.setPosition(e.latLng);
-        const newLat = e.latLng.lat();
-        const newLng = e.latLng.lng();
-        setValue('lat', newLat);
-        setValue('lng', newLng);
-        fetchAddress(newLat, newLng);
-      });
-    } else {
-      mapInstance.current.setCenter(center);
-      markerInstance.current.setPosition(center);
-    }
-  }, [mapLoaded, lat, lng]);
-
-  return (
-    <div>
-      <label className="block font-semibold mb-1">Location on map</label>
-      <div ref={mapRef} className="w-full h-[300px] rounded border" />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-        <InputField name="address_line1" label="Address Line 1" />
-        <InputField name="address_line2" label="Address Line 2" />
-        <InputField name="city" label="City" />
-        <InputField name="state_code" label="State" />
-        <InputField name="postal_code" label="Postal Code" />
-        {/* Lat/Lng hidden, set by map only */}
-        <input type="hidden" name="lat" />
-        <input type="hidden" name="lng" />
-      </div>
-    </div>
-  );
-}
 
 /* =========================
   Image logic (FIXED)
