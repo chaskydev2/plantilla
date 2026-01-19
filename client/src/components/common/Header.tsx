@@ -17,6 +17,15 @@ const Header = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
+  // Menu item interfaces
+  interface SubMenuItem {
+    name: string;
+    path: string;
+  }
+  type MenuItem =
+    | { name: string; path: string }
+    | { name: string; submenu: SubMenuItem[] };
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     setOpenSubmenu(null);
@@ -35,7 +44,7 @@ const Header = () => {
   const isHomePage = location.pathname === "/";
   const shouldBeTransparent = isHomePage && !scrolled && !isMenuOpen;
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { name: t("navigation.services"), path: "/services" },
     { name: t("navigation.scamAlerts"), path: "/scam-alerts" },
     { name: t("navigation.priceCheck"), path: "/fair-price-check" },
@@ -43,8 +52,8 @@ const Header = () => {
     {
       name: t("navigation.registerGuara"),
       submenu: [
-        { name: t("navigation.howItWorks"), path: "/register-guara" },
-        { name: t("navigation.whatCover"), path: "/register-guara" },
+        { name: t("navigation.howItWorks"), path: "/register-guara/how-it-works" },
+        { name: t("navigation.whatCover"), path: "/register-guara/what-cover" },
       ],
     },
   ];
@@ -87,7 +96,7 @@ const Header = () => {
                   onMouseLeave={() => setHoveredItem(null)}
                 >
                   <Link
-                    to={item.submenu ? "#" : item.path}
+                    to={'submenu' in item ? "#" : item.path}
                     className={`
                       px-4 py-2 transition-all duration-300 relative flex items-center font-medium
                       ${shouldBeTransparent 
@@ -96,14 +105,15 @@ const Header = () => {
                       }
                       after:content-[''] after:absolute after:bottom-0 after:left-0
                       after:w-full after:h-0.5 after:transition-all after:duration-300 after:transform
-                      ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
-                        ? `after:scale-x-100 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"}`
-                        : `after:scale-x-0 ${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} hover:after:scale-x-100`
-                      }
+                      ${('submenu' in item
+                        ? item.submenu.some(sub => location.pathname === sub.path)
+                        : location.pathname === item.path)
+                        ? `${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} after:scale-x-100`
+                        : `${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} after:scale-x-0 hover:after:scale-x-100`}
                     `}
                   >
                     {item.name}
-                    {item.submenu && (
+                    {'submenu' in item && (
                       <ChevronDown
                         size={16}
                         className={`ml-2 transition-transform duration-300 ${
@@ -114,7 +124,7 @@ const Header = () => {
                   </Link>
 
                   {/* Desktop Submenu */}
-                  {item.submenu && (
+                  {'submenu' in item && (
                     <div
                       className={`
                         absolute left-0 mt-3 w-64 origin-top
@@ -254,19 +264,20 @@ const Header = () => {
                   <div key={item.name}>
                     <div className="flex items-center justify-between">
                       <Link
-                        to={item.submenu ? "#" : item.path}
-                        onClick={() => !item.submenu && toggleMenu()}
+                        to={'submenu' in item ? "#" : item.path}
+                        onClick={() => { if (!('submenu' in item)) toggleMenu(); }}
                         className={`
                           flex-1 px-4 py-3 text-left font-medium transition-colors rounded-lg
-                          ${location.pathname === item.path || (item.submenu && item.submenu.some(sub => location.pathname === sub.path))
+                          ${('submenu' in item
+                            ? item.submenu.some((sub: SubMenuItem) => location.pathname === sub.path)
+                            : location.pathname === item.path)
                             ? "bg-[#F5D238] text-[#1A1B16]"
-                            : "text-gray-700 hover:bg-gray-100"
-                          }
+                            : "text-gray-700 hover:bg-gray-100"}
                         `}
                       >
                         {item.name}
                       </Link>
-                      {item.submenu && (
+                      {'submenu' in item && (
                         <button
                           onClick={() => toggleSubmenu(item.name)}
                           className="p-2 text-gray-500 hover:text-gray-700"
@@ -282,7 +293,7 @@ const Header = () => {
                     </div>
 
                     {/* Mobile Submenu */}
-                    {item.submenu && openSubmenu === item.name && (
+                    {'submenu' in item && openSubmenu === item.name && (
                       <div className="mt-2 ml-4 space-y-2">
                         {item.submenu.map((subItem) => (
                           <Link

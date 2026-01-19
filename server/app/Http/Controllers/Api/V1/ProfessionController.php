@@ -118,14 +118,19 @@ class ProfessionController extends Controller
     public function store(StoreProfessionRequest $request): JsonResponse
     {
         $data = $request->validated();
-
-        $data['image'] = $this->persistImage($request, null) ?? $data['image'] ?? null;
+        $image = $this->persistImage($request, null);
+        if ($image !== '__keep') {
+            $data['image'] = $image;
+        } else {
+            unset($data['image']);
+        }
 
         $profession = Profession::create($data);
 
         return response()->json([
             'message' => 'Profesión creada exitosamente',
-            'data' => new ProfessionResource($profession)
+            'data' => new ProfessionResource($profession), 
+            'datase' => $request->all()
         ], 201);
     }
 
@@ -168,25 +173,27 @@ class ProfessionController extends Controller
     public function update(UpdateProfessionRequest $request, $id): JsonResponse
     {
         try {
+            $data = $request->validated();
+
             // Buscar por ID o por slug
             $profession = is_numeric($id) 
                 ? Profession::findOrFail($id)
                 : Profession::where('slug', $id)->firstOrFail();
-
-            $data = $request->validated();
-
+            
             $image = $this->persistImage($request, $profession->image);
             if ($image !== '__keep') {
                 $data['image'] = $image;
             } else {
                 unset($data['image']);
             }
-
             $profession->update($data);
+
+            $profession->refresh()->load('service');
 
             return response()->json([
                 'message' => 'Profesión actualizada exitosamente',
-                'data' => new ProfessionResource($profession)
+                'data' => new ProfessionResource($profession),
+                'datasent' => $request->all()
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([

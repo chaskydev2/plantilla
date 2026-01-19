@@ -166,6 +166,16 @@ class AttributeModel extends Model
         return 'slug';
     }
 
+    /**
+     * Allow route binding by slug or id.
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where($field ?? $this->getRouteKeyName(), $value)
+            ->orWhere('id', $value)
+            ->firstOrFail();
+    }
+
     public function getRequiredForLabelAttribute(): string
     {
         return self::getRequiredForOptions()[$this->required_for] ?? 'Desconocido';

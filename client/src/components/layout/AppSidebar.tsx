@@ -22,11 +22,14 @@ import {
   HelpCircle,
   Image,
   Share2,
+  PlayCircle,
   BarChart2,
   Briefcase,
   Tag,
   Wrench,
-  UserPlus
+  UserPlus,
+  Bell,
+  FileText
 } from "lucide-react";
 
 import { useSidebar } from "@/core/context/SidebarContext";
@@ -99,6 +102,16 @@ const AppSidebar: React.FC = () => {
       icon: <BarChart2 className="w-5 h-5" />,
       path: "/contractor/payments",
     },
+    {
+      name: t("homeowner.sidebar.chats", "Chats"),
+      icon: <MessageSquare className="w-5 h-5 text-blue-500" />,
+      path: "/homeowner/chats",
+    },
+    {
+      name: t("homeowner.sidebar.notifications", "Notifications"),
+      icon: <Bell className="w-5 h-5 text-amber-500" />,
+      path: "/homeowner/notifications",
+    }
   ];
 
 
@@ -113,6 +126,11 @@ const AppSidebar: React.FC = () => {
           icon: <Users className="w-5 h-5" />,
           path: "/homeowner/perfil",
         },
+         {
+          name: t("homeowner.sidebar.services", "Services"),
+          icon: <Wrench className="w-5 h-5" />,
+          path: "/homeowner/services",
+        },
         {
           name: t("homeowner.sidebar.documents", "Documents"),
           icon: <Clipboard className="w-5 h-5" />,
@@ -121,13 +139,23 @@ const AppSidebar: React.FC = () => {
         {
           name: t("homeowner.sidebar.claims", "Claims"),
           icon: <Clipboard className="w-5 h-5" />,
-          path: "/homeowner/under-construction",
+          path: "/homeowner/claims",
         },
         {
           name: t("homeowner.sidebar.postJob", "Post Job"),
           icon: <Tag className="w-5 h-5 text-amber-400" />,
           path: "/homeowner/post-job",
         },
+          {
+            name: t("homeowner.sidebar.chats", "Chats"),
+            icon: <MessageSquare className="w-5 h-5 text-blue-500" />,
+            path: "/homeowner/chats",
+          },
+          {
+            name: t("homeowner.sidebar.notifications", "Notifications"),
+            icon: <Bell className="w-5 h-5 text-amber-500" />,
+            path: "/homeowner/notifications",
+          }
     ];
 
   const navItems: MenuItem[] = [
@@ -241,36 +269,12 @@ const AppSidebar: React.FC = () => {
         }
       ],
     },
-    {
-      name: t("admin.sidebar.requirements"),
-      icon: <Briefcase className="w-5 h-5" />,
-      //permissions: ["profesion_listar"],
-      subItems: [
-        {
-          name: t("admin.sidebar.documentsrequirements"),
-          path: "/admin/atributes",
-          icon: <Clipboard className="w-4 h-4 text-blue-500" />,
-        //  permissions: ["profesion_listar"]
-        },
-        {
-          name: t("admin.sidebar.documentscontractors"),
-          path: "/admin/atribute_contractor",
-          icon: <Users className="w-4 h-4 text-emerald-500" />,
-        //  permissions: ["profesion_listar"]
-        },
-        {
-          name: t("admin.sidebar.documentshomeowners","Documents Homeowners"),
-          path: "/admin/attribute_homeowner",
-          icon: <Clipboard className="w-4 h-4 text-blue-500" />,
-        //  permissions: ["profesion_listar"]
-        },
-        {
-          name: t("admin.sidebar.contractorJobs", "Contractor Jobs"),
-          path: "/admin/jobs",
-          icon: <Briefcase className="w-4 h-4" />,
-        },
-      ],
-    },
+     {
+      name: t("admin.sidebar.claimsSection","Scam Alerts"),
+      icon: <Clipboard className="w-5 h-5" />,
+        path: "/admin/claim",
+      // Puedes agregar permisos si lo necesitas
+    }
   ];
 
   const webItems: MenuItem[] = [
@@ -306,12 +310,6 @@ const AppSidebar: React.FC = () => {
           permissions: ["valor_moral_listar"]
         },
         { 
-          name: t("admin.sidebar.directive"), 
-          path: "/admin/directiva",
-          icon: <Users className="w-4 h-4" />,
-          permissions: ["directiva_listar"]
-        },
-        { 
           name: t("admin.sidebar.requirementsWeb"), 
           path: "/admin/requisitos",
           icon: <Clipboard className="w-4 h-4" />,
@@ -342,11 +340,29 @@ const AppSidebar: React.FC = () => {
           permissions: ["banner_listar"]
         },
         { 
+          name: t("admin.sidebar.youtubeVideos", "YouTube Videos"), 
+          path: "/admin/youtube-videos",
+          icon: <PlayCircle className="w-4 h-4" />,
+        },
+        { 
+          name: t("admin.sidebar.principalText", "Texto Principal"), 
+          path: "/admin/textblock",
+          icon: <FileText className="w-4 h-4" />,
+          permissions: ["red_social_listar"]
+        },
+        { 
+          name: t("admin.sidebar.youtubeVideos", "Videos de YouTube"), 
+          path: "/admin/youtube-videos",
+          icon: <PlayCircle className="w-4 h-4" />,
+          permissions: ["red_social_listar"]
+        },
+        { 
           name: t("admin.sidebar.socialNetworks"), 
           path: "/admin/redes_sociales",
           icon: <Share2 className="w-4 h-4" />,
           permissions: ["red_social_listar"]
         },
+
       ],
     },
   ];

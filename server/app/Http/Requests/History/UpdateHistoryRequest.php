@@ -17,9 +17,22 @@ class UpdateHistoryRequest extends FormRequest
             'title' => 'required',
             'description' => 'nullable',
             'content' => 'nullable',
-            'banner1' => 'nullable',
-            'banner2' => 'nullable',
-            'banner3' => 'nullable',
+            'banner1' => 'sometimes|nullable|file|mimes:jpg,jpeg,png,webp|max:4096',
+            'banner2' => 'sometimes|nullable|file|mimes:jpg,jpeg,png,webp|max:4096',
+            'banner3' => 'sometimes|nullable|file|mimes:jpg,jpeg,png,webp|max:4096',
+            'remove_banner1' => 'sometimes|boolean',
+            'remove_banner2' => 'sometimes|boolean',
+            'remove_banner3' => 'sometimes|boolean',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        foreach (['banner1', 'banner2', 'banner3'] as $field) {
+            $value = $this->input($field);
+            if (is_string($value) && trim($value) === '') {
+                $this->merge([$field => null]);
+            }
+        }
     }
 }

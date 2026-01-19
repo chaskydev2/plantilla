@@ -2,12 +2,14 @@ import { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { ServiceService as ItemService } from "@/core/services/service/service.service";
 import type { IService as IItemResource } from "@/core/types/IService";
-import { Search, Plus, Trash2, Edit, Image as ImageIcon } from "lucide-react";
+import type { IProfession } from "@/core/types/IProfession";
+import { Search, Plus, Trash2, Edit, Eye, Image as ImageIcon } from "lucide-react";
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toastify } from "@/core/utils/toastify";
 import DataTable from "@/components/table/DataTable";
+import Modal from "@/components/modal/Modal";
 
 export default function ServiceList() {
   const columns = [
@@ -21,7 +23,7 @@ export default function ServiceList() {
     },
     {
       key: "name",
-      header: "Nombre",
+      header: "Name",
       render: (item: IItemResource) => <div className="font-semibold">{item?.name ?? "-"}</div>,
       sortable: true,
     },
@@ -35,7 +37,7 @@ export default function ServiceList() {
     },
     {
       key: "icon",
-      header: "Icono",
+      header: "Icon",
       render: (item: IItemResource) => {
         const src = item?.icon;
         if (!src) return <span className="text-gray-500">-</span>;
@@ -50,7 +52,7 @@ export default function ServiceList() {
     },
     {
       key: "image",
-      header: "Imagen",
+      header: "Image",
       render: (item: IItemResource) => {
         const src = item?.image;
         if (!src) return <span className="text-gray-500">-</span>;
@@ -70,7 +72,7 @@ export default function ServiceList() {
     },
     {
       key: "created_at",
-      header: "Creado",
+      header: "Created",
       render: (item: IItemResource) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {item?.created_at ? new Date(item.created_at).toLocaleDateString() : "-"}
@@ -101,6 +103,11 @@ export default function ServiceList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<IItemResource | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [profModalOpen, setProfModalOpen] = useState(false);
+  const [profLoading, setProfLoading] = useState(false);
+  const [profError, setProfError] = useState<string | null>(null);
+  const [profItems, setProfItems] = useState<IProfession[]>([]);
+  const [profServiceName, setProfServiceName] = useState<string>("");
   const [dialogConfig, setDialogConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -131,10 +138,26 @@ export default function ServiceList() {
     setIsModalOpen(true);
   };
 
+  const handleViewProfessions = async (item: IItemResource) => {
+    setProfServiceName(item.name || "");
+    setProfModalOpen(true);
+    setProfLoading(true);
+    setProfError(null);
+    try {
+      const res = await ItemService.getProfessionsByService(item.id);
+      setProfItems((res.data as IProfession[]) || []);
+    } catch {
+      setProfError("Could not load professions for this service");
+      setProfItems([]);
+    } finally {
+      setProfLoading(false);
+    }
+  };
+
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Seguro que deseas eliminar el servicio "${item.name}"?`,
+      "Confirm deletion",
+      `Are you sure you want to delete the service "${item.name}"?`,
       () => handleDelete(item),
       "danger"
     );
@@ -144,10 +167,10 @@ export default function ServiceList() {
     setIsProcessing(true);
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Servicio eliminado");
+      toastify.success(response?.message || "Service deleted");
       fetchItems();
     } catch (error: any) {
-      toastify.error(error?.response?.data?.message || "Error al eliminar servicio");
+      toastify.error(error?.response?.data?.message || "Error deleting service");
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -156,14 +179,21 @@ export default function ServiceList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: "Edit",
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
       show: () => true,
     },
     {
-      label: "Eliminar",
+      label: "View professions",
+      icon: <Eye className="w-4 h-4" />,
+      onClick: (item: IItemResource) => handleViewProfessions(item),
+      variant: "secondary" as const,
+      show: () => true,
+    },
+    {
+      label: "Delete",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -182,7 +212,7 @@ export default function ServiceList() {
           }}
         >
           <Plus className="w-5 h-5" />
-          Agregar servicio
+          Add service
         </button>
       </div>
       <div className="relative w-full sm:w-64">
@@ -191,7 +221,7 @@ export default function ServiceList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar servicios..."
+          placeholder="Search services..."
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -202,7 +232,7 @@ export default function ServiceList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Servicios" />
+      <PageBreadcrumb pageTitle="Services" />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -227,6 +257,34 @@ export default function ServiceList() {
         initialData={currentItem}
         load={fetchItems}
       />
+
+      {profModalOpen && (
+        <Modal
+          isOpen
+          onClose={() => setProfModalOpen(false)}
+          title={`Professions of ${profServiceName || "service"}`}
+          size="lg"
+        >
+          <div className="space-y-3">
+            {profLoading && <div className="text-sm text-gray-500">Loading professions...</div>}
+            {profError && !profLoading && <div className="text-sm text-red-600">{profError}</div>}
+            {!profLoading && !profError && profItems.length === 0 && (
+              <div className="text-sm text-gray-500">No professions associated with this service.</div>
+            )}
+            {!profLoading && !profError && profItems.length > 0 && (
+              <ul className="divide-y divide-gray-200 max-h-80 overflow-auto">
+                {profItems.map((p) => (
+                  <li key={p.id} className="py-2">
+                    <div className="font-semibold text-gray-900">{p.name}</div>
+                    <div className="text-xs text-gray-500">/{p.slug}</div>
+                    {p.description && <div className="text-sm text-gray-700 mt-1 line-clamp-2">{p.description}</div>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Modal>
+      )}
       {dialogConfig && (
         <ConfirmDialog
           isOpen={dialogConfig.isOpen}
@@ -236,7 +294,7 @@ export default function ServiceList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Confirmar"}
+          confirmText={dialogConfig.variant === "danger" ? "Delete" : "Confirm"}
         />
       )}
     </div>

@@ -36,6 +36,11 @@ class HomeownerProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'user_id';
+    }
     
     public function scopeSearch(Builder $query, ?string $search): Builder
     {
@@ -71,5 +76,18 @@ class HomeownerProfile extends Model
         }
 
         return $query->where('state_code', $state_code);
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'homeowner_profile_service',
+            'homeowner_profile_id',
+            'service_id',
+            'user_id',
+            'id'
+        )->using(HomeownerProfileService::class)
+         ->withTimestamps();
     }
 }

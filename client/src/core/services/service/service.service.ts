@@ -125,8 +125,9 @@ export const create = async (request: IServiceCreateRequest): Promise<IApiRespon
 };
 
 export const update = async (id: number, request: IServiceUpdateRequest): Promise<IApiResponse<IService>> => {
+  
   const formData = buildFormData(request, { includeRemoveFlags: true });
-  const res = await axios.put(`/v1/services/${id}`, formData, {
+  const res = await axios.post(`/v1/services/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return res.data;
@@ -147,6 +148,11 @@ export const getAllServices = async (): Promise<IApiResponse<IService[]>> => {
   return res.data;
 };
 
+export const getProfessionsByService = async (serviceId: string | number): Promise<IApiResponse> => {
+  const res = await axios.get(`/v1/services/${serviceId}/professions`);
+  return res.data;
+};
+
 export const ServiceService = {
   getAllPaginated,
   get,
@@ -155,4 +161,5 @@ export const ServiceService = {
   remove,
   getFirstFifteenServices,
   getAllServices,
+  getProfessionsByService,
 };

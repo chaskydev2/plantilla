@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { Search, Plus, Trash2, Edit } from "lucide-react";
+import { Search, Trash2, Edit } from "lucide-react";
 import DataTable from "@/components/table/DataTable";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toastify } from "@/core/utils/toastify";
@@ -240,18 +240,6 @@ export default function JobPostList() {
 
   const renderToolbar = () => (
     <div className="flex flex-col gap-4 w-full sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex gap-2">
-        <button
-          className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
-          onClick={() => {
-            setCurrentItem(null);
-            setIsModalOpen(true);
-          }}
-        >
-          <Plus className="w-5 h-5" />
-          New Post
-        </button>
-      </div>
       <div className="relative w-full sm:w-64">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-700 dark:text-gray-300">
           <Search className="w-5 h-5" />

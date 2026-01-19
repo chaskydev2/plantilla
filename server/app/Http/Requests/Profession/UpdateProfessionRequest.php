@@ -5,6 +5,7 @@ namespace App\Http\Requests\Profession;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Models\Profession;
 
 class UpdateProfessionRequest extends FormRequest
 {
@@ -35,7 +36,18 @@ class UpdateProfessionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $professionId = $this->route('profession'); // Assuming the route parameter is 'profession'
+        // Accept route param as model, id or slug (route name may be 'profession' or 'id')
+        $routeParam = $this->route('profession') ?? $this->route('id');
+
+        if ($routeParam instanceof Profession) {
+            $professionId = $routeParam->id;
+        } elseif (is_numeric($routeParam)) {
+            $professionId = (int) $routeParam;
+        } elseif (is_string($routeParam)) {
+            $professionId = Profession::where('slug', $routeParam)->value('id');
+        } else {
+            $professionId = null;
+        }
 
         return [
             'name' => [
@@ -56,6 +68,7 @@ class UpdateProfessionRequest extends FormRequest
             'image' => ['sometimes', 'nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'remove_image' => ['sometimes', 'boolean'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'service_id' => ['sometimes', 'required', 'integer', 'exists:services,id'],
         ];
     }
 
@@ -77,12 +90,12 @@ class UpdateProfessionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'El nombre de la profesión es obligatorio.',
-            'name.unique' => 'Ya existe una profesión con este nombre.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'slug.unique' => 'Ya existe una profesión con este slug.',
-            'slug.max' => 'El slug no puede exceder los 255 caracteres.',
-            'description.max' => 'La descripción no puede exceder los 1000 caracteres.',
+            'name.required' => 'The profession name is required.',
+            'name.unique' => 'A profession with this name already exists.',
+            'name.max' => 'The name may not exceed 255 characters.',
+            'slug.unique' => 'A profession with this slug already exists.',
+            'slug.max' => 'The slug may not exceed 255 characters.',
+            'description.max' => 'The description may not exceed 1000 characters.',
         ];
     }
 }

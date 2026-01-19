@@ -22,6 +22,14 @@ class ProfessionResource extends JsonResource
             'icon' => $this->icon,
             'image' => $this->image,
             'description' => $this->description,
+            'service_id' => $this->service_id,
+            'service' => $this->whenLoaded('service', function () {
+                return [
+                    'id' => $this->service?->id,
+                    'name' => $this->service?->name,
+                    'slug' => $this->service?->slug,
+                ];
+            }),
             'contractors_count' => $this->when(
                 $this->relationLoaded('contractors'),
                 fn() => $this->contractors->count()

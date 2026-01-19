@@ -275,9 +275,9 @@ class ContractorController extends Controller
     /**
      * Search contractors near a location.
      */
+  
     public function nearLocation(Request $request): AnonymousResourceCollection
     {
-     
         $validated = $request->validate([
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',
@@ -286,18 +286,22 @@ class ContractorController extends Controller
             'min_rating' => 'nullable|numeric|min:0|max:5',
             'profession_name' => 'nullable|string',
             'tag_name' => 'nullable|string',
+            'service_id' => 'nullable|integer',
+            'service_name' => 'nullable|string',
         ]);
 
         $lat = (float) $validated['lat'];
         $lng = (float) $validated['lng'];
-        $radius = $request->filled('radius') ? (float) $validated['radius'] : 20.0;
-        $tagIds = $validated['tags'] ?? [];
-        $professionIds = $validated['professions'] ?? [];
         $professionName = $validated['profession_name'] ?? null;
         $tagName = $validated['tag_name'] ?? null;
+        $serviceId = $validated['service_id'] ?? null;
+        $serviceName = $validated['service_name'] ?? null;
+        $minRating = $validated['min_rating'] ?? null;
 
+        // Fórmula Haversine para calcular distancia en millas
 
-        $query = Contractor::with([
+        $query = Contractor::select('contractors.*')
+            ->with([
                 'professions',
                 'tags',
                 'attributeContractors.attribute',
@@ -311,12 +315,19 @@ class ContractorController extends Controller
             ])
             ->whereHas('user', function($q) {
                 $q->where('verification', true);
-            });
+            }); // Filtrar por radio
 
-        // Filtrar por nombre de profesión si se proporciona
+        // Filtrar por profesión (prioridad si viene profession_name)
+
+        // Filtrar por servicio (solo si NO hay profession_name)
         if ($professionName) {
             $query->whereHas('professions', function ($q) use ($professionName) {
                 $q->where('name', 'like', "%{$professionName}%");
+            });
+         }
+        if ($serviceId) {
+            $query->whereHas('professions', function ($q) use ($serviceId) {
+                $q->where('service_id', $serviceId);
             });
         }
 
@@ -331,6 +342,7 @@ class ContractorController extends Controller
 
         return ContractorResource::collection($contractors);
     }
+
 
      public function updateAllFields(Request $request, $id): JsonResponse
     {
@@ -348,7 +360,7 @@ class ContractorController extends Controller
             'is_insured' => 'nullable|boolean',
             'service_area' => 'nullable|string|max:255',
             'average_rating' => 'nullable|numeric|min:0|max:5',
-            'state_code' => 'nullable|string|max:10',
+            'state_code' => 'nullable|string',
             'country_code' => 'nullable|string|max:2',
             'lat' => 'nullable|numeric',
             'lng' => 'nullable|numeric',

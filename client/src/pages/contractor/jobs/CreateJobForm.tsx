@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { GoogleMap, Marker, StandaloneSearchBox, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, Marker, StandaloneSearchBox, useJsApiLoader } from '@react-google-maps/api';
 import type { Libraries } from '@react-google-maps/api';
 import { JobCreatorService } from '@/core/services/job/jobCreator.service';
 import { ServiceService } from '@/core/services/service/service.service';
@@ -36,9 +36,12 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
   const [servicesError, setServicesError] = useState<string | null>(null);
 
   const libraries = useMemo<Libraries>(() => ['places'], []);
-  const { isLoaded, loadError } = useLoadScript({
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '',
     libraries,
+    language: 'en',
+    region: 'US',
   });
   const mapReady = isLoaded && !loadError;
   const [mapCenter, setMapCenter] = useState<LatLngLiteral>(DEFAULT_MAP_CENTER);

@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Briefcase, Locate, MapPin, Plus, Search, Tag } from "lucide-react";
 import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
@@ -55,12 +55,12 @@ type FilterPopupProps = {
 
 export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [queryService, setQueryService] = useState("");
+  const [selectedServiceId, setSelectedServiceId] = useState<number | undefined>(undefined);
   const [queryTags, setQueryTags] = useState("");
   const [queryLocation, setQueryLocation] = useState("");
   const [queryLatLng, setQueryLatLng] = useState<{ lat: number; lng: number } | null>(null);
-  const [openService, setOpenService] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
   const [openLocation, setOpenLocation] = useState(false);
   const [services, setServices] = useState<{ id: number; name: string; icon?: LucideIcon; iconName?: string }[]>([]);
   const [locationPredictions, setLocationPredictions] = useState<PlacesPrediction[]>([]);
@@ -73,7 +73,6 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
   const [mapSearchError, setMapSearchError] = useState<string | null>(null);
   const [mapGeoLoading, setMapGeoLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const locationPopupRef = useRef<HTMLDivElement | null>(null);
   const autocompleteServiceRef = useRef<PlacesAutocompleteService | null>(null);
   const sessionTokenRef = useRef<unknown | null>(null);
@@ -124,7 +123,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     }
     const key = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
     if (!key) {
-      setLocationError("Google Maps API not loaded");
+      setLocationError("No se pudo cargar Google Maps");
       return;
     }
     if (!w.__gmapsLoadingPromise) {
@@ -145,7 +144,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
           geocoderRef.current = new w.google.maps.Geocoder();
         }
       }
-    }).catch(() => setLocationError("Failed to load Google Maps"));
+    }).catch(() => setLocationError("No se pudo cargar Google Maps"));
   }, [openLocation]);
 
   // Debounced predictions fetch
@@ -180,7 +179,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
         );
       } catch {
         setLocationLoading(false);
-        setLocationError("Autocomplete failed");
+        setLocationError("Error en el autocompletado");
       }
     }, 250);
     return () => window.clearTimeout(id);
@@ -250,7 +249,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     if (w.google && w.google.maps) return true;
     const key = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
     if (!key) {
-      setLocationError("Google Maps API not loaded");
+      setLocationError("No se pudo cargar Google Maps");
       return false;
     }
     if (!w.__gmapsLoadingPromise) {
@@ -267,7 +266,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       await w.__gmapsLoadingPromise;
       return !!(w.google && w.google.maps);
     } catch {
-      setLocationError("Failed to load Google Maps");
+      setLocationError("No se pudo cargar Google Maps");
       return false;
     }
   };
@@ -457,9 +456,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     service.name.toLowerCase().includes(queryService.toLowerCase())
   );
 
-  const handleSelectService = (name: string) => {
+  const handleSelectService = (name: string, id: number) => {
     setQueryService(name);
-    setOpenService(false);
+    setSelectedServiceId(id);
+    setShowServiceModal(false);
   };
 
  
@@ -483,29 +483,41 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       setQueryLocation(finalLocation);
     }
 
-    const params = new URLSearchParams(searchParams);
-    if (queryService) {
-      params.set("service", queryService);
-    } else {
-      params.delete("service");
+    const params = new URLSearchParams();
+    
+    // Service parameters (similar to FindProPage)
+    if (selectedServiceId && queryService) {
+      // Si hay service_id y service_name, usarlos (NO enviar profession_name)
+      params.set("profession_name", queryService);
+    } else if (queryService) {
+      // Si solo hay nombre sin ID, enviar como profession_name
+      params.set("profession_name", queryService);
     }
+    
+    // Tags parameter
     if (queryTags) {
       params.set("tag_name", queryTags);
-    } else {
-      params.delete("tag_name");
     }
+    
+    // Location parameters
     if (finalLocation) {
       params.set("location", finalLocation);
-    } else {
-      params.delete("location");
     }
     if (finalLatLng && typeof finalLatLng.lat === "number" && typeof finalLatLng.lng === "number") {
       params.set("lat", String(finalLatLng.lat));
       params.set("lng", String(finalLatLng.lng));
-    } else {
-      params.delete("lat");
-      params.delete("lng");
     }
+    
+    console.log("🔍 FilterPopup applying search with params:", {
+      service_id: selectedServiceId,
+      service_name: queryService,
+      profession_name: queryService,
+      tag_name: queryTags,
+      location: finalLocation,
+      lat: finalLatLng?.lat,
+      lng: finalLatLng?.lng,
+    });
+    
     navigate({ search: params.toString() });
     onApply(queryService, queryTags, finalLocation, finalLatLng);
     onClose();
@@ -532,44 +544,18 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <Plus aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
             <input
               placeholder="¿En qué podemos ayudarte?"
-              aria-label="Select a service"
+              aria-label="Selecciona un servicio"
               value={queryService}
               onFocus={() => {
-                setOpenService(true);
+                setShowServiceModal(true);
                 setOpenLocation(false);
               }}
               onChange={(e) => {
                 setQueryService(e.target.value);
-                if (!openService) setOpenService(true);
+                setShowServiceModal(true);
               }}
               className="placeholder:text-[#F5D238] w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-[#F5D238] bg-transparent appearance-none cursor-text border-none"
             />
-            {openService && (
-              <div ref={dropdownRef} className="absolute left-0 top-full mt-2 w-full z-50">
-                <div className="rounded-2xl border bg-white shadow-xl p-0 overflow-hidden">
-                  <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 border-b border-blue-100">
-                    <Briefcase className="w-6 h-6 text-blue-600" />
-                    <span className="font-semibold text-blue-700 text-base">Selecciona una profesión</span>
-                  </div>
-                  <div className="p-3 grid grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
-                    {filteredServices.map((service) => (
-                      <button
-                        key={service.id}
-                        onClick={() => handleSelectService(service.name)}
-                        className="flex items-center gap-3 p-2 rounded-lg border border-gray-100 hover:bg-blue-50 transition text-left"
-                      >
-                        <span className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                          {(service.icon && <service.icon className="w-4 h-4 text-[#1A1B16]" />) || (
-                            <Briefcase className="w-4 h-4 text-[#1A1B16]" />
-                          )}
-                        </span>
-                        <span className="text-sm font-medium text-[#1A1B16]">{service.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
           {/* Tags input */}
           <div className="relative flex-1">
@@ -590,11 +576,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
             <input
               onFocus={() => {
-                setOpenService(false);
                 setOpenLocation(true);
               }}
               type="text"
-              aria-label="Enter your ZIP code or city"
+              aria-label="Ingresa tu código postal o ciudad"
               placeholder="Ciudad, calle o código postal"
               value={queryLocation}
               onChange={(e) => {
@@ -732,6 +717,72 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 type="button"
                 className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 onClick={() => setShowMapPicker(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Service Picker Modal */}
+      {showServiceModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#1E1E17]/80 backdrop-blur-sm">
+          <div className="relative bg-[#1E1E17] rounded-2xl shadow-2xl p-4 w-full max-w-3xl flex flex-col border border-[#F5D238]">
+            <button
+              type="button"
+              className="absolute top-2 right-2 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
+              aria-label="Cerrar selector de servicio"
+              onClick={() => setShowServiceModal(false)}
+            >
+              ×
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <Plus className="w-5 h-5 text-[#F5D238]" />
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white">Selecciona un servicio</h3>
+                <p className="text-xs text-[#F5D238]/80">Escribe para filtrar o elige de la lista</p>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <input
+                type="text"
+                value={queryService}
+                onChange={(e) => setQueryService(e.target.value)}
+                placeholder="Buscar servicio..."
+                className="w-full px-3 py-2 rounded-lg border border-[#F5D238] bg-[#1E1E17] text-[#F5D238] placeholder-[#F5D238] focus:outline-none"
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 max-h-[420px] overflow-y-auto pr-1">
+              {filteredServices.length === 0 && (
+                <div className="col-span-full text-sm text-center text-[#F5D238]/80 border border-dashed border-[#F5D238]/40 rounded-lg p-4">
+                  No se encontraron servicios
+                </div>
+              )}
+              {filteredServices.map((service) => (
+                <button
+                  key={service.id}
+                  onClick={() => handleSelectService(service.name, service.id)}
+                  className="flex items-center gap-3 p-3 rounded-xl border border-[#F5D238]/40 bg-[#1E1E17] hover:bg-[#F5D238]/10 transition text-left"
+                >
+                  <span className="w-10 h-10 bg-[#F5D238]/15 rounded-full flex items-center justify-center">
+                    {(service.icon && <service.icon className="w-5 h-5 text-[#F5D238]" />) || (
+                      <Briefcase className="w-5 h-5 text-[#F5D238]" />
+                    )}
+                  </span>
+                  <span className="text-sm font-semibold text-white">{service.name}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4 w-full flex justify-end">
+              <button
+                type="button"
+                className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
+                onClick={() => setShowServiceModal(false)}
               >
                 Cancelar
               </button>

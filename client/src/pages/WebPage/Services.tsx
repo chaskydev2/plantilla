@@ -59,7 +59,7 @@ const Services: React.FC = () => {
               Find trusted professionals for your needs
             </p>
           </header>
-          <div className="relative overflow-hidden rounded-3xl bg-white px-6 py-10 text-center shadow-2xl border border-[rgba(0,0,0,0.06)]">
+          <div className="rounded-2xl border px-6 py-10 md:px-10 shadow-sm text-center" style={{ background: 'white', color: 'var(--color-secondary)', borderColor: 'var(--color-secondary)', opacity: 1, transform: 'none' }}>
             <div className="relative z-10">
               <div className="overflow-x-auto scrollbar-hide">
                 <div className="flex gap-6 min-w-full py-2">

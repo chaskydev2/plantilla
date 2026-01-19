@@ -3,6 +3,7 @@ import type { AxiosProgressEvent } from "axios";
 import type { User } from "@/types/dashboard";
 import { AttributeHomeownerService } from "@/core/services/homeowner/attributeHomeowner.service";
 import { AttributeHomeownerUploadService } from "@/core/services/homeowner/attributeHomeownerUpload.service";
+import { DashboardHomeownerService } from "@/core/services/homeowner/dashboardHomeowner.service";
 
 import StatCard from "./StatCard";
 import QuickActionsPanel from "./QuickActionsPanel";
@@ -24,6 +25,15 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
+
+  // Dashboard data
+  const [dashLoading, setDashLoading] = useState<boolean>(false);
+  const [dashError, setDashError] = useState<string | null>(null);
+  const [homeProfile, setHomeProfile] = useState<any | null>(null);
+  const [statistics, setStatistics] = useState<{ services_count?: number; job_posts_count?: number; scam_alerts_count?: number }>({});
+  const [services, setServices] = useState<any[]>([]);
+  const [recentJobPosts, setRecentJobPosts] = useState<any[]>([]);
+  const [recentClaims, setRecentClaims] = useState<any[]>([]);
 
   const homeownerProfile: any =
     (user as any)?.homeowner_profile ||
@@ -189,6 +199,39 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
     };
   }, [isVerified, homeownerId, userId, userAltId]);
 
+  // Fetch dashboard data (stats, services, recent items)
+  useEffect(() => {
+    let isMounted = true;
+    const loadDashboard = async () => {
+      setDashLoading(true);
+      setDashError(null);
+      try {
+        const res = await DashboardHomeownerService.getMyDashboard();
+        console.log(res);
+        const data: any = (res as any)?.data ?? res;
+        const payload = data?.data ?? data; // tolerate wrapped shapes
+
+        if (!isMounted) return;
+
+        setHomeProfile(payload?.homeowner_profile || null);
+        setStatistics(payload?.statistics || {});
+        setServices(Array.isArray(payload?.services) ? payload.services : []);
+        setRecentJobPosts(Array.isArray(payload?.recent_job_posts) ? payload.recent_job_posts : []);
+        setRecentClaims(Array.isArray(payload?.recent_scam_alerts) ? payload.recent_scam_alerts : []);
+      } catch (e: any) {
+        if (isMounted) setDashError(e?.message || "Failed to load dashboard");
+      } finally {
+        if (isMounted) setDashLoading(false);
+      }
+    };
+
+    // Load dashboard always; UI shows it when verified
+    loadDashboard();
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, homeownerId]);
+
   useEffect(() => {
     if (!homeownerId) return;
 
@@ -291,10 +334,10 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
             <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-yellow-200">
               <header className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-yellow-200">
-                  Documentación requerida
+                  Required documentation
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Sube los documentos necesarios para validar tu cuenta de propietario.
+                  Upload the documents needed to verify your homeowner account.
                 </p>
               </header>
 
@@ -396,18 +439,81 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
             <>
               <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100">
                 <h2 className="text-2xl font-semibold text-gray-800 dark:text-yellow-200">
-                  Bienvenido{displayName ? `, ${displayName}` : ""}
+                  Welcome{displayName ? `, ${displayName}` : ""}
                 </h2>
                 <p className="mt-2 text-sm text-gray-600">
-                  Gestiona tus proyectos, programa visitas y guarda a tus contratistas favoritos.
+                  Manage your projects, schedule visits, and save your favorite contractors.
                 </p>
+                {homeProfile && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Location: {homeProfile.city ?? '-'}, {homeProfile.state_code ?? '-'}, {homeProfile.country_code ?? '-'}
+                  </p>
+                )}
+                {dashError && (
+                  <p className="mt-2 text-sm text-red-600">{dashError}</p>
+                )}
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title="Solicitudes activas" value="0" subtitle="Proyectos en curso" />
-                <StatCard title="Visitas agendadas" value="0" subtitle="Próximas visitas" />
-                <StatCard title="Favoritos" value="0" subtitle="Contratistas guardados" />
+                <StatCard title="Interested Services" value={String(statistics?.services_count ?? 0)} subtitle="Saved interests" />
+                <StatCard title="Job Posts" value={String(statistics?.job_posts_count ?? 0)} subtitle="Created by you" />
+                <StatCard title="Claims" value={String(statistics?.scam_alerts_count ?? 0)} subtitle="Reported issues" />
               </div>
+
+              <section className="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-yellow-200">Interested Services</h3>
+                {dashLoading && <p className="text-sm text-gray-500 mt-2">Loading services...</p>}
+                {!dashLoading && services.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-2">No interested services yet.</p>
+                )}
+                <ul className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {services.slice(0, 8).map((svc: any) => (
+                    <li key={svc.id ?? `${svc?.service_id}-${svc?.profession_id}`}
+                        className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border">
+                      <p className="font-medium">{svc.name ?? svc.title ?? svc.service_name ?? 'Service'}</p>
+                      {svc.profession?.name && (
+                        <p className="text-xs text-gray-500">Profession: {svc.profession.name}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-yellow-200">Recent Job Posts</h3>
+                {dashLoading && <p className="text-sm text-gray-500 mt-2">Loading job posts...</p>}
+                {!dashLoading && recentJobPosts.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-2">No recent job posts.</p>
+                )}
+                <ul className="mt-3 space-y-2">
+                  {recentJobPosts.slice(0, 5).map((jp: any) => (
+                    <li key={jp.id} className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border">
+                      <p className="font-medium">{jp.title ?? jp.name ?? 'Job Post'}</p>
+                      {jp.created_at && (
+                        <p className="text-xs text-gray-500">Created: {new Date(jp.created_at).toLocaleString()}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-yellow-200">Recent Claims</h3>
+                {dashLoading && <p className="text-sm text-gray-500 mt-2">Loading claims...</p>}
+                {!dashLoading && recentClaims.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-2">No recent claims.</p>
+                )}
+                <ul className="mt-3 space-y-2">
+                  {recentClaims.slice(0, 5).map((c: any) => (
+                    <li key={c.id} className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border">
+                      <p className="font-medium">{c.title ?? c.subject ?? 'Claim'}</p>
+                      {c.created_at && (
+                        <p className="text-xs text-gray-500">Reported: {new Date(c.created_at).toLocaleString()}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </>
           )}
         </main>

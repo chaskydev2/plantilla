@@ -47,6 +47,10 @@ const buildFormData = (
   if (payload.name !== undefined) fd.append('name', payload.name as string);
   if (payload.slug !== undefined) fd.append('slug', payload.slug as string);
   if (payload.description !== undefined) fd.append('description', payload.description as string);
+  // Always forward service_id when provided (create or update)
+  if ('service_id' in payload && (payload as any).service_id !== undefined) {
+    fd.append('service_id', String((payload as any).service_id));
+  }
   if ((payload as IProfessionCreateRequest).icon !== undefined) fd.append('icon', (payload as IProfessionCreateRequest).icon ?? '');
 
   appendFileField(fd, 'image', (payload as IProfessionCreateRequest).image);
@@ -91,11 +95,12 @@ export const getAll = async (): Promise<IApiResponse> => {
 }
 
 export const create = async (request: IProfessionCreateRequest): Promise<IApiResponse> => {
+  console.log(request);
   const formData = buildFormData(request);
   const res = await axios.post('/v1/professions', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  
+  console.log(res);
   // Adaptar la respuesta del API Laravel al formato esperado
   return {
     success: true,
@@ -105,11 +110,14 @@ export const create = async (request: IProfessionCreateRequest): Promise<IApiRes
 }
 
 export const update = async (id: number, request: IProfessionUpdateRequest): Promise<IApiResponse> => {
+  console.log(request);
   const formData = buildFormData(request, { includeRemoveFlags: true });
-  const res = await axios.put(`/v1/professions/${id}`, formData, {
+  
+  const res = await axios.post(`/v1/professions/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   
+  console.log(res);
   // Adaptar la respuesta del API Laravel al formato esperado
   return {
     success: true,

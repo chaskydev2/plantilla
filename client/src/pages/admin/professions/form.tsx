@@ -1,4 +1,4 @@
-import { getAllServices } from '@/core/services/service/service.service';
+import { getAllServices, ServiceService } from '@/core/services/service/service.service';
 import ServiceSelectField from './ServiceSelectField';
 import { useMemo, useState, useEffect } from 'react';
 import { InputField, TextAreaField } from '@/components/form-field';
@@ -127,6 +127,7 @@ const ProfessionModal = ({
         const response = await ItemService.update(initialData!.id, cleanData as IUpdateRequest);
         toastify.success(response.message || 'Profession updated successfully');
       } else {
+        console.log(cleanData); 
         const response = await ItemService.create(cleanData as ICreateRequest);
         console.log(cleanData);
         toastify.success(response.message || 'Profession created successfully');
@@ -181,12 +182,15 @@ const ProfessionModal = ({
           />
 
           {/* ServiceSelectField como campo normal de react-hook-form */}
-          <ServiceSelectField
-            name="service_id"
-            options={services}
-            loading={loadingServices}
-            disabled={isViewing}
-          />
+          <div className="space-y-2">
+            <ServiceSelectField
+              name="service_id"
+              options={services}
+              loading={loadingServices}
+              disabled={isViewing}
+            />
+            {!isViewing && <ServiceProfessionsPreview />}
+          </div>
 
           <div>
             <label className="label mb-2">Icon</label>
@@ -199,6 +203,80 @@ const ProfessionModal = ({
 };
 
 export default ProfessionModal;
+
+/* -------------------------------------------------------------------------- */
+/*                  SERVICE PROFESSIONS PREVIEW POPUP                         */
+/* -------------------------------------------------------------------------- */
+
+function ServiceProfessionsPreview() {
+  const { watch } = useFormContext();
+  const serviceId = watch('service_id');
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [professions, setProfessions] = useState<IItemResponse[]>([]);
+
+  const loadProfessions = async () => {
+    if (!serviceId) {
+      toastify.error('Selecciona un servicio primero');
+      return;
+    }
+    setOpen(true);
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await ServiceService.getProfessionsByService(serviceId);
+      setProfessions((res.data as IItemResponse[]) || []);
+    } catch {
+      setError('No se pudieron cargar las profesiones para este servicio');
+      setProfessions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        className="btn btn-outline btn-sm"
+        onClick={loadProfessions}
+      >
+        Ver profesiones del servicio
+      </button>
+
+      {open && (
+        <Modal
+          isOpen
+          onClose={() => setOpen(false)}
+          title="Profesiones del servicio"
+          size="lg"
+        >
+          <div className="space-y-3">
+            {loading && <div className="text-sm text-gray-500">Cargando profesiones...</div>}
+            {error && !loading && <div className="text-sm text-red-600">{error}</div>}
+            {!loading && !error && professions.length === 0 && (
+              <div className="text-sm text-gray-500">No hay profesiones registradas para este servicio.</div>
+            )}
+            {!loading && !error && professions.length > 0 && (
+              <ul className="divide-y divide-gray-200 max-h-80 overflow-auto">
+                {professions.map((p) => (
+                  <li key={p.id} className="py-2">
+                    <div className="font-semibold text-gray-900">{p.name}</div>
+                    <div className="text-xs text-gray-500">/{p.slug}</div>
+                    {p.description && (
+                      <div className="text-sm text-gray-700 mt-1 line-clamp-2">{p.description}</div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                ICON FIELD                                  */

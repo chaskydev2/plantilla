@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import type { SubmitHandler, FieldValues, DefaultValues } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,6 +27,13 @@ export const FormProviderWrapper = <T extends FieldValues>({
     resolver: yupResolver(validationSchema),
     defaultValues,
   });
+
+  // Reset form values when a different record is loaded (e.g., open edit modal)
+  useEffect(() => {
+    if (defaultValues) {
+      methods.reset(defaultValues);
+    }
+  }, [defaultValues, methods]);
 
   const handleError = (error: any) => {
     console.log("error ", error);

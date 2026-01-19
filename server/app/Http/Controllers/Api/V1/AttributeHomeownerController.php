@@ -247,4 +247,41 @@ class AttributeHomeownerController extends Controller
             ], 500);
         }
     }
+
+    public function destroy(int $id): JsonResponse
+    {
+        $attributeHomeowner = AttributeHomeowner::findOrFail($id);
+
+        DB::beginTransaction();
+
+        try {
+            if ($attributeHomeowner->value) {
+                $existingPath = public_path($attributeHomeowner->value);
+                if (file_exists($existingPath)) {
+                    @unlink($existingPath);
+                }
+            }
+
+            $attributeHomeowner->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registro eliminado correctamente',
+            ]);
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            Log::error('Error deleting attribute_homeowner: ' . $exception->getMessage(), [
+                'trace' => $exception->getTraceAsString(),
+                'id' => $id,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el registro',
+                'error' => $exception->getMessage(),
+            ], 500);
+        }
+    }
 }

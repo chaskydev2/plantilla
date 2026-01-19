@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { GoogleMap, Marker, StandaloneSearchBox, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, Marker, StandaloneSearchBox, useJsApiLoader } from '@react-google-maps/api';
 import type { Libraries } from '@react-google-maps/api';
 import { JobCreatorService } from '@/core/services/job/jobCreator.service';
 import { ServiceService } from '@/core/services/service/service.service';
@@ -44,9 +44,12 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const libraries = useMemo<Libraries>(() => ['places'], []);
-  const { isLoaded, loadError } = useLoadScript({
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '',
     libraries,
+    language: 'en',
+    region: 'US',
   });
   const mapReady = isLoaded && !loadError;
   const [mapCenter, setMapCenter] = useState<LatLngLiteral>(DEFAULT_MAP_CENTER);
@@ -350,10 +353,6 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
 
   return (
     <>
-      <button className="btn btn-primary mb-4" onClick={() => setIsOpen(true)}>
-        New job
-      </button>
-
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 overflow-y-auto">
           <div className="relative w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900 max-h-[90vh] overflow-y-auto">

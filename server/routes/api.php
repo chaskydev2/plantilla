@@ -32,6 +32,8 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\HomeownerProfileController;
+use App\Http\Controllers\Api\V1\DashboardHomeownerProfileController;
+use App\Http\Controllers\Api\V1\DashboardContractorController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\Api\V1\JobPostController;
@@ -45,6 +47,10 @@ use App\Http\Controllers\Api\V1\ContractorTeamMemberController;
 use App\Http\Controllers\Api\V1\ContractorMessageController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\AttributeHomeownerController;
+use App\Http\Controllers\Api\V1\HomeownerProfileServiceController;
+use App\Http\Controllers\Api\V1\ScamAlertController;
+use App\Http\Controllers\Api\V1\TextBlockController;
+use App\Http\Controllers\Api\V1\YoutubeVideoController;
 use App\Http\Controllers\ReviewController;
 
 use Illuminate\Support\Facades\Route;
@@ -53,8 +59,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('/v1')
     ->name('v1.')
     ->group(function () {
+        Route::get('contractors/{contractor}/cv', [DashboardContractorController::class, 'exportPdf']);
+        
         // Rutas pública
-       
+        Route::get('services/{service}/professions', [ServiceController::class, 'professions']);
+        
         Route::get('trabajadores/near', [ContractorController::class, 'nearLocation']);
         Route::get('contractors/near', [ContractorController::class, 'nearLocation']);
 
@@ -75,6 +84,10 @@ Route::prefix('/v1')
         Route::get('agreements/all', [AgreementController::class, 'all']);
 
         Route::get('announcements/all', [AnnouncementController::class, 'all']); 
+
+        Route::get('scam-alerts/all', [ScamAlertController::class, 'all']);
+        Route::apiResource('text-blocks', TextBlockController::class)->only(['index', 'show']);
+        Route::get('youtube-videos/all', [YoutubeVideoController::class, 'index']);
 
         Route::get('banners/all', [BannerController::class, 'all']);
 
@@ -121,6 +134,13 @@ Route::prefix('/v1')
           
                  
          Route::middleware(['auth:api'])->group(function () {
+
+            // Perfil del homeowner logueado
+            Route::get('homeowner-profile/claims', [ScamAlertController::class, 'myHomeownerScanAlerts']);
+            Route::get('homeowner-profile/dashboard', [DashboardHomeownerProfileController::class, 'myDashboard']);
+
+            // Perfil del contractor logueado
+            Route::get('contractor-profile/dashboard', [DashboardContractorController::class, 'myDashboard']);
 
          
             Route::apiResource('job-posts', JobPostController::class);
@@ -197,6 +217,8 @@ Route::prefix('/v1')
 
             Route::apiResource('contacts', ContactController::class);
 
+            Route::apiResource('text-blocks', TextBlockController::class)->except(['index', 'show']);
+
             Route::apiResource('beginnings', BeginningController::class);
 
             Route::apiResource('moral_values', MoralValueController::class); 
@@ -217,7 +239,20 @@ Route::prefix('/v1')
 
             Route::apiResource('tags', TagController::class);
 
-            Route::apiResource('services', ServiceController::class);
+            Route::apiResource('services', ServiceController::class)->except(['update']);
+            // Permitir actualizar servicios vía POST (además de PUT/PATCH)
+            Route::post('services/{service}', [ServiceController::class, 'update'])->name('services.update.post');
+
+            // Homeowner profile services (pivot)
+            Route::get('homeowner-profiles/{homeownerProfile}/services', [HomeownerProfileServiceController::class, 'index']);
+            Route::post('homeowner-profiles/{homeownerProfile}/services', [HomeownerProfileServiceController::class, 'store']);
+            Route::delete('homeowner-profiles/{homeownerProfile}/services/{service}', [HomeownerProfileServiceController::class, 'destroy']);
+            Route::put('homeowner-profiles/{homeownerProfile}/services/sync', [HomeownerProfileServiceController::class, 'sync']);
+            Route::get('services/{service}/homeowners', [HomeownerProfileServiceController::class, 'homeowners']);
+
+            Route::apiResource('scam-alerts', ScamAlertController::class);
+
+            Route::apiResource('youtube-videos', YoutubeVideoController::class);
 
             // Contractor tags
             Route::get('contractor-tags', [ContractorTagController::class, 'index']);
@@ -271,8 +306,7 @@ Route::prefix('/v1')
             Route::get('professions', [ProfessionController::class, 'index']);
             Route::post('professions', [ProfessionController::class, 'store']);
             Route::get('professions/{id}', [ProfessionController::class, 'show']);
-            Route::put('professions/{id}', [ProfessionController::class, 'update']);
-            Route::patch('professions/{id}', [ProfessionController::class, 'update']);
+            Route::post('professions/{id}', [ProfessionController::class, 'update']);
             Route::delete('professions/{id}', [ProfessionController::class, 'destroy']);
 
             // Category routes
@@ -294,8 +328,12 @@ Route::prefix('/v1')
             // Homeowner Profile routes
             Route::get('homeowner-profiles/all', [HomeownerProfileController::class, 'all']);
             Route::get('homeowner-profiles/stats', [HomeownerProfileController::class, 'stats']);
+            Route::get('homeowner-profiles/{homeownerProfile}/dashboard', [DashboardHomeownerProfileController::class, 'dashboard']);
             Route::apiResource('homeowner-profiles', HomeownerProfileController::class);
-        
+
+            // Contractor dashboards
+            Route::get('contractors/{contractor}/dashboard', [DashboardContractorController::class, 'dashboard']);
+    
             Route::get('attribute-contractors', [AttributeContractorController::class, 'index']);
             Route::post('attribute-contractors', [AttributeContractorController::class, 'store']);
             Route::get('attribute-contractors/by-contractor/{contractor_id}', [AttributeContractorController::class, 'byContractor']);
@@ -306,13 +344,14 @@ Route::prefix('/v1')
             
             Route::patch('attribute-contractors/{id}/comentario', [AttributeContractorController::class, 'updateComentario']);                
             
-            Route::patch('users/{id}/edit-profile', [UserController::class, 'updateEditProfileStatus']);
-            Route::patch('users/{id}/verification', [UserController::class, 'updateVerificationStatus']);
-     
-            Route::put('contractors/{id}/update-all', [ContractorController::class, 'updateAllFields']);
-
             Route::post('attribute-contractors/{id}/update-document', [AttributeContractorController::class, 'updateDocument']);
 
+          
+              
+            Route::patch('users/{id}/edit-profile', [UserController::class, 'updateEditProfileStatus']);
+            Route::patch('users/{id}/verification', [UserController::class, 'updateVerificationStatus']);
+            Route::put('contractors/{id}/update-all', [ContractorController::class, 'updateAllFields']);
+            
             Route::get('attribute-homeowners', [AttributeHomeownerController::class, 'index']);
             Route::post('attribute-homeowners', [AttributeHomeownerController::class, 'store']);
             Route::get('attribute-homeowners/by-homeowner/{homeowner_id}', [AttributeHomeownerController::class, 'byHomeowner']);
@@ -320,6 +359,7 @@ Route::prefix('/v1')
             Route::patch('attribute-homeowners/{id}/status', [AttributeHomeownerController::class, 'updateStatus']);
             Route::patch('attribute-homeowners/{id}/comentario', [AttributeHomeownerController::class, 'updateComentario']);
             Route::post('attribute-homeowners/{id}/update-document', [AttributeHomeownerController::class, 'updateDocument']);
+            Route::delete('attribute-homeowners/{id}', [AttributeHomeownerController::class, 'destroy']);
 
             // Jobs CRUD routes
             Route::get('jobs-creator', [JobContractorController::class, 'index']);

@@ -67,6 +67,15 @@ export default function FindProPage() {
   const queryLocation = searchParams.get("location")?.trim() || "";
   const queryLat = Number(searchParams.get("lat"));
   const queryLng = Number(searchParams.get("lng"));
+
+  // Asegurar que service_id solo sea numérico válido; si viene "null" o inválido, no se envía
+  const rawServiceIdParam = searchParams.get("service_id");
+  const rawServiceId = rawServiceIdParam && rawServiceIdParam !== "null" ? Number(rawServiceIdParam) : NaN;
+  const normalizedServiceId = Number.isFinite(rawServiceId) && rawServiceId > 0 ? rawServiceId : undefined;
+  const queryServiceName = (searchParams.get("service_name") || searchParams.get("service") || "").trim();
+  const queryProfessionName = (searchParams.get("profession_name") || searchParams.get("profesion") || "").trim();
+  const queryTagName = (searchParams.get("tag_name") || searchParams.get("tags") || "").trim();
+  
   const hasQueryCoords = !Number.isNaN(queryLat) && !Number.isNaN(queryLng);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(hasQueryCoords ? { lat: queryLat, lng: queryLng } : null);
   // Debug: show received lat/lng from URL
@@ -80,11 +89,22 @@ export default function FindProPage() {
       try {
         setLoadingContractors(true);
         setContractorsError(null);
+        const hasService = Boolean(normalizedServiceId);
+        const hasProfession = Boolean(queryProfessionName);
+        const finalServiceId = hasProfession ? undefined : normalizedServiceId;
+        const finalServiceName = hasProfession ? undefined : (normalizedServiceId && queryServiceName ? queryServiceName : undefined);
+        const finalProfessionName = hasService ? undefined : (queryProfessionName || undefined);
+
         const payload = {
           lat,
           lng,
           radius: 50,
           service_area: queryLocation || undefined,
+          // Si hay profession_name, se elimina service_id/service_name; caso contrario se usa service_id + service_name
+          service_id: finalServiceId,
+          service_name: finalServiceName,
+          profession_name: finalProfessionName,
+          tag_name: queryTagName || undefined,
         };
         console.log("🔧 Fetching contractors near:", payload);
         const res = await ContractorService.getNearLocation(payload, { signal: abort.signal });
@@ -142,14 +162,25 @@ export default function FindProPage() {
       isMounted = false;
       abort.abort();
     };
-  }, [fallbackCenter.lat, fallbackCenter.lng, hasQueryCoords, queryLat, queryLng, queryLocation]);
+  }, [
+    fallbackCenter.lat,
+    fallbackCenter.lng,
+    hasQueryCoords,
+    queryLat,
+    queryLng,
+    queryLocation,
+    normalizedServiceId,
+    queryServiceName,
+    queryProfessionName,
+    queryTagName,
+  ]);
 
   return (
     <div className="min-h-screen pb-8 bg-[#F5D238]">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-3 sm:px-6 lg:px-10 xl:px-16">
         <Breadcrumb />
 
-        <div className="mx-auto max-w-6xl rounded-3xl shadow-2xl bg-white/90 border border-[#F5D238]/30 p-6 md:p-10 mt-4">
+        <div className="mx-auto max-w-none rounded-3xl shadow-2xl bg-white/90 border border-[#F5D238]/30 p-6 md:p-10 mt-4">
           {contractorsError && (
             <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm">
               {contractorsError}

@@ -61,6 +61,7 @@ class StoreProfessionRequest extends FormRequest
             'icon' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'description' => ['nullable', 'string', 'max:1000'],
+             'service_id' => ['required', 'string', 'exists:services,id'],
         ];
     }
 
@@ -75,6 +76,7 @@ class StoreProfessionRequest extends FormRequest
             'name' => 'nombre',
             'slug' => 'slug',
             'description' => 'descripción',
+            'service_id' => 'servicio',
         ];
     }
 
@@ -92,6 +94,7 @@ class StoreProfessionRequest extends FormRequest
             'slug.unique' => 'Ya existe una profesión con este slug.',
             'slug.max' => 'El slug no puede exceder los 255 caracteres.',
             'description.max' => 'La descripción no puede exceder los 1000 caracteres.',
+            'service_id.exists' => 'El servicio seleccionado no es válido.',
         ];
     }
 }

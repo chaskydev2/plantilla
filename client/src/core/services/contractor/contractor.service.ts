@@ -89,12 +89,15 @@ export const getNearLocation = async (
     radius?: number;
     service_area?: string;
     min_rating?: number;
-    tags?: number[];
-    professions?: number[];
+    service_id?: number;
+    service_name?: string;
+    profession_name?: string;
+    tag_name?: string;
   } & IPaginationRequest
   ,
   config: { signal?: AbortSignal } = {}
 ): Promise<IApiResponse> => {
+  console.log('Fetching contractors near location with params:', params);
   const res = await axios.get('/v1/contractors/near', { params, ...config });
   return res.data;
 }
@@ -205,6 +208,19 @@ export const searchContractorsByName = async (
   return res.data;
 };
 
+export const getDashboard = async (): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/contractor-profile/dashboard');
+  console.log("DASHBOARD CONTRACTOR ", res);
+  return res.data;
+};
+
+export const exportPdfCV = async (contractorId: number | string): Promise<Blob> => {
+  const res = await axios.get(`/v1/contractors/${contractorId}/cv`, {
+    responseType: 'blob',
+  });
+  return res.data;
+};
+
 export const ContractorService = {
   getAllPaginated,
   create,
@@ -229,4 +245,6 @@ export const ContractorService = {
   updateTeamMemberStatus,
   deleteTeamMember,
   searchContractorsByName,
+  getDashboard,
+  exportPdfCV,
 }

@@ -16,6 +16,13 @@ import DataTable from "@/components/table/DataTable";
 export default function HistoryList() {
   const { t } = useTranslation();
 
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+  function getBannerImageUrl(image?: string | null): string {
+    if (!image) return 'https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2000&auto=format&fit=crop';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
+
   const columns = [
     {
       key: "id",
@@ -49,7 +56,7 @@ export default function HistoryList() {
       render: (item: IItemResource) =>
         item.banner1 ? (
           <img
-            src={item.banner1}
+            src={getBannerImageUrl(item.banner1)}
             alt={item.title}
             className="w-10 h-10 object-cover rounded-md"
           />
@@ -63,7 +70,7 @@ export default function HistoryList() {
       render: (item: IItemResource) =>
         item.banner2 ? (
           <img
-            src={item.banner2}
+            src={getBannerImageUrl(item.banner2)}
             alt={item.title}
             className="w-10 h-10 object-cover rounded-md"
           />
@@ -77,7 +84,7 @@ export default function HistoryList() {
       render: (item: IItemResource) =>
         item.banner3 ? (
           <img
-            src={item.banner3}
+            src={getBannerImageUrl(item.banner3)}
             alt={item.title}
             className="w-10 h-10 object-cover rounded-md"
           />

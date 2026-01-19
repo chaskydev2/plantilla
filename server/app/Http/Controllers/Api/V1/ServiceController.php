@@ -19,7 +19,10 @@ class ServiceController extends Controller
      */
     public function firstFifteen(): JsonResponse
     {
-        $services = Service::orderBy('name', 'asc')->limit(15)->get();
+        $services = Service::with('professions')
+            ->orderBy('name', 'asc')
+            ->limit(15)
+            ->get();
         return response()->json([
             'success' => true,
             'data' => $services,
@@ -31,7 +34,9 @@ class ServiceController extends Controller
      */
     public function all(): JsonResponse
     {
-        $services = Service::orderBy('name', 'asc')->get();
+        $services = Service::with('professions')
+            ->orderBy('name', 'asc')
+            ->get();
         return response()->json([
             'success' => true,
             'data' => $services,
@@ -40,7 +45,7 @@ class ServiceController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = Service::query();
+        $query = Service::with('professions');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -71,6 +76,8 @@ class ServiceController extends Controller
 
         $service = Service::create($data);
 
+        $service->load('professions');
+
         return response()->json([
             'success' => true,
             'data' => $service,
@@ -79,6 +86,7 @@ class ServiceController extends Controller
 
     public function show(Service $service): JsonResponse
     {
+        $service->load('professions');
         return response()->json([
             'success' => true,
             'data' => $service,
@@ -102,6 +110,8 @@ class ServiceController extends Controller
 
         $service->update($data);
 
+        $service->load('professions');
+
         return response()->json([
             'success' => true,
             'data' => $service->fresh(),
@@ -117,6 +127,19 @@ class ServiceController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Servicio eliminado correctamente',
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Obtener todas las profesiones asociadas a un servicio.
+     */
+    public function professions(Service $service): JsonResponse
+    {
+        $professions = $service->professions()->orderBy('name', 'asc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $professions,
         ], Response::HTTP_OK);
     }
 

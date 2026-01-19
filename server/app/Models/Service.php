@@ -19,6 +19,19 @@ class Service extends Model
 
     public function professions()
     {
-        return $this->hasOne(Profession::class);
+        return $this->hasMany(Profession::class);
+    }
+
+    public function homeownerProfiles()
+    {
+        return $this->belongsToMany(
+            HomeownerProfile::class,
+            'homeowner_profile_service',
+            'service_id',
+            'homeowner_profile_id',
+            'id',
+            'user_id'
+        )->using(HomeownerProfileService::class)
+         ->withTimestamps();
     }
 }

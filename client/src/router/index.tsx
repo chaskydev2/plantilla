@@ -57,6 +57,8 @@ import ScamAlerts from "@/pages/WebPage/ScamAlerts";
 import FairPriceCheck from "@/pages/WebPage/FairPriceCheck";
 import GuGuarantee from "@/pages/WebPage/GuGuarantee";
 import RegisterGuara from "@/pages/WebPage/RegisterGuara";
+import RegisterGuaraHowItWorks from "@/pages/WebPage/RegisterGuara/HowItWorks";
+import RegisterGuaraWhatCover from "@/pages/WebPage/RegisterGuara/WhatCover";
 
 import HomeownerPage from "@/pages/admin/homeowners/Main";
 import JobApplicationPage from "@/pages/admin/job-applications/Main";
@@ -79,6 +81,7 @@ import ServicePage from "@/pages/admin/services/Main";
 import TeamUser from "@/pages/contractor/team-user/Main";
 
 import AttributeHomeownerList from "@/pages/admin/attribute-homeowner/main";
+import HomeownerDocumentsList from "@/pages/homeownner/documents/Main";
 
 import PostJob from "@/pages/homeownner/PostJob/Main";
 
@@ -92,6 +95,21 @@ import LoaderScreen from "@/components/common/LoaderScreen";
 import { ToastContainer } from "react-toastify";
 
 import ContractorProfilePage from "@/pages/WebPage/FindPro/ContractorProfilePage";
+
+import HomeownerServiceList from "@/pages/homeownner/service/Main";
+import HomeownerServiceForm from "@/pages/homeownner/service/Form";
+
+import HomeClaimsList from "@/pages/homeownner/claims/Main";
+
+import ContractorChats from "@/pages/contractor/chatst/Main"; 
+import ContractorNotifications from "@/pages/contractor/notifications/Main";
+
+import HomeownerChats from "@/pages/homeownner/chatst/Main";
+import HomeownerNotifications from "@/pages/homeownner/notifications/Main";
+
+import TextBlockMain  from "@/pages/admin/textblock/Main";
+import ClaimAdmin from "@/pages/admin/claim/Main";
+import YouTubeVideosMain from "@/pages/admin/youtube-videos/Main";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -131,6 +149,8 @@ export default function App() {
             <Route path="/fair-price-check" element={<FairPriceCheck />} />
             <Route path="/gu-guarantee" element={<GuGuarantee />} />
             <Route path="/register-guara" element={<RegisterGuara />} />
+            <Route path="/register-guara/how-it-works" element={<RegisterGuaraHowItWorks />} />
+            <Route path="/register-guara/what-cover" element={<RegisterGuaraWhatCover />} />
             <Route path="/services" element={<Services />} />
             <Route path="/loader" element={<LoaderScreen />} />
 
@@ -200,6 +220,12 @@ export default function App() {
               
               <Route path="/admin/job" element={<JobAdmin/>} />
 
+              <Route path="/admin/claim" element={<ClaimAdmin/>} />
+
+              <Route path="/admin/textblock" element={<TextBlockMain/>} />
+              <Route path="/admin/youtube-videos" element={<YouTubeVideosMain/>} />
+           
+
               {/* CONTRACTOR SPECIFIC ROUTES */}
               <Route path="/contractor/perfil" element={<UserProfiles />} />
               
@@ -218,15 +244,24 @@ export default function App() {
               <Route path="/contractor/team" element={<Team/>} />
               
               <Route path="/contractor/team-user" element={<TeamUser/>} />
+              
+              <Route path="/contractor/chats" element={<ContractorChats/>} />
+              
+              <Route path="/contractor/notifications" element={<ContractorNotifications />} />
 
               {/* HOMEOWNER SPECIFIC ROUTES */}
               <Route path="/homeowner/post-job" element={<PostJob/>} />
               <Route path="/homeowner/jobs" element={<JobPage/>} />
-              <Route path="/homeowner/claims" element={<JobApplicationPage/>} />
-              <Route path="/homeowner/documents" element={<AttributeHomeownerList/>} />
+              {/* Homeowner claims list */}
+              <Route path="/homeowner/claims" element={<HomeClaimsList/>} />
+              <Route path="/homeowner/documents" element={<HomeownerDocumentsList/>} />
               <Route path="/homeowner/payments" element={<PaymentPage/>} />
               <Route path="/homeowner/perfil" element={<UserProfiles/>} />
+              <Route path="/homeowner/services/form" element={<HomeownerServiceForm/>} />
+              <Route path="/homeowner/services" element={<HomeownerServiceList/>} />
 
+              <Route path="/homeowner/chats" element={<HomeownerChats />} />
+               <Route path="/homeowner/notifications" element={<HomeownerNotifications />} />
 
               <Route path="/admin/job" element={<JobAdmin/>} />
 

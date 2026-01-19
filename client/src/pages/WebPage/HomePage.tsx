@@ -10,7 +10,6 @@ import {
   CalendarDays,
   Wrench,
   User,
-  Star,
   Plus,
   Minus,
   ArrowRight as ArrowRightIcon,
@@ -25,6 +24,14 @@ import { useTranslation } from "react-i18next";
 import SearchBar from "./HomePage/SearchBar";
 import { JobContractService } from '@/core/services/job-contracts/jobContract.service';
 import type { IJobContract } from '@/core/types/IJobContract';
+import { FaqService } from '@/core/services/faq/faq.service';
+import type { IFaq } from '@/core/types/IFaq';
+import { TextBlockService } from '@/core/services/textblock/textblock.service';
+import type { ITextBlock } from '@/core/types/ITextBlock';
+import { YouTubeVideoService } from '@/core/services/youtube/youtubeVideo.service';
+import type { IYouTubeVideo } from '@/core/types/IYouTubeVideo';
+import { BannerService } from '@/core/services/banner/banner.service';
+import type { IBanner } from '@/core/types/IBanner';
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -83,12 +90,6 @@ const HomePage = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, [servicesModalOpen]);
 
-  const bannerContent = {
-    topText: t('hero.topText'),
-    title: t('hero.title'),
-    subtitle: t('hero.subtitle'),
-  };
-
   // removed: getAnnouncements
 
   // Extiende el tipo para los contratos recientes
@@ -103,6 +104,18 @@ const HomePage = () => {
 
   const [latestContracts, setLatestContracts] = useState<IJobContractExtended[]>([]);
   const [contractsLoading, setContractsLoading] = useState(true);
+  const [faqs, setFaqs] = useState<IFaq[]>([]);
+  const [faqsLoading, setFaqsLoading] = useState(true);
+  const [textBlock, setTextBlock] = useState<ITextBlock | null>(null);
+  const [youtubeVideos, setYouTubeVideos] = useState<IYouTubeVideo[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+  const [banner, setBanner] = useState<IBanner | null>(null);
+
+  const bannerContent = {
+    topText: textBlock?.text_tertiary || t('hero.topText'),
+    title: textBlock?.text_primary || t('hero.title'),
+    subtitle: textBlock?.text_secondary || t('hero.subtitle'),
+  };
 
   useEffect(() => {
     async function fetchLatestContracts() {
@@ -121,12 +134,107 @@ const HomePage = () => {
     fetchLatestContracts();
   }, []);
 
+  useEffect(() => {
+    async function fetchFaqs() {
+      setFaqsLoading(true);
+      try {
+        const res = await FaqService.getAll();
+        setFaqs(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.log('Error fetching FAQs:', err);
+        setFaqs([]);
+      } finally {
+        setFaqsLoading(false);
+      }
+    }
+    fetchFaqs();
+  }, []);
+
+  useEffect(() => {
+    async function fetchTextBlock() {
+      try {
+        const res = await TextBlockService.getFirst();
+        if (res.data) {
+          setTextBlock(res.data);
+        }
+      } catch (err) {
+        console.log('Error fetching text block:', err);
+      }
+    }
+    fetchTextBlock();
+  }, []);
+
+  useEffect(() => {
+    async function fetchYouTubeVideos() {
+      setVideosLoading(true);
+      try {
+        const res = await YouTubeVideoService.getAllPaginated({ per_page: 10 });
+        const videoList = Array.isArray(res.data) ? res.data : [];
+        setYouTubeVideos(videoList);
+      } catch (err) {
+        console.log('Error fetching YouTube videos:', err);
+        setYouTubeVideos([]);
+      } finally {
+        setVideosLoading(false);
+      }
+    }
+    fetchYouTubeVideos();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBanner() {
+      try {
+        const res = await BannerService.getAll();
+        const bannerList = Array.isArray(res.data) ? res.data : [];
+        if (bannerList.length > 0) {
+          setBanner(bannerList[0]);
+        }
+      } catch (err) {
+        console.log('Error fetching banner:', err);
+        setBanner(null);
+      }
+    }
+    fetchBanner();
+  }, []);
+
   const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
   function getJobImageUrl(image?: string | null): string {
     if (!image) return '/images/default-service.jpg';
     if (image.startsWith('http://') || image.startsWith('https://')) return image;
     // Quitar cualquier /api o api al inicio
     return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
+
+  function getBannerImageUrl(image?: string | null): string {
+    if (!image) return 'https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2000&auto=format&fit=crop';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
+
+  function getYouTubeEmbedUrl(url?: string): string {
+    if (!url) return '';
+    
+    // Si ya es una URL de embed, devolverla
+    if (url.includes('youtube.com/embed/')) return url;
+    
+    // Extraer video ID de diferentes formatos
+    let videoId = '';
+    
+    // Formato: https://www.youtube.com/watch?v=VIDEO_ID
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (watchMatch) videoId = watchMatch[1];
+    
+    // Formato: https://youtu.be/VIDEO_ID
+    const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+    if (shortMatch && !videoId) videoId = shortMatch[1];
+    
+    // Si se extrajo un video ID, retornar URL de embed
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // Si no se pudo extraer, retornar la URL original
+    return url;
   }
 
   return (
@@ -223,37 +331,37 @@ const HomePage = () => {
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">{t('videos.title')}</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Video 1 */}
-                <div className="rounded-2xl overflow-hidden shadow-lg">
-                  <div className="relative w-full pt-[56.25%] bg-gray-100">
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src="https://www.youtube.com/embed/6yYl2ucx2Ng"
-                      title={t('videos.roofingWarranty')}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
+              {videosLoading ? (
+                <div className="text-center py-10 text-gray-400">Loading videos...</div>
+              ) : youtubeVideos.length === 0 ? (
+                <div className="text-center py-10 text-gray-400">No videos available.</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {youtubeVideos.slice(0, 2).map((video) => (
+                    <div key={video.id} className="rounded-2xl overflow-hidden shadow-lg">
+                      <div className="relative w-full pt-[56.25%] bg-gray-100">
+                        <iframe
+                          className="absolute inset-0 w-full h-full"
+                          src={getYouTubeEmbedUrl(video.youtube_url)}
+                          title={video.title || 'YouTube Video'}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                      {video.title && (
+                        <div className="p-4">
+                          <h3 className="text-lg font-semibold text-gray-900">{video.title}</h3>
+                          {video.description && (
+                            <p className="text-sm text-gray-600 mt-2 line-clamp-2">{video.description}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-
-                {/* Video 2 */}
-                <div className="rounded-2xl overflow-hidden shadow-lg">
-                  <div className="relative w-full pt-[56.25%] bg-gray-100">
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src="https://www.youtube.com/embed/n1G1kvt8R1g"
-                      title={t('videos.avoidScams')}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </section>
 
@@ -659,19 +767,16 @@ const HomePage = () => {
           </AnimatePresence>
 
           {/* What Our Customers Say - infinite scroll carousel */}
-          <section className="py-16 bg-white">
+          {/* <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16] mb-10">
                 What Our Customers Say
               </h2>
 
-              {/* Carousel viewport */}
               <div className="relative overflow-hidden">
-                {/* edge fades */}
                 <div className="pointer-events-none absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-white to-transparent"></div>
                 <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-white to-transparent"></div>
 
-                {/* Track: duplicate items for seamless loop; pause on hover */}
                 <div className="group/carousel">
                   <div className="flex gap-6 w-[200%] animate-[scroll-left_40s_linear_infinite] group-hover/carousel:[animation-play-state:paused]">
                     {(() => {
@@ -730,7 +835,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-          </section>
+          </section> */}
           {/* $250K Guarantee Banner (placed after testimonials) */}
           <section className="py-8 bg-white">
             <div className="container mx-auto px-6 md:px-12">
@@ -739,8 +844,7 @@ const HomePage = () => {
                 <div
                   className="relative h-[360px] md:h-[440px] w-full bg-center bg-cover"
                   style={{
-                    backgroundImage:
-                      "url(https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2000&auto=format&fit=crop)",
+                    backgroundImage: `url(${getBannerImageUrl(banner?.image)})`,
                   }}
                 >
                   {/* Overlay */}
@@ -750,13 +854,21 @@ const HomePage = () => {
                   <div className="absolute inset-0 flex items-center justify-center text-center px-6">
                     <div className="max-w-5xl">
                       <h2 className="text-white font-extrabold leading-tight text-3xl md:text-5xl lg:text-6xl">
-                        Join homeowners who've chosen
-                        <br className="hidden md:block" />
-                        the security of our $250,000 guarantee
+                        {banner?.title || (
+                          <>
+                            Join homeowners who've chosen
+                            <br className="hidden md:block" />
+                            the security of our $250,000 guarantee
+                          </>
+                        )}
                       </h2>
                       <p className="text-white/90 mt-5 text-base md:text-lg max-w-3xl mx-auto">
-                        We understand the trust you place in contractors when you invite them into your space. That's
-                        why we've created the most comprehensive protection program in the industry.
+                        {banner?.subtitle || (
+                          <>
+                            We understand the trust you place in contractors when you invite them into your space. That's
+                            why we've created the most comprehensive protection program in the industry.
+                          </>
+                        )}
                       </p>
                       <div className="mt-7">
                         <Link
@@ -779,30 +891,15 @@ const HomePage = () => {
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16] mb-6">Questions about GU</h2>
               <div className="max-w-4xl mx-auto divide-y divide-gray-200">
-                {[
-                  {
-                    q: "How do I use GU?",
-                    a: "Search for your project type and location, compare vetted contractors, and hire with confidence under our protection program.",
-                  },
-                  {
-                    q: "How are GU contractors different?",
-                    a: "All contractors on GU are verified, financially screened, and backed by our guarantee to protect homeowners.",
-                  },
-                  {
-                    q: "What if there are no contractors in my area?",
-                    a: "We are expanding rapidly. If none are listed, leave your info and we will notify you as soon as vetted contractors are available.",
-                  },
-                  {
-                    q: "How much does it cost?",
-                    a: "Using GU is free for homeowners. Contractors may have membership fees, but your protection is always included.",
-                  },
-                  {
-                    q: "What does the $250,000 Guarantee cover?",
-                    a: "It covers eligible losses such as contractor abandonment, shoddy workmanship, or damage caused during the project, up to the specified limit.",
-                  },
-                ].map((item, idx) => (
-                  <FaqItem key={idx} question={item.q} answer={item.a} />
-                ))}
+                {faqsLoading ? (
+                  <div className="text-center py-10 text-gray-400">Loading FAQs...</div>
+                ) : faqs.length === 0 ? (
+                  <div className="text-center py-10 text-gray-400">No FAQs available.</div>
+                ) : (
+                  faqs.map((item) => (
+                    <FaqItem key={item.id} question={item.question} answer={item.answer} />
+                  ))
+                )}
               </div>
             </div>
           </section>

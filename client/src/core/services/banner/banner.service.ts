@@ -2,6 +2,11 @@ import axios from '@/core/config/axios';
 import type { IApiResponse, IPaginationRequest } from '@/core/types/IApi';
 import type { IBannerCreateRequest, IBannerUpdateRequest } from '@/core/types/IBanner';
 
+export const getAll = async (config: { signal?: AbortSignal } = {}): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/banners/all', { ...config });
+  return res.data;
+}
+
 export const getAllPaginated = async (params?: IPaginationRequest, config: { signal?: AbortSignal } = {}): Promise<IApiResponse> => {
   const res = await axios.get('/v1/banners', { params, ...config });
   return res.data;
@@ -65,6 +70,7 @@ export const remove = async (id: any): Promise<IApiResponse> => {
 }
 
 export const BannerService = {
+  getAll,
   getAllPaginated,
   create,
   update,

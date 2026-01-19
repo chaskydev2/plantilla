@@ -27,8 +27,15 @@ export const remove = async (id: any): Promise<IApiResponse> => {
   return res.data;
 };
 
+export const getAll = async (config: { signal?: AbortSignal } = {}): Promise<IApiResponse> => {
+  const res = await axios.get('v1/faqs/all', config);
+  console.log("FAQS ", res.data);
+  return res.data;
+};
+
 export const FaqService = {
   getAllPaginated,
+  getAll,
   create,
   update,
   get,

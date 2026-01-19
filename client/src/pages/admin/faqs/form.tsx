@@ -49,7 +49,7 @@ const FaqsModal = ({
     if (isEditing) {
       await ItemService.update(initialData!.id, cleanData as IUpdateRequest)
         .then((response) => {
-          toastify.success(response.message || 'Pregunta frecuente actualizada');
+          toastify.success(response.message || 'FAQ updated');
           onClose();
           load();
         })
@@ -58,7 +58,7 @@ const FaqsModal = ({
     } else {
       await ItemService.create(cleanData as ICreateRequest)
         .then((response) => {
-          toastify.success(response.message || 'Pregunta frecuente creada');
+          toastify.success(response.message || 'FAQ created');
           onClose();
           load();
         })
@@ -70,7 +70,7 @@ const FaqsModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Pregunta Frecuente' : 'Nueva Pregunta Frecuente'}
+      title={isEditing ? 'Edit FAQ' : 'New FAQ'}
       size="lg"
     >
       <FormProviderWrapper
@@ -84,16 +84,16 @@ const FaqsModal = ({
           <div className="col-span-1">
             <InputField
               name="question"
-              label="Pregunta"
-              placeholder="Ej: ¿Cómo puedo contactar al soporte técnico?"
+              label="Question"
+              placeholder="E.g. How can I contact support?"
             />
           </div>
 
           <div className="col-span-1">
             <TextAreaField
               name="answer"
-              label="Respuesta"
-              placeholder="Redacte una respuesta clara y completa..."
+              label="Answer"
+              placeholder="Write a clear and complete answer..."
               rows={5}
             />
           </div>
@@ -101,10 +101,10 @@ const FaqsModal = ({
           <div className="col-span-1">
             <InputField
               name="order"
-              label="Orden de prioridad"
+              label="Priority order"
               type="number"
               min="0"
-              placeholder="Ej: 1 (para mostrar primero)"
+              placeholder="E.g. 1 (to show first)"
             />
           </div>
         </div>

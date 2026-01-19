@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, Users, Briefcase } from "lucide-react";
+import { ArrowLeft, Users, Briefcase, Download } from "lucide-react";
 
 // Servicios
 import { ContractorService } from "@/core/services/contractor/contractor.service";
@@ -47,6 +47,7 @@ export default function ContractorProfilePage() {
 
   // Estado de Rating
   const [currentRating, setCurrentRating] = useState(0);
+  const [exportingCv, setExportingCv] = useState(false);
 
   // ViewModel
   const profile = useMemo<ContractorProfileViewModel | null>(
@@ -203,6 +204,39 @@ export default function ContractorProfilePage() {
     }
   };
 
+  const handleExportCv = async () => {
+    if (!contractor) return;
+    const contractorId = contractor.user_id ?? contractor.user?.id ?? Number(id);
+    if (!contractorId) {
+      alert("No contractor ID available to export CV.");
+      return;
+    }
+    try {
+      setExportingCv(true);
+      const response = await ContractorService.exportPdfCV(contractorId);
+      const r: any = response;
+      const blob = r instanceof Blob
+        ? r
+        : r?.data instanceof Blob
+          ? r.data
+          : new Blob([r?.data ?? r], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `contractor_cv_${contractorId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      console.error("CV export error:", error);
+      const msg = error?.response?.data?.message || "No se pudo descargar el CV";
+      alert(msg);
+    } finally {
+      setExportingCv(false);
+    }
+  };
+
   // --- RENDER ---
 
   if (loading) return <ContractorProfileSkeleton />;
@@ -329,6 +363,27 @@ export default function ContractorProfilePage() {
                 ) : (
                   <p className="text-sm italic text-gray-400">No jobs registered yet.</p>
                 )}
+              </div>
+
+              {/* 4. DESCARGAR CV (Debajo de trabajos) */}
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2">
+                    <Download className="h-5 w-5 text-[#1E1E17]" />
+                    <div>
+                      <h3 className="text-xl font-bold text-[#1E1E17]">Descargar CV</h3>
+                      <p className="text-xs text-gray-600">Genera el CV en PDF con experiencia, referencias y equipo.</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleExportCv}
+                    disabled={exportingCv}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#F5D238] px-4 py-2 text-sm font-bold text-[#1E1E17] shadow hover:bg-[#e6c12e] disabled:opacity-60"
+                  >
+                    {exportingCv ? "Generando..." : "Descargar CV (PDF)"}
+                  </button>
+                </div>
               </div>
 
             </div>

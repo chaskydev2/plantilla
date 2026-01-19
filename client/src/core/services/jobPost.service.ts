@@ -24,6 +24,7 @@ export const changeJobPostAprobationStatus = async (
 
 const buildJobPostFormData = (data: any, initialData?: JobPost | null) => {
   const formData = new FormData();
+
   Object.entries(data).forEach(([key, value]) => {
     if (key === 'image') return; // Handled separately below
     if (key === 'remove_image') {
@@ -49,9 +50,17 @@ const buildJobPostFormData = (data: any, initialData?: JobPost | null) => {
     formData.append('homeowner_id', initialData?.homeowner_id?.toString() || '1');
   }
   // Imagen
-  if (data.image && Array.isArray(data.image) && data.image[0] instanceof File) {
-    formData.append('image', data.image[0]);
-  } else if (data.image === null) {
+  const imageValue = data.image;
+  if (imageValue instanceof File) {
+    formData.append('image', imageValue);
+  } else if (imageValue && Array.isArray(imageValue) && imageValue[0] instanceof File) {
+    formData.append('image', imageValue[0]);
+  } else if (imageValue instanceof Blob) {
+    formData.append('image', imageValue);
+  } else if (typeof imageValue === 'string' && imageValue.startsWith('data:image/')) {
+    // Laravel acepta base64 y lo transforma en archivo
+    formData.append('image', imageValue);
+  } else if (imageValue === null) {
     // Si image es null explícito, enviar para eliminar
     formData.append('image', '');
   }

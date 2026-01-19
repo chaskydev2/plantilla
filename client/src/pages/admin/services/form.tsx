@@ -69,7 +69,9 @@ const ServiceModal = ({ isOpen, onClose, initialData = null, load }: ServiceModa
           }
         }
 
+        console.log(payload);
         const response = await ItemService.update(initialData!.id, payload);
+        console.log(response, "mi api ");
         toastify.success(response.message || 'Servicio actualizado');
       } else {
         const payload: IServiceCreateRequest = {

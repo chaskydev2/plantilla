@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import type { ContractorDashboardProps, ContractorStats, TeamMember } from "@/types/dashboard";
+import type { 
+  ContractorDashboardProps, 
+  ContractorStats, 
+  TeamMember,
+  DashboardData
+} from "@/types/dashboard";
 import { ContractorService } from '@/core/services/contractor/contractor.service';
 import { AttributeContractorUploadService } from '@/core/services/contractor/attributeContractorUpload.service';
 
@@ -12,20 +17,16 @@ import SupportChat from "./SupportChat";
 import UploadedDocumentItem from "./UploadedDocumentItem";
 
 const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
-  const [contractorStats] = useState<ContractorStats>({
-    activeJobs: 8,
-    completedJobs: 45,
-    totalEarnings: "$12,450",
-    monthlyEarnings: "$3,200",
-    averageRating: 4.8,
-    totalReviews: 28,
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [contractorStats, setContractorStats] = useState<ContractorStats>({
+    activeJobs: 0,
+    completedJobs: 0,
+    totalEarnings: "$0",
+    monthlyEarnings: "$0",
+    averageRating: 0,
+    totalReviews: 0,
   });
-
-  const teamMembers: TeamMember[] = [
-    { name: "Carlos Martinez", role: "Lead Electrician", avatar: "CM", status: "online" },
-    { name: "Ana Rodriguez", role: "Assistant", avatar: "AR", status: "online" },
-    { name: "Juan Perez", role: "Helper", avatar: "JP", status: "offline" },
-  ];
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   const [attributes, setAttributes] = useState<any[]>([]);
   const [uploadedAttributes, setUploadedAttributes] = useState<any[]>([]);
@@ -38,10 +39,59 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const getDocumentUrl = (value: string) => `http://127.0.0.1:8000/${value}`;
 
   /* ===================== DATA ===================== */
+
+  // Fetch dashboard data
+  useEffect(() => {
+    if (user?.verification) {
+      ContractorService.getDashboard()
+        .then((res: any) => {
+          console.log(res);
+          const data = res?.data?.data || res?.data || res;
+          setDashboardData(data);
+          
+          // Map team members
+          if (data?.team_members) {
+            const mappedTeamMembers: TeamMember[] = data.team_members.map((member: any) => ({
+              user_id: member.user_id || member.id,
+              name: member.user?.name || member.name || 'Unknown',
+              role: member.professions?.[0]?.name || 'Team Member',
+              avatar: member.user?.name?.substring(0, 2).toUpperCase() || 'TM',
+              status: 'offline' as const,
+              user: member.user,
+              professions: member.professions,
+            }));
+            setTeamMembers(mappedTeamMembers);
+          }
+
+          // Map statistics
+          if (data?.statistics) {
+            const stats = data.statistics;
+            setContractorStats({
+              activeJobs: data.jobs?.filter((j: any) => j.is_active).length || 0,
+              completedJobs: data.jobs?.filter((j: any) => !j.is_active).length || 0,
+              totalEarnings: `$${stats.total_paid?.toLocaleString() || '0'}`,
+              monthlyEarnings: `$${stats.average_paid?.toLocaleString() || '0'}`,
+              averageRating: 4.8, // TODO: Calculate from reviews if available
+              totalReviews: stats.jobs_count || 0,
+            });
+          }
+
+          setError(null);
+        })
+        .catch((err) => {
+          console.error('Failed to load dashboard data:', err);
+          setError("Failed to load dashboard data");
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [user?.verification]);
 
   useEffect(() => {
     if (user?.verification) {
@@ -86,6 +136,49 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
           ua.value
       )
     );
+
+  /* ===================== PDF EXPORT ===================== */
+
+  const handleExportPdf = async () => {
+    try {
+      setExportingPdf(true);
+      
+      // Get user data from localStorage
+      const userDataStr = localStorage.getItem('user_data');
+      if (!userDataStr) {
+        alert('User data not found');
+        return;
+      }
+      
+      const userData = JSON.parse(userDataStr);
+      const contractorId = userData.id;
+      
+      if (!contractorId) {
+        alert('Contractor ID not found');
+        return;
+      }
+
+      // Call API to get PDF blob
+      const blob = await ContractorService.exportPdfCV(contractorId);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `contractor_cv_${contractorId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('Failed to export PDF');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
 
   /* ===================== SUBMIT ===================== */
 
@@ -273,14 +366,126 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
 
           {user?.verification && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title="Active" value="8" subtitle="Active jobs" />
-                <StatCard title="Completed" value="45" subtitle="Finished jobs" />
-                <StatCard title="Rating" value="4.8/5" subtitle="Average rating" />
+              {/* Export CV Button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleExportPdf}
+                  disabled={exportingPdf}
+                  className="px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold rounded-xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <span className="material-icons text-xl">
+                    {exportingPdf ? 'hourglass_empty' : 'download'}
+                  </span>
+                  {exportingPdf ? 'Exporting...' : 'Export CV as PDF'}
+                </button>
               </div>
 
-              <EarningsOverview contractorStats={contractorStats} />
-              <ContractorTeam teamMembers={teamMembers} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard 
+                  title="Active" 
+                  value={contractorStats.activeJobs.toString()} 
+                  subtitle="Active jobs" 
+                />
+                <StatCard 
+                  title="Completed" 
+                  value={contractorStats.completedJobs.toString()} 
+                  subtitle="Finished jobs" 
+                />
+                <StatCard 
+                  title="Total Earned" 
+                  value={contractorStats.totalEarnings} 
+                  subtitle="Total earnings" 
+                />
+              </div>
+
+              {dashboardData && (
+                <>
+                  <EarningsOverview contractorStats={contractorStats} />
+                  <ContractorTeam teamMembers={teamMembers} />
+                  
+                  {/* Jobs Summary */}
+                  {dashboardData.jobs && dashboardData.jobs.length > 0 && (
+                    <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg">
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-yellow-200 mb-4">
+                        Recent Jobs
+                      </h2>
+                      <div className="space-y-3">
+                        {dashboardData.jobs.map((job) => (
+                          <div 
+                            key={job.id} 
+                            className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-800"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-semibold text-lg">{job.title}</h3>
+                                <p className="text-sm text-gray-600">
+                                  {job.service_type} • {job.location}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(job.job_date).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-green-600">
+                                  ${job.amount_paid.toLocaleString()}
+                                </p>
+                                <span 
+                                  className={`text-xs px-2 py-1 rounded-full ${
+                                    job.is_active 
+                                      ? 'bg-green-100 text-green-700' 
+                                      : 'bg-gray-100 text-gray-700'
+                                  }`}
+                                >
+                                  {job.is_active ? 'Active' : 'Completed'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* Jobs by Service Type */}
+                  {dashboardData.jobs_summary?.by_service_type && 
+                   dashboardData.jobs_summary.by_service_type.length > 0 && (
+                    <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg">
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-yellow-200 mb-4">
+                        Jobs by Service Type
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {dashboardData.jobs_summary.by_service_type.map((summary, idx) => (
+                          <div 
+                            key={idx} 
+                            className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-800"
+                          >
+                            <h3 className="font-semibold text-lg">{summary.service_type}</h3>
+                            <div className="mt-2 space-y-1">
+                              <p className="text-sm">
+                                <span className="text-gray-600">Jobs:</span>{' '}
+                                <span className="font-semibold">{summary.jobs_count}</span>
+                              </p>
+                              <p className="text-sm">
+                                <span className="text-gray-600">Total:</span>{' '}
+                                <span className="font-semibold text-green-600">
+                                  ${summary.total_paid.toLocaleString()}
+                                </span>
+                              </p>
+                              <p className="text-sm">
+                                <span className="text-gray-600">Average:</span>{' '}
+                                <span className="font-semibold">
+                                  ${summary.avg_paid.toLocaleString()}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
+
               <ContractorProfile />
             </>
           )}

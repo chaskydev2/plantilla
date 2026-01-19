@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Briefcase, MapPin, Plus, Search, Tag } from "lucide-react";
+import { Briefcase, ChevronLeft, ChevronRight, MapPin, Plus, Search, Tag } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
 import { Link } from "react-router";
 import { ProfessionService } from "@/core/services/profession/profession.service";
+import { ServiceService } from "@/core/services/service/service.service";
 import { MapPickerSection } from "./components/MapPickerSection";
 import { QuickLocations } from "./components/QuickLocations";
 import { toLucideIcon } from "./utils/iconUtils";
@@ -72,9 +73,16 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   // Form State
   const [queryService, setQueryService] = useState<string>("");
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+  const [selectedProfessionName, setSelectedProfessionName] = useState<string>("");
 
   const [queryLocation, setQueryLocation] = useState<string>("");
   const [services, setServices] = useState<ServiceItem[]>([]);
+  const [serviceFilters, setServiceFilters] = useState<ServiceItem[]>([]);
+  const [serviceFiltersLoading, setServiceFiltersLoading] = useState<boolean>(false);
+  const [serviceFiltersQuery, setServiceFiltersQuery] = useState<string>("");
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const serviceCarouselRef = useRef<HTMLDivElement | null>(null);
 
   // Location State
   const [locationPredictions, setLocationPredictions] = useState<Array<{ description: string; place_id: string }>>([]);
@@ -97,14 +105,26 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   const findProHref = useMemo(() => {
     const params = new URLSearchParams();
     const serviceName = queryService.trim();
+    const professionName = (selectedProfessionName || queryService).trim();
     const location = queryLocation.trim();
     const tags = queryTags.trim();
 
+    if (serviceName) {
+      params.set("service", serviceName);
+      params.set("service_name", serviceName);
+    }
+    if (professionName) {
+      params.set("profesion", professionName);
+      params.set("profession_name", professionName);
+    }
     if (selectedServiceId) params.set("service_id", selectedServiceId.toString());
     else if (serviceName) params.set("search", serviceName);
 
     if (location) params.set("location", location);
-    if (tags) params.set("tags", tags);
+    if (tags) {
+      params.set("tags", tags);
+      params.set("tag_name", tags);
+    }
     if (queryLatLng) {
       params.set("lat", queryLatLng.lat.toString());
       params.set("lng", queryLatLng.lng.toString());
@@ -112,7 +132,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
 
     const qs = params.toString();
     return qs ? `/findpro?${qs}` : "/findpro";
-  }, [queryService, selectedServiceId, queryLocation, queryTags, queryLatLng]);
+  }, [queryService, selectedServiceId, selectedProfessionName, queryLocation, queryTags, queryLatLng]);
 
   // Load Services
   useEffect(() => {
@@ -132,6 +152,28 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
       }
     };
     loadServices();
+  }, []);
+
+  useEffect(() => {
+    const loadServiceFilters = async () => {
+      setServiceFiltersLoading(true);
+      try {
+        const res = await ServiceService.getAllServices();
+        const data = (res.data as any[]) || [];
+        const mapped: ServiceItem[] = data.map((item, idx) => ({
+          id: item.id ?? idx,
+          name: item.name ?? item.slug ?? `Servicio ${idx + 1}`,
+          icon: toLucideIcon(item.icon),
+          iconName: item.icon as string | undefined,
+        }));
+        setServiceFilters(mapped);
+      } catch {
+        setServiceFilters([]);
+      } finally {
+        setServiceFiltersLoading(false);
+      }
+    };
+    loadServiceFilters();
   }, []);
 
   // Dropdown positioning
@@ -442,11 +484,53 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   }, [showMapPicker]);
 
   const filteredServices = services.filter((service) => service.name.toLowerCase().includes(queryService.toLowerCase()));
+  const visibleQuickServices = useMemo(() => {
+    const query = serviceFiltersQuery.trim().toLowerCase();
+    if (!query) return serviceFilters;
+    return serviceFilters.filter((service) => service.name.toLowerCase().includes(query));
+  }, [serviceFilters, serviceFiltersQuery]);
+
+  const updateCarouselScrollState = () => {
+    const container = serviceCarouselRef.current;
+    if (!container) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
+  };
+
+  const handleCarouselScroll = () => updateCarouselScrollState();
+
+  const scrollCarousel = (direction: "left" | "right") => {
+    const container = serviceCarouselRef.current;
+    if (!container) return;
+    const scrollAmount = container.clientWidth * 0.85;
+    container.scrollBy({ left: direction === "left" ? -scrollAmount : scrollAmount, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    updateCarouselScrollState();
+  }, [serviceFilters, serviceFiltersLoading, serviceFiltersQuery]);
+
+  useEffect(() => {
+    const onResize = () => updateCarouselScrollState();
+    window.addEventListener("resize", onResize, { passive: true } as AddEventListenerOptions);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const handleSelectService = (service: ServiceItem) => {
     setQueryService(service.name);
     setSelectedServiceId(service.id);
+    setSelectedProfessionName(service.name);
     setOpen(false);
+  };
+
+  const handleQuickServiceSelect = (service: ServiceItem) => {
+    handleSelectService(service);
+    inputRef.current?.blur();
   };
 
   const handleUseLocation = () => {
@@ -512,6 +596,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
               const value = e.target.value;
               setQueryService(value);
               setSelectedServiceId(null);
+              setSelectedProfessionName("");
               if (!open) setOpen(true);
             }}
             className="placeholder:text-gray-400 w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-[#1A1B16] bg-transparent appearance-none cursor-text"
@@ -568,6 +653,76 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
           <Search className="ml-2 size-4 text-white" />
         </Link>
       </motion.div>
+
+      <div className="mt-5">
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 min-w-[200px]">
+              <Tag className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder={t("searchBar.quickServices.filterPlaceholder", "Search a service")}
+                value={serviceFiltersQuery}
+                onChange={(e) => setServiceFiltersQuery(e.target.value)}
+                className="w-full border border-gray-200 rounded-full py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1B16]"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 w-8 pointer-events-none " aria-hidden />
+          <div className="absolute inset-y-0 right-0 w-8 pointer-events-none" aria-hidden />
+          <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2" ref={serviceCarouselRef} onScroll={handleCarouselScroll}>
+            {serviceFiltersLoading
+              ? Array.from({ length: 6 }).map((_, idx) => (
+                  <div key={`service-skeleton-${idx}`} className="min-w-[160px] h-[84px] rounded-2xl bg-gray-100 animate-pulse" />
+                ))
+              : visibleQuickServices.map((service) => (
+                  <ServiceQuickItem
+                    key={`service-filter-${service.id}`}
+                    label={service.name}
+                    iconLabel={service.iconName}
+                    icon={service.icon}
+                    selected={selectedServiceId === service.id || queryService === service.name}
+                    onSelect={() => handleQuickServiceSelect(service)}
+                  />
+                ))}
+          </div>
+          {!serviceFiltersLoading && visibleQuickServices.length === 0 && (
+            <div className="text-sm text-gray-500 py-4 text-center">
+              {t("searchBar.quickServices.emptyFilter", "No matches for your search.")}
+            </div>
+          )}
+          {!serviceFiltersLoading && serviceFilters.length === 0 && (
+            <div className="text-sm text-gray-500 py-4 text-center">
+              {t("searchBar.quickServices.empty", "No services available right now.")}
+            </div>
+          )}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-1">
+            <button
+              type="button"
+              onClick={() => scrollCarousel("left")}
+              disabled={!canScrollLeft}
+              className={`pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border shadow bg-white transition-opacity duration-200 ${
+                canScrollLeft ? "opacity-95" : "opacity-0"
+              }`}
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollCarousel("right")}
+              disabled={!canScrollRight}
+              className={`pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border shadow bg-white transition-opacity duration-200 ${
+                canScrollRight ? "opacity-95" : "opacity-0"
+              }`}
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* ERROR MESSAGE */}
       {locationRequiredErrorText && (
@@ -787,8 +942,47 @@ function DropdownItem({
       </span>
       <span className="flex flex-col items-start">
         <span className="font-medium text-[#1A1B16] dark:text-white">{label}</span>
-        {iconLabel && <span className="text-xs text-gray-500 mt-0.5">{iconLabel}</span>}
       </span>
+    </button>
+  );
+}
+
+function ServiceQuickItem({
+  label,
+  icon,
+  iconLabel,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  icon?: LucideIcon;
+  iconLabel?: string;
+  selected?: boolean;
+  onSelect: () => void;
+}) {
+  const iconName = iconLabel as keyof typeof LucideIcons | undefined;
+  const Icon = iconName && LucideIcons[iconName] ? (LucideIcons[iconName] as LucideIcon) : (icon || Briefcase);
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`min-w-[160px] flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#1A1B16]/40
+        ${selected ? "bg-[#1A1B16] text-white border-[#1A1B16]" : "bg-white text-[#1A1B16] border-gray-200"}
+      `}
+    >
+      <span
+        className={`flex h-11 w-11 items-center justify-center rounded-full shadow ${
+          selected ? "bg-white/10" : "bg-blue-100"
+        }`}
+      >
+        {Icon ? (
+          <Icon className={`w-6 h-6 ${selected ? "text-white" : "text-black"}`} />
+        ) : (
+          <Briefcase className={`w-6 h-6 ${selected ? "text-white" : "text-black"}`} />
+        )}
+      </span>
+      <span className="font-medium line-clamp-2">{label}</span>
     </button>
   );
 }

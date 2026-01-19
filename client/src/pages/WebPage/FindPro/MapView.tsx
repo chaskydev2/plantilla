@@ -36,6 +36,8 @@ export default function MapView({ contractors, initialCenter, radiusMiles = 10 }
     id: "google-map-script",
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "",
     libraries: ["places"],
+    language: "en",
+    region: "US",
   });
 
   const mapCenter = useMemo(() => initialCenter || { lat: 35.4676, lng: -97.5164 }, [initialCenter]);

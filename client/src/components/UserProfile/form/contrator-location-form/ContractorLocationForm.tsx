@@ -93,6 +93,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
   const [error, setError] = useState<string | null>(null);
   const [fullInfo, setFullInfo] = useState<any>(null); // Store full API response for debug
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
 
   // Fetch full contractor info when modal opens
   useEffect(() => {
@@ -183,15 +184,30 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
   // Google Maps API key from Vite env
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
     googleMapsApiKey: GOOGLE_MAPS_API_KEY || "",
     libraries: ["places"],
+    language: 'en',
+    region: 'US',
   });
 
 
-  // Autocompletado manual usando la API REST de Google Places
+  // Autocompletado usando Google Places Autocomplete Service
   const [manualSearch, setManualSearch] = useState("");
   const [manualSuggestions, setManualSuggestions] = useState<any[]>([]);
   const [manualLoading, setManualLoading] = useState(false);
+  const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
+  const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
+
+  // Initialize Google Places services when maps is loaded
+  useEffect(() => {
+    if (isLoaded && window.google) {
+      setAutocompleteService(new google.maps.places.AutocompleteService());
+      // Create a dummy div for PlacesService
+      const dummyDiv = document.createElement('div');
+      setPlacesService(new google.maps.places.PlacesService(dummyDiv));
+    }
+  }, [isLoaded]);
 
   const handleManualInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setManualSearch(e.target.value);
@@ -199,19 +215,28 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
       setManualSuggestions([]);
       return;
     }
+    if (!autocompleteService) {
+      return;
+    }
     setManualLoading(true);
     try {
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
-          e.target.value
-        )}&types=geocode&language=es&key=${apiKey}`
+      autocompleteService.getPlacePredictions(
+        {
+          input: e.target.value,
+          types: ['geocode', 'establishment'],
+          language: 'es'
+        },
+        (predictions, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setManualSuggestions(predictions);
+          } else {
+            setManualSuggestions([]);
+          }
+          setManualLoading(false);
+        }
       );
-      const data = await res.json();
-      setManualSuggestions(data.predictions || []);
     } catch {
       setManualSuggestions([]);
-    } finally {
       setManualLoading(false);
     }
   };
@@ -219,58 +244,125 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
   const handleManualSelect = async (description: string, placeId: string) => {
     setManualSearch(description);
     setManualSuggestions([]);
-    try {
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${apiKey}&language=es`
-      );
-      const data = await res.json();
-      const location = data.result?.geometry?.location;
-      const address_components = data.result?.address_components || [];
-      // Extraer campos relevantes
-      const getComponent = (type: string) => {
-        const comp = address_components.find((c: any) => c.types.includes(type));
-        return comp ? comp.long_name : "";
-      };
-      const getShortComponent = (type: string) => {
-        const comp = address_components.find((c: any) => c.types.includes(type));
-        return comp ? comp.short_name : "";
-      };
-      const address_line1 = getComponent("route")
-        ? `${getComponent("street_number")} ${getComponent("route")}`.trim()
-        : getComponent("route") || getComponent("street_address") || "";
-      const city = getComponent("locality") || getComponent("sublocality") || getComponent("administrative_area_level_2") || "";
-      const state_code = getShortComponent("administrative_area_level_1");
-      const preferred_zip = getComponent("postal_code");
-      const country_code = getShortComponent("country");
+    
+    if (!placesService) {
+      setError("Servicio de lugares no disponible");
+      return;
+    }
 
-      if (location) {
-        setMapPosition([location.lat, location.lng]);
-        setForm((prev) => ({
-          ...prev,
-          lat: location.lat,
-          lng: location.lng,
-          address_line1,
-          city,
-          state_code,
-          preferred_zip,
-          country_code,
-          address_components,
-        }));
-      }
-    } catch {
+    try {
+      placesService.getDetails(
+        {
+          placeId: placeId,
+          fields: ['geometry', 'address_components', 'formatted_address']
+        },
+        (place, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+            const location = place.geometry?.location;
+            const address_components = place.address_components || [];
+            
+            // Extraer campos relevantes
+            const getComponent = (type: string) => {
+              const comp = address_components.find((c: any) => c.types.includes(type));
+              return comp ? comp.long_name : "";
+            };
+            const getShortComponent = (type: string) => {
+              const comp = address_components.find((c: any) => c.types.includes(type));
+              return comp ? comp.short_name : "";
+            };
+            
+            const streetNumber = getComponent("street_number");
+            const route = getComponent("route");
+            const address_line1 = streetNumber && route 
+              ? `${streetNumber} ${route}`.trim()
+              : route || getComponent("street_address") || "";
+            const city = getComponent("locality") || getComponent("sublocality") || getComponent("administrative_area_level_2") || "";
+            const state_code = getShortComponent("administrative_area_level_1");
+            const preferred_zip = getComponent("postal_code");
+            const country_code = getShortComponent("country");
+
+            if (location) {
+              const lat = location.lat();
+              const lng = location.lng();
+              setMapPosition([lat, lng]);
+              setForm((prev) => ({
+                ...prev,
+                lat,
+                lng,
+                address_line1,
+                city,
+                state_code,
+                preferred_zip,
+                country_code,
+                address_components,
+              }));
+            }
+          } else {
+            setError("No se pudo obtener la ubicación seleccionada.");
+          }
+        }
+      );
+    } catch (err) {
+      console.error("Error al obtener detalles del lugar:", err);
       setError("No se pudo obtener la ubicación seleccionada.");
     }
   };
 
-  // Map click handler
+  // Map click handler - actualiza todos los campos desde la geocodificación inversa
   const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
       const lat = e.latLng.lat();
       const lng = e.latLng.lng();
       setMapPosition([lat, lng]);
-      setForm((prev) => ({ ...prev, lat, lng }));
-      fetchCountry(lat, lng).then((country_code) => setForm((prev) => ({ ...prev, country_code })));
+      
+      // Usar Geocoder para obtener la dirección completa desde las coordenadas
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          const address_components = results[0].address_components || [];
+          
+          const getComponent = (type: string) => {
+            const comp = address_components.find((c: any) => c.types.includes(type));
+            return comp ? comp.long_name : "";
+          };
+          const getShortComponent = (type: string) => {
+            const comp = address_components.find((c: any) => c.types.includes(type));
+            return comp ? comp.short_name : "";
+          };
+          
+          const streetNumber = getComponent("street_number");
+          const route = getComponent("route");
+          const address_line1 = streetNumber && route 
+            ? `${streetNumber} ${route}`.trim()
+            : route || "";
+          const city = getComponent("locality") || getComponent("sublocality") || getComponent("administrative_area_level_2") || "";
+          const state_code = getShortComponent("administrative_area_level_1");
+          const preferred_zip = getComponent("postal_code");
+          const country_code = getShortComponent("country");
+          
+          setManualSearch(results[0].formatted_address);
+          setForm((prev) => ({
+            ...prev,
+            lat,
+            lng,
+            address_line1,
+            city,
+            state_code,
+            preferred_zip,
+            country_code,
+            address_components,
+          }));
+          
+          // Mark address fields as auto-filled (read-only)
+          const fieldsToLock = ['address_line1', 'city', 'state_code', 'preferred_zip', 'country_code'];
+          setAutoFilledFields(new Set(fieldsToLock));
+        } else {
+          // Si falla la geocodificación, solo actualizar las coordenadas
+          setForm((prev) => ({ ...prev, lat, lng }));
+          fetchCountry(lat, lng).then((country_code) => setForm((prev) => ({ ...prev, country_code })));
+          setAutoFilledFields(new Set());
+        }
+      });
     }
   }, []);
 
@@ -287,6 +379,14 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
       setForm((prev) => ({ ...prev, [name]: value }));
     } else {
       setForm((prev) => ({ ...prev, [name]: newValue }));
+    }
+    // Remove from auto-filled set when user manually edits
+    if (autoFilledFields.has(name)) {
+      setAutoFilledFields((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(name);
+        return newSet;
+      });
     }
   };
 
@@ -311,11 +411,15 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
       }
     });
     try {
-      await updateAllFields(cleanedForm.user_id, cleanedForm);
+      await updateAllFields(form.user_id, cleanedForm);
       setSuccessMessage('¡Información guardada correctamente!');
       onSave(cleanedForm);
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (err: any) {
-      setError('Error al guardar los cambios.');
+      console.error("Error al guardar:", err);
+      setError(err.response?.data?.message || 'Error al guardar los cambios.');
     } finally {
       setLoading(false);
     }
@@ -343,11 +447,25 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
         <input type="hidden" name="user_id" value={form.user_id} />
         <label>
           Código Postal
-          <input className="input input-bordered w-full" name="preferred_zip" value={form.preferred_zip || ""} onChange={handleChange} />
+          <input 
+            className="input input-bordered w-full" 
+            name="preferred_zip" 
+            value={form.preferred_zip || ""} 
+            onChange={handleChange}
+            disabled={autoFilledFields.has('preferred_zip')}
+            title={autoFilledFields.has('preferred_zip') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
+          />
         </label>
         <label>
           Dirección 1
-          <input className="input input-bordered w-full" name="address_line1" value={form.address_line1 || ""} onChange={handleChange} />
+          <input 
+            className="input input-bordered w-full" 
+            name="address_line1" 
+            value={form.address_line1 || ""} 
+            onChange={handleChange}
+            disabled={autoFilledFields.has('address_line1')}
+            title={autoFilledFields.has('address_line1') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
+          />
         </label>
         <label>
           Dirección 2
@@ -355,7 +473,14 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
         </label>
         <label>
           Ciudad
-          <input className="input input-bordered w-full" name="city" value={form.city || ""} onChange={handleChange} />
+          <input 
+            className="input input-bordered w-full" 
+            name="city" 
+            value={form.city || ""} 
+            onChange={handleChange}
+            disabled={autoFilledFields.has('city')}
+            title={autoFilledFields.has('city') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
+          />
         </label>
         <label>
           Empresa
@@ -379,7 +504,14 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
         </label>
         <label>
           Estado
-          <input className="input input-bordered w-full" name="state_code" value={form.state_code || ""} onChange={handleChange} />
+          <input 
+            className="input input-bordered w-full" 
+            name="state_code" 
+            value={form.state_code || ""} 
+            onChange={handleChange}
+            disabled={autoFilledFields.has('state_code')}
+            title={autoFilledFields.has('state_code') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
+          />
         </label>
         <div className="md:col-span-2">
           <label className="block mb-2 font-semibold">Ubicación en el mapa</label>
@@ -444,6 +576,11 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
               <span className="font-medium">País:</span> {form.country_code ?? ""}
             </div>
           </div>
+          {autoFilledFields.size > 0 && (
+            <div className="alert alert-info my-2">
+              <span>Los campos de dirección fueron auto-completados desde el mapa y no pueden editarse. Haz click nuevamente en el mapa para actualizar.</span>
+            </div>
+          )}
           <small className="text-gray-500 block mt-1">Haz click en el mapa o busca una dirección para seleccionar la ubicación.</small>
         </div>
         <label>
