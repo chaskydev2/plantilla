@@ -2,448 +2,552 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV - {{ $user->name ?? 'Professional' }}</title>
     <style>
-        /* Optimizaciones para PDF y Reset */
-        @page { margin: 0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Optimizaciones para dompdf */
+        @page { 
+            margin: 0mm;
+            size: letter portrait;
+        }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         
         body { 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            background: #fff;
-            color: #333;
-            line-height: 1.4;
-            display: flex;
+            font-family: 'DejaVu Sans', 'Arial', sans-serif; 
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.3;
+            font-size: 9pt;
             position: relative;
         }
 
-        /* Anillación (Binding Holes) */
-        .binding-holes {
-            position: absolute;
-            left: 10px;
-            top: 0;
-            bottom: 0;
-            width: 20px;
-            z-index: 10;
-        }
-        .hole {
-            width: 15px;
-            height: 15px;
-            background: #fff;
-            border: 2px solid #ccc;
-            border-radius: 50%;
-            position: absolute;
-            left: 2px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .hole:nth-child(1) { top: 80px; }
-        .hole:nth-child(2) { top: 240px; }
-        .hole:nth-child(3) { top: 400px; }
-        .hole:nth-child(4) { top: 560px; }
-        .hole:nth-child(5) { top: 720px; }
-
-        /* Contenedor Principal Estilo Dos Columnas */
+        /* Contenedor Principal */
         .resume-container {
-            display: flex;
-            flex-direction: row;
             width: 100%;
             min-height: 100vh;
-            margin-left: 30px;
-            align-items: flex-start;
-        }
-
-        /* --- COLUMNA IZQUIERDA (NEGRA) --- */
-        .sidebar {
-            width: 28%;
-            background-color: #000;
-            color: #fff;
-            padding: 20px 15px;
             position: relative;
-            flex-shrink: 0;
         }
         
-        /* Logo/Header Company */
-        .company-header {
-            text-align: center;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f5c400;
-            margin-bottom: 12px;
+        /* Header con colores amarillos */
+        .header-section {
+            background: #F5C400;
+            padding: 18px 30px;
+            color: #1a1a1a;
+            position: relative;
+            border-bottom: 3px solid #000000;
         }
-        .company-logo {
-            width: 45px;
-            height: 45px;
-            background: #f5c400;
-            border-radius: 50%;
-            margin: 0 auto 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #000;
+        
+        .header-content {
+            position: relative;
         }
-        .company-name {
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
+        
+        .contractor-name {
+            font-size: 26pt;
+            font-weight: 900;
             letter-spacing: 1px;
-            color: #f5c400;
-            word-break: break-word;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: #000000;
+        }
+        
+        .contractor-title {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .header-info {
+            margin-top: 8px;
+            border-top: 2px solid rgba(0,0,0,0.3);
+            padding-top: 8px;
+        }
+        
+        .info-row {
+            margin-bottom: 4px;
+            font-size: 8pt;
+        }
+        
+        .info-label {
+            display: inline-block;
+            width: 110px;
+            font-weight: 900;
+            color: #000000;
+        }
+        
+        .info-value {
+            color: #1a1a1a;
+            font-weight: 600;
         }
 
-        .sidebar-section { margin-bottom: 12px; }
-
-        .sidebar-title {
-            font-size: 13px;
-            font-weight: bold;
+        
+        /* Contenedor de dos columnas */
+        .body-section {
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar {
+            width: 32%;
+            float: left;
+            background: #1a1a1a;
+            min-height: 700px;
+            padding: 18px 15px;
+            color: #ffffff;
+        }
+        
+        .main-content {
+            width: 68%;
+            float: right;
+            padding: 18px 25px;
+            background: #ffffff;
+        }
+        
+        /* Secciones */
+        .section {
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            font-size: 11pt;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #1a1a1a;
+            border-bottom: 3px solid #F5C400;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .sidebar .section-title {
+            color: #F5C400;
+            border-bottom-color: #F5C400;
+        }
+        
+        /* Profile/About */
+        .profile-text {
+            font-size: 8pt;
+            line-height: 1.4;
+            text-align: justify;
+            color: #333333;
+            padding: 8px 10px;
+            background: #fffef5;
+            border-left: 4px solid #F5C400;
+            margin-top: 6px;
+        }
+        
+        /* Company Info en Sidebar */
+        .company-box {
+            background: rgba(245, 196, 0, 0.15);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #F5C400;
+        }
+        
+        .company-name-text {
+            font-size: 10pt;
+            font-weight: 900;
+            color: #F5C400;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            border-bottom: 3px solid #f5c400;
-            padding-bottom: 4px;
-            margin-bottom: 10px;
-            display: block;
-            color: #fff;
-            font-weight: 900;
-            letter-spacing: 1px;
         }
-
-        /* Contacto */
+        
+        .company-license {
+            font-size: 8pt;
+            color: #cccccc;
+            margin-top: 3px;
+        }
+        
+        /* Contact Items */
+        .contact-list {
+            margin-top: 8px;
+        }
+        
         .contact-item {
-            display: flex;
-            align-items: center;
             margin-bottom: 6px;
-            font-size: 11px;
-        }
-        .contact-icon {
-            width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #f5c400, #f0b800);
-            border-radius: 50%;
-            margin-right: 7px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-weight: bold;
-            font-size: 9px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* Educación en Sidebar */
-        .edu-item { margin-bottom: 7px; }
-        .edu-year { font-size: 9px; color: #f5c400; font-weight: bold; }
-        .edu-degree { font-size: 11px; font-weight: bold; text-transform: uppercase; margin: 1px 0; line-height: 1.2; }
-        .edu-school { font-size: 10px; color: #bbb; line-height: 1.2; }
-
-        /* Skills con barras de progreso */
-        .skill-item { margin-bottom: 6px; }
-        .skill-name { font-size: 9px; margin-bottom: 2px; display: block; text-transform: uppercase; }
-        .skill-bar-bg { background: #333; height: 2px; width: 100%; position: relative; }
-        .skill-bar-fill { background: #f5c400; height: 2px; position: absolute; left: 0; top: 0; }
-
-        /* --- COLUMNA DERECHA (BLANCA) --- */
-        .main-content {
-            width: 72%;
-            padding: 20px 18px;
-            background: #fff;
+            padding-left: 20px;
             position: relative;
-            flex-shrink: 0;
+            font-size: 8pt;
+            line-height: 1.3;
+            color: #ffffff;
         }
-
-        /* Header Report Style */
-        .report-header {
-            border-bottom: 4px solid #f5c400;
-            padding-bottom: 10px;
-            margin-bottom: 12px;
-            background: linear-gradient(to right, rgba(245,196,0,0.05), transparent);
-            padding-top: 8px;
-            padding-left: 6px;
+        
+        .contact-item:before {
+            content: '●';
+            position: absolute;
+            left: 0;
+            color: #F5C400;
+            font-size: 11pt;
         }
-        .report-title {
-            font-size: 9px;
-            color: #999;
-            letter-spacing: 2px;
-            margin-bottom: 3px;
-            font-weight: 600;
-        }
-        .report-doc-number {
-            font-size: 8px;
-            color: #aaa;
-            float: right;
-            margin-top: -25px;
-            font-weight: 600;
-            background: #f5c400;
-            color: #000;
-            padding: 2px 6px;
-            border-radius: 2px;
-        }
-
-        .personal-profile { margin-bottom: 12px; }
-        .section-header {
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
+        
+        /* Education Items */
+        .edu-item {
             margin-bottom: 8px;
-            color: #000;
-            padding-bottom: 4px;
-            border-bottom: 2px solid #f5c400;
-            display: inline-block;
+            padding: 8px;
+            background: rgba(245, 196, 0, 0.08);
+            border-left: 3px solid #F5C400;
         }
-
-        .profile-text { 
-            font-size: 10px; 
-            color: #444; 
-            text-align: justify; 
-            line-height: 1.4;
-            padding: 6px 8px;
-            background: #fafafa;
-            border-left: 3px solid #f5c400;
-            border-radius: 2px;
+        
+        .edu-year {
+            font-size: 7pt;
+            color: #F5C400;
+            font-weight: 700;
+            margin-bottom: 3px;
         }
-
-        /* Línea de Tiempo de Experiencia - Ahora con Tabla */
+        
+        .edu-degree {
+            font-size: 8pt;
+            font-weight: 700;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+        
+        .edu-school {
+            font-size: 7pt;
+            color: #cccccc;
+            font-style: italic;
+        }
+        
+        /* Skills */
+        .skill-item {
+            margin-bottom: 8px;
+        }
+        
+        .skill-name {
+            font-size: 7pt;
+            margin-bottom: 3px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+        
+        .skill-bar {
+            background: rgba(255,255,255,0.15);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .skill-bar-fill {
+            background: #F5C400;
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        /* Tables */
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 6px 0;
-            font-size: 9px;
-            border: 1px solid #e0e0e0;
+            margin-top: 6px;
+            font-size: 7pt;
         }
+        
         .data-table thead {
-            background: linear-gradient(to right, #f5c400, #f0b800);
-            color: #000;
+            background: #1a1a1a;
+            color: #F5C400;
         }
+        
         .data-table th {
-            padding: 5px 6px;
+            padding: 6px 8px;
             text-align: left;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 8px;
-            letter-spacing: 0.5px;
-            border: 1px solid #e0e0e0;
             font-weight: 900;
+            text-transform: uppercase;
+            font-size: 7pt;
+            letter-spacing: 0.5px;
+            border: 1px solid #1a1a1a;
         }
+        
         .data-table td {
-            padding: 5px 6px;
-            border-bottom: 1px solid #f0f0f0;
-            color: #333;
+            padding: 6px 8px;
+            border: 1px solid #e8e8e8;
+            color: #1a1a1a;
             line-height: 1.3;
+            font-size: 7pt;
         }
-        .data-table tbody tr {
-            transition: all 0.2s ease;
-        }
+        
         .data-table tbody tr:nth-child(even) {
-            background: #fafafa;
+            background: #fffef5;
         }
-        .data-table tbody tr:hover {
-            background: #f5f5f5;
-            box-shadow: inset 0 0 3px rgba(245,196,0,0.1);
+        
+        .data-table tbody tr:nth-child(odd) {
+            background: #ffffff;
         }
-
-        /* Etiquetas para Especialidades */
-        .pill-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
-        .pill { 
-            background: linear-gradient(135deg, #f2f2f2, #e8e8e8); 
-            color: #333; 
-            padding: 3px 8px; 
-            border-radius: 3px; 
-            font-size: 8px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            border-left: 3px solid #f5c400;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            letter-spacing: 0.3px;
+        
+        /* Experience Timeline */
+        .experience-item {
+            margin-bottom: 22px;
+            padding: 16px;
+            background: #fffef5;
+            border-left: 5px solid #F5C400;
+            page-break-inside: avoid;
         }
-
-        /* Referencias y Equipo en cuadrícula */
-        .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .ref-card { 
-            padding: 7px 8px; 
-            background: linear-gradient(135deg, #fafafa, #f5f5f5); 
-            border-radius: 3px; 
-            font-size: 10px; 
-            border-left: 3px solid #f5c400;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            line-height: 1.4;
+        
+        .exp-header {
+            margin-bottom: 10px;
+        }
+        
+        .exp-position {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .exp-company {
+            font-size: 10pt;
+            color: #666666;
+            font-weight: 600;
+        }
+        
+        .exp-dates {
+            font-size: 8pt;
+            color: #999999;
+            margin-top: 6px;
+            font-style: italic;
+        }
+        
+        /* Pills/Tags */
+        .pill-container {
+            margin-top: 6px;
+        }
+        
+        .pill {
+            display: inline-block;
+            background: #F5C400;
+            color: #1a1a1a;
+            padding: 4px 8px;
+            margin: 3px 3px 3px 0;
+            border-radius: 3px;
+            font-size: 7pt;
+            font-weight: 700;
+            border: 1px solid #1a1a1a;
+            text-transform: uppercase;
         }
         
         /* Empty State */
-        .empty { 
-            font-size: 10px; 
-            color: #999; 
-            font-style: italic; 
+        .empty {
+            font-size: 8pt;
+            color: #999999;
+            font-style: italic;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
+            background: #f9f9f9;
         }
         
-        .section { margin-top: 8px !important; }
+        /* Utility */
+        .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+        .text-muted {
+            color: #666666;
+        }
+        
+        .text-bold {
+            font-weight: 700;
+        }
         
     </style>
 </head>
 <body>
 
-<!-- Anillación -->
-<div class="binding-holes">
-    <div class="hole"></div>
-    <div class="hole"></div>
-    <div class="hole"></div>
-    <div class="hole"></div>
-    <div class="hole"></div>
-</div>
-
 <div class="resume-container">
-    <div class="sidebar">
-        <!-- Company Header -->
-        <div class="company-header">
-            <div class="company-logo">{{ strtoupper(substr($contractor->company_name ?? 'CO', 0, 2)) }}</div>
-            <div class="company-name">{{ $contractor->company_name ?? 'Company Name' }}</div>
-        </div>
-        
-        <div class="sidebar-section">
-            <h3 class="sidebar-title">CONTACT INFO</h3>
-            <div class="contact-item">
-                <span class="contact-icon">P</span> {{ $contractor->mobile_number ?? '—' }}
-            </div>
-            <div class="contact-item">
-                <span class="contact-icon">E</span> {{ $user->email ?? '—' }}
-            </div>
-            <div class="contact-item">
-                <span class="contact-icon">W</span> {{ $contractor->city ?? 'Location' }}
-            </div>
-            <div class="contact-item">
-                <span class="contact-icon">L</span> {{ $contractor->license_number ?? 'No License' }}
-            </div>
-        </div>
-
-        @if($academicTrainings->isNotEmpty())
-        <div class="sidebar-section">
-            <h3 class="sidebar-title">EDUCATION</h3>
-            @foreach($academicTrainings as $training)
-            <div class="edu-item">
-                <p class="edu-year">{{ $training->graduation_date ? $training->graduation_date->format('Y') : 'N/A' }}</p>
-                <p class="edu-degree">{{ $training->academic_degree }}</p>
-                <p class="edu-school">{{ $training->graduated_from }}</p>
-            </div>
-            @endforeach
-        </div>
-        @endif
-
-        @if($technicalSkills->isNotEmpty())
-        <div class="sidebar-section">
-            <h3 class="sidebar-title">SKILLS</h3>
-            @foreach($technicalSkills as $skill)
-            <div class="skill-item">
-                <span class="skill-name">{{ $skill->skill_name }}</span>
-                <div class="skill-bar-bg">
-                    <div class="skill-bar-fill" style="width: 80%;"></div>
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content">
+            <h1 class="contractor-name">{{ strtoupper($user->name ?? 'Professional Name') }}</h1>
+            <p class="contractor-title">{{ strtoupper($contractor->service_area ?? 'Professional Contractor') }}</p>
+            
+            <div class="header-info">
+                <div class="info-row">
+                    <span class="info-label">Document #:</span>
+                    <span class="info-value">{{ $contractor->license_number ?? 'N/A' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date:</span>
+                    <span class="info-value">{{ date('F d, Y') }}</span>
                 </div>
             </div>
-            @endforeach
         </div>
-        @endif
     </div>
 
-    <div class="main-content">
-        <!-- Report Header -->
-        <div class="report-header">
-            <p class="report-title">PROFESSIONAL CONTRACTOR REPORT</p>
-            <h1 style="font-size: 19px; line-height: 1.2; margin: 2px 0; font-weight: 900; color: #000; letter-spacing: 0.5px;">{{ strtoupper($user->name) }}</h1>
-            <p style="letter-spacing: 1.5px; color: #555; font-weight: 700; font-size: 10px; margin-top: 2px;">{{ strtoupper($contractor->service_area ?? 'PROFESSIONAL') }}</p>
-            <p class="report-doc-number">Doc. #{{ $contractor->license_number ?? 'N/A' }} | {{ date('d/m/Y') }}</p>
-        </div>
+    <!-- Body with Sidebar and Main Content -->
+    <div class="body-section clearfix">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Company Info -->
+            <div class="section">
+                <h3 class="section-title">Company Info</h3>
+                <div class="company-box">
+                    <div class="company-name-text">{{ $contractor->company_name ?? 'Company Name' }}</div>
+                    <div class="company-license">License: {{ $contractor->license_number ?? 'Not Available' }}</div>
+                    @if($contractor->is_insured)
+                    <div class="company-license" style="color: #F5C400; margin-top: 5px; font-weight: 700;">✓ Insured</div>
+                    @endif
+                </div>
+            </div>
 
-        <div class="section">
-            <h3 class="section-header">Personal Profile</h3>
-            <p class="profile-text">
-                {{ $contractor->company_description ?? 'Professional contractor dedicated to providing high-quality services in their area of expertise, focused on efficiency and excellence.' }}
-            </p>
-        </div>
+            <!-- Contact Information -->
+            <div class="section">
+                <h3 class="section-title">Contact</h3>
+                <div class="contact-list">
+                    @if($contractor->mobile_number)
+                    <div class="contact-item">{{ $contractor->mobile_number }}</div>
+                    @endif
+                    @if($user->email)
+                    <div class="contact-item">{{ $user->email }}</div>
+                    @endif
+                    @if($contractor->city)
+                    <div class="contact-item">{{ $contractor->city }}@if($contractor->state_code), {{ $contractor->state_code }}@endif</div>
+                    @endif
+                    @if($contractor->address_line1)
+                    <div class="contact-item">{{ $contractor->address_line1 }}</div>
+                    @endif
+                </div>
+            </div>
 
-        <div class="section">
-            <h3 class="section-header">Work Experience</h3>
-            @if($workExperiences->isNotEmpty())
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 30%;">POSITION</th>
-                        <th style="width: 35%;">COMPANY</th>
-                        <th style="width: 18%;">START DATE</th>
-                        <th style="width: 17%;">END DATE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($workExperiences as $exp)
-                    <tr>
-                        <td><strong>{{ $exp->position }}</strong></td>
-                        <td>{{ $exp->company_name }}</td>
-                        <td>{{ $exp->start_date->format('m/Y') }}</td>
-                        <td>{{ $exp->end_date ? $exp->end_date->format('m/Y') : 'Present' }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            @else
-            <p class="empty">No work experience registered</p>
+            <!-- Education -->
+            @if($academicTrainings->isNotEmpty())
+            <div class="section">
+                <h3 class="section-title">Education</h3>
+                @foreach($academicTrainings as $training)
+                <div class="edu-item">
+                    <div class="edu-year">{{ $training->graduation_date ? $training->graduation_date->format('Y') : 'N/A' }}</div>
+                    <div class="edu-degree">{{ $training->academic_degree }}</div>
+                    <div class="edu-school">{{ $training->graduated_from }}</div>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
+            <!-- Technical Skills -->
+            @if($technicalSkills->isNotEmpty())
+            <div class="section">
+                <h3 class="section-title">Skills</h3>
+                @foreach($technicalSkills as $skill)
+                <div class="skill-item">
+                    <div class="skill-name">{{ $skill->skill_name }}</div>
+                    <div class="skill-bar">
+                        <div class="skill-bar-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
             @endif
         </div>
 
-        <div class="section">
-            <h3 class="section-header">Specialties</h3>
-            <div class="pill-container">
-                @foreach($professions as $profession)
-                    <span class="pill">{{ $profession->name }}</span>
-                @endforeach
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Professional Profile -->
+            <div class="section">
+                <h2 class="section-title">Professional Profile</h2>
+                <p class="profile-text">
+                    {{ $contractor->company_description ?? 'Experienced professional contractor dedicated to delivering high-quality services with a focus on customer satisfaction, efficiency, and excellence in every project. Committed to maintaining the highest standards of workmanship and professional conduct.' }}
+                </p>
             </div>
-        </div>
+            
+            <!-- Work Experience -->
+            <div class="section">
+                <h2 class="section-title">Work Experience</h2>
+                @if($workExperiences->isNotEmpty())
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Position</th>
+                            <th style="width: 35%;">Company</th>
+                            <th style="width: 18%;">Start Date</th>
+                            <th style="width: 17%;">End Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($workExperiences as $exp)
+                        <tr>
+                            <td class="text-bold">{{ $exp->position }}</td>
+                            <td>{{ $exp->company_name }}</td>
+                            <td class="text-muted">{{ $exp->start_date->format('M Y') }}</td>
+                            <td class="text-muted">{{ $exp->end_date ? $exp->end_date->format('M Y') : 'Present' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                @else
+                <p class="empty">No work experience registered</p>
+                @endif
+            </div>
 
-        @if($workReferences->isNotEmpty())
-        <div class="section">
-            <h3 class="section-header">Professional References</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 30%;">NAME</th>
-                        <th style="width: 25%;">POSITION</th>
-                        <th style="width: 25%;">COMPANY</th>
-                        <th style="width: 20%;">PHONE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($workReferences as $ref)
-                    <tr>
-                        <td><strong>{{ $ref->reference_name }}</strong></td>
-                        <td>{{ $ref->position ?? '—' }}</td>
-                        <td>{{ $ref->company ?? '—' }}</td>
-                        <td>{{ $ref->phone ?? '—' }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <!-- Specialties/Professions -->
+            <div class="section">
+                <h2 class="section-title">Specialties & Expertise</h2>
+                <div class="pill-container">
+                    @forelse($professions as $profession)
+                        <span class="pill">{{ $profession->name }}</span>
+                    @empty
+                        <p class="empty">No specialties registered</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Professional References -->
+            @if($workReferences->isNotEmpty())
+            <div class="section">
+                <h2 class="section-title">Professional References</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Name</th>
+                            <th style="width: 25%;">Position</th>
+                            <th style="width: 25%;">Company</th>
+                            <th style="width: 20%;">Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($workReferences as $ref)
+                        <tr>
+                            <td class="text-bold">{{ $ref->reference_name }}</td>
+                            <td>{{ $ref->position ?? '—' }}</td>
+                            <td>{{ $ref->company ?? '—' }}</td>
+                            <td class="text-muted">{{ $ref->phone ?? '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
+            
+            <!-- Work Team -->
+            @if($team->isNotEmpty())
+            <div class="section">
+                <h2 class="section-title">Work Team</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Team Member</th>
+                            <th style="width: 50%;">Specialty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($team as $member)
+                        <tr>
+                            <td class="text-bold">{{ $member->user->name ?? 'Team Member' }}</td>
+                            <td>{{ $member->professions->isNotEmpty() ? $member->professions->first()->name : '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
         </div>
-        @endif
-        
-        @if($team->isNotEmpty())
-        <div class="section">
-            <h3 class="section-header">Work Team</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50%;">MEMBER NAME</th>
-                        <th style="width: 50%;">SPECIALTY</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($team as $member)
-                    <tr>
-                        <td><strong>{{ $member->user->name ?? 'Member' }}</strong></td>
-                        <td>{{ $member->professions->isNotEmpty() ? $member->professions->first()->name : '—' }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @endif
     </div>
 </div>
 

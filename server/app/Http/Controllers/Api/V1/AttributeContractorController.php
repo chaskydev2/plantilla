@@ -77,6 +77,7 @@ class AttributeContractorController extends Controller
         'attributes' => 'required|array',
         'attributes.*.attribute_id' => ['required', Rule::exists('attributes', 'id')],
         'attributes.*.value' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'attributes.*.coment' => 'nullable|string',
     ]);
 
     
@@ -115,6 +116,7 @@ class AttributeContractorController extends Controller
                     'contractor_id' => $validated['contractor_id'],
                     'attribute_id' => $attributeId,
                     'value' => $storedValue,
+                    'coment' => $attr['coment'] ?? '',
                 ]);
                 $created[] = $row;
             } else {

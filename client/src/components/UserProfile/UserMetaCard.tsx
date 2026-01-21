@@ -90,13 +90,15 @@ export default function UserMetaCard({
                 <span>Falta confirmación del admin</span>
               </div>
             )}
-            <button
-              type="button"
-              className="btn btn-sm btn-outline-primary w-full xl:w-auto"
-              onClick={() => setLocationModalOpen(true)}
-            >
-              Editar información de localización
-            </button>
+            {user?.role_name === "contractor" && (
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-primary w-full xl:w-auto"
+                onClick={() => setLocationModalOpen(true)}
+              >
+                Editar información de localización
+              </button>
+            )}
           </div>
         </div>
         <AuthFormModal initialData={user} load={initializeProfile} />

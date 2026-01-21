@@ -14,11 +14,14 @@ type Props = {
 	setIsProcessing: (v: boolean) => void;
 };
 
-const getLocalUrl = (url: string | null | undefined) => {
-	if (!url) return "";
-	if (/^https?:\/\//i.test(url)) return url;
-	const cleanUrl = url.startsWith("/") ? url.slice(1) : url;
-	return `${import.meta.env.VITE_API_URL ?? "http://localhost:8080"}/${cleanUrl}`;
+const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+const DEFAULT_FILE_URL = 'https://via.placeholder.com/150/cccccc/ffffff?text=File';
+
+const getLocalUrl = (url?: string | null): string => {
+	if (!url || url.trim() === '') return DEFAULT_FILE_URL;
+	if (url.startsWith('http://') || url.startsWith('https://')) return url;
+	const fullUrl = `${API_BASE}/${url.replace(/^\//, '')}`;
+	return fullUrl;
 };
 
 const AttributeHomeownerModal: React.FC<Props> = ({
@@ -31,30 +34,12 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 	setIsProcessing,
 }) => {
 	const [comentario, setComentario] = useState<string>(viewItem?.coment || "");
-	const [savingComentario, setSavingComentario] = useState(false);
 	const [uploading, setUploading] = useState(false);
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
 	useEffect(() => {
 		setComentario(viewItem?.coment || "");
 	}, [viewItem]);
-
-	const handleSaveComentario = async () => {
-		if (!viewItem) return;
-		setSavingComentario(true);
-		try {
-			const response = await ItemService.updateComentario(viewItem.id, comentario);
-			if (response.success) {
-				toastify.success("Comentario guardado");
-				fetchItems();
-			} else {
-				toastify.error(response.message || "Error al guardar comentario");
-			}
-		} catch (err: any) {
-			toastify.error(err?.response?.data?.message || err?.message || "Error al guardar comentario");
-		} finally {
-			setSavingComentario(false);
-		}
-	};
 
 	const handleStatusToggle = async (newStatus: boolean) => {
 		if (!viewItem) return;
@@ -76,23 +61,46 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 	};
 
 	const handleUpload = async (file: File) => {
-		if (!viewItem?.id || !viewItem.homeowner_id || !viewItem.attribute_id) return;
-		const formData = new FormData();
-		formData.append("homeowner_id", String(viewItem.homeowner_id));
-		formData.append("attribute_id", String(viewItem.attribute_id));
-		formData.append("value", file);
+		if (!viewItem?.id || !viewItem.homeowner_id || !viewItem.attribute_id) {
+			toastify.error("Datos incompletos para actualizar documento");
+			return;
+		}
+
+		// Validar tipo de archivo
+		const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+		if (!allowedTypes.includes(file.type)) {
+			toastify.error('Solo se permiten archivos PDF e imágenes (JPG, PNG)');
+			return;
+		}
+
+		// Validar tamaño máx 10MB
+		if (file.size > 10 * 1024 * 1024) {
+			toastify.error('El archivo no puede superar los 10MB');
+			return;
+		}
+
 		setUploading(true);
 		try {
-			const res = await ItemService.updateDocument(viewItem.id, formData as any);
+			const formData = new FormData();
+			formData.append("homeowner_id", String(viewItem.homeowner_id));
+			formData.append("attribute_id", String(viewItem.attribute_id));
+			formData.append("value", file);
+
+			const res = await ItemService.updateDocument(viewItem.id, formData);
+			
 			if (res.success) {
 				toastify.success(res.message || "Documento actualizado");
+				setViewFile(null);
 				fetchItems();
 			} else {
 				toastify.error(res.message || "Error al actualizar documento");
 			}
+
 		} catch (err: any) {
+			
 			toastify.error(err?.response?.data?.message || err?.message || "Error al actualizar documento");
 		} finally {
+			
 			setUploading(false);
 		}
 	};
@@ -146,21 +154,12 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 			<div className="flex flex-col gap-2">
 				<label className="font-semibold text-sm">Comentario</label>
 				<textarea
-					className="textarea textarea-bordered w-full"
+					className="textarea textarea-bordered w-full bg-gray-100"
 					value={comentario}
-					onChange={(e) => setComentario(e.target.value)}
+					readOnly
 					rows={3}
-					disabled={savingComentario || isProcessing}
+					disabled
 				/>
-				<div className="flex justify-end">
-					<button
-						className="btn btn-primary"
-						onClick={handleSaveComentario}
-						disabled={savingComentario || isProcessing}
-					>
-						{savingComentario ? "Guardando..." : "Guardar comentario"}
-					</button>
-				</div>
 			</div>
 
 			<div className="flex flex-col gap-2">
@@ -170,11 +169,37 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 					accept="application/pdf,image/jpeg,image/png,image/jpg"
 					onChange={(e) => {
 						const file = e.target.files?.[0];
-						if (file) handleUpload(file);
+						if (file) setSelectedFile(file);
 					}}
-					disabled={uploading || isProcessing}
+					disabled={uploading || isProcessing} 
 					className="file-input file-input-bordered w-full"
 				/>
+				{selectedFile && (
+					<div className="flex items-center gap-2">
+						<input
+							type="text"
+							value={selectedFile.name}
+							readOnly
+							className="input input-bordered w-full bg-gray-100"
+							disabled
+						/>
+						<button
+							onClick={() => handleUpload(selectedFile)}
+							disabled={uploading || isProcessing}
+							className="btn btn-primary btn-sm"
+						>
+							{uploading ? "Subiendo..." : "Subir"}
+						</button>
+						<button
+							onClick={() => setSelectedFile(null)}
+							disabled={uploading || isProcessing}
+							className="btn btn-outline btn-sm"
+						>
+							Cancelar
+						</button>
+					</div>
+				)}
+				{uploading && <p className="text-sm text-blue-600">Actualizando documento...</p>}
 			</div>
 		</div>
 	);

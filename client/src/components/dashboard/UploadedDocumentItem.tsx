@@ -5,6 +5,7 @@ interface UploadedDocumentItemProps {
   allRequirementsUploaded: boolean;
   getDocumentUrl: (value: string) => string;
   setPdfViewerUrl: (url: string | null) => void;
+  onEdit?: () => void;
 }
 
 const UploadedDocumentItem: React.FC<UploadedDocumentItemProps> = ({
@@ -12,6 +13,7 @@ const UploadedDocumentItem: React.FC<UploadedDocumentItemProps> = ({
   allRequirementsUploaded,
   getDocumentUrl,
   setPdfViewerUrl,
+  onEdit,
 }) => {
   // Normalize status, comment, and metadata coming from different API shapes
   const rawStatus = item.status ?? item.estado ?? item.state ?? item.status_name ?? 0;
@@ -67,6 +69,15 @@ const UploadedDocumentItem: React.FC<UploadedDocumentItemProps> = ({
             Uploaded: {new Date(createdAt).toLocaleString()}
           </span>
         ) : null}
+        {onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="ml-2 px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition"
+          >
+            Edit
+          </button>
+        )}
       </div>
     </li>
   );

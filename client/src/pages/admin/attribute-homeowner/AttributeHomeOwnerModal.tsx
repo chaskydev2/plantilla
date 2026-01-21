@@ -16,11 +16,14 @@ interface AttributeHomeownerModalProps {
 	setIsProcessing: (value: boolean) => void;
 }
 
-const getLocalUrl = (url: string | null | undefined) => {
-	if (!url) return '';
-	if (/^https?:\/\//i.test(url)) return url;
-	const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
-	return `http://localhost:8080/${cleanUrl}`;
+const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+const DEFAULT_FILE_URL = 'https://via.placeholder.com/150/cccccc/ffffff?text=File';
+
+const getLocalUrl = (url?: string | null): string => {
+	if (!url || url.trim() === '') return DEFAULT_FILE_URL;
+	if (url.startsWith('http://') || url.startsWith('https://')) return url;
+	const fullUrl = `${API_BASE}/${url.replace(/^\//, '')}`;
+	return fullUrl;
 };
 
 const AttributeHomeownerModal: React.FC<AttributeHomeownerModalProps> = ({

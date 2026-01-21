@@ -12,8 +12,6 @@ import StatCard from "./StatCard";
 import ContractorTeam from "./ContractorTeam";
 import EarningsOverview from "./EarningsOverview";
 import ContractorProfile from "./ContractorProfile";
-import QuickActionsPanel from "./QuickActionsPanel";
-import SupportChat from "./SupportChat";
 import UploadedDocumentItem from "./UploadedDocumentItem";
 
 const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
@@ -31,6 +29,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
   const [attributes, setAttributes] = useState<any[]>([]);
   const [uploadedAttributes, setUploadedAttributes] = useState<any[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
+  const [editingUploadId, setEditingUploadId] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,8 +40,14 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
 
-  const getDocumentUrl = (value: string) => `http://127.0.0.1:8000/${value}`;
-
+  
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+  
+  const getDocumentUrl = (value: string): string => {
+    if (!value) return '';
+    if (value.startsWith('http://') || value.startsWith('https://')) return value;
+    return `${API_BASE}/${value.replace(/^\/?api(\/|$)/, '')}`;
+  };
   /* ===================== DATA ===================== */
 
   // Fetch dashboard data
@@ -123,7 +128,26 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
   /* ===================== HELPERS ===================== */
 
   const handleFileChange = (key: string, file?: File | null) => {
-    setSelectedFiles(prev => ({ ...prev, [key]: file ?? null }));
+    if (!file) {
+      setSelectedFiles(prev => ({ ...prev, [key]: null }));
+      return;
+    }
+
+    // Validar tipo de archivo (MIME type)
+    const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/jpg'];
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const allowedExtensions = ['pdf', 'jpg', 'jpeg'];
+    
+    const isValidMimeType = allowedMimeTypes.includes(file.type);
+    const isValidExtension = fileExtension && allowedExtensions.includes(fileExtension);
+    
+    if (!isValidMimeType || !isValidExtension) {
+      setSubmitError('Only PDF and JPG/JPEG files are accepted');
+      setTimeout(() => setSubmitError(null), 3000);
+      return;
+    }
+
+    setSelectedFiles(prev => ({ ...prev, [key]: file }));
   };
 
   const allRequirementsUploaded =
@@ -177,6 +201,63 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
       alert('Failed to export PDF');
     } finally {
       setExportingPdf(false);
+    }
+  };
+
+  /* ===================== EDIT DOCUMENT ===================== */
+
+  const handleEditSubmit = async (uploadId: number, attributeId: number, file: File | null) => {
+    if (!file) {
+      setSubmitError("Please select a file to replace");
+      return;
+    }
+
+    setSubmitLoading(true);
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    try {
+      const contractorId = user?.id || user?.user_id;
+      if (!contractorId) {
+        throw new Error("Contractor not found");
+      }
+
+      const response = await AttributeContractorUploadService.updateDocument(
+        uploadId,
+        contractorId,
+        attributeId,
+        file,
+        localStorage.getItem("token") || localStorage.getItem("_tkn") || "",
+        {
+          onUploadProgress: (progressEvent: any) => {
+            if (progressEvent.total) {
+              setUploadProgress(
+                Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              );
+            }
+          },
+        }
+      );
+
+      setSubmitSuccess("Document updated successfully");
+      setEditingUploadId(null);
+      setSelectedFiles({});
+      setUploadProgress(null);
+
+      // Recargar documentos subidos
+      if (contractorId) {
+        const res = await AttributeContractorUploadService.getByContractor(contractorId);
+
+        const data = res?.data?.data ?? res?.data ?? res;
+        setUploadedAttributes(Array.isArray(data) ? data : []);
+      }
+
+      console.log("Document updated:", response);
+    } catch (err: any) {
+      console.error("Edit error:", err);
+      setSubmitError(err.message || "Update failed");
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -299,6 +380,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
                           <input
                             type="file"
                             hidden
+                            accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg,image/jpg"
                             onChange={e =>
                               handleFileChange(key, e.target.files?.[0] ?? null)
                             }
@@ -344,20 +426,90 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
               </form>
 
               {uploadedAttributes.length > 0 && (
-                <section className="mt-6">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-yellow-100">
-                      Submitted documents
-                    </h3>
-                  <ul className="space-y-2">
-                    {uploadedAttributes.map(item => (
-                      <UploadedDocumentItem
-                        key={item.id || `${item.attribute_id}-${item.value}`}
-                        item={item}
-                        allRequirementsUploaded={allRequirementsUploaded}
-                        getDocumentUrl={getDocumentUrl}
-                        setPdfViewerUrl={setPdfViewerUrl}
-                      />
-                    ))}
+                <section className="mt-8">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-yellow-100">
+                    ✅ Submitted Documents ({uploadedAttributes.length})
+                  </h3>
+                  <ul className="space-y-4">
+                    {uploadedAttributes.map(item => {
+                      const isEditing = editingUploadId === item.id;
+                      const editKey = `edit-${item.id}`;
+
+                      return (
+                        <div key={item.id || `${item.attribute_id}-${item.value}`} className="border rounded-xl p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                          {isEditing ? (
+                            <div className="space-y-3">
+                              <div>
+                                <p className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                  Editing: {item.attribute?.name || `Document #${item.attribute_id}`}
+                                </p>
+                                <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-5 cursor-pointer hover:bg-blue-50 transition">
+                                  <span className="material-icons text-3xl text-blue-500">
+                                    upload_file
+                                  </span>
+                                  <span className="text-sm font-semibold mt-2">Select new file</span>
+                                  <input
+                                    type="file"
+                                    hidden
+                                    accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg,image/jpg"
+                                    onChange={event => handleFileChange(editKey, event.target.files?.[0] ?? null)}
+                                  />
+                                </label>
+                              </div>
+
+                              {selectedFiles[editKey] && (
+                                <p className="text-sm text-green-600">
+                                  New file: {selectedFiles[editKey]?.name}
+                                </p>
+                              )}
+
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditSubmit(item.id, item.attribute_id, selectedFiles[editKey] || null)}
+                                  disabled={submitLoading || !selectedFiles[editKey]}
+                                  className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg font-semibold transition"
+                                >
+                                  {submitLoading ? "Updating..." : "Save"}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setEditingUploadId(null);
+                                    setSelectedFiles(prev => ({ ...prev, [editKey]: null }));
+                                  }}
+                                  className="flex-1 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg font-semibold transition"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+
+                              {uploadProgress !== null && (
+                                <div>
+                                  <div className="flex justify-between text-xs mb-1">
+                                    <span>Updating</span>
+                                    <span>{uploadProgress}%</span>
+                                  </div>
+                                  <div className="h-2 bg-gray-200 rounded-full">
+                                    <div
+                                      className="h-2 bg-blue-400 rounded-full"
+                                      style={{ width: `${uploadProgress}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <UploadedDocumentItem
+                              key={item.id || `${item.attribute_id}-${item.value}`}
+                              item={item}
+                              allRequirementsUploaded={allRequirementsUploaded}
+                              getDocumentUrl={getDocumentUrl}
+                              setPdfViewerUrl={setPdfViewerUrl}
+                              onEdit={() => setEditingUploadId(item.id)}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </ul>
                 </section>
               )}
@@ -491,12 +643,7 @@ const ContractorDashboard = ({ user }: ContractorDashboardProps) => {
           )}
         </main>
 
-        {user?.edit_profile && (
-          <aside className="w-full lg:w-96 space-y-6">
-            <QuickActionsPanel />
-            <SupportChat />
-          </aside>
-        )}
+       
       </div>
     </div>
   );

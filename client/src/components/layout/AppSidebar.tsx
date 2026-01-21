@@ -274,7 +274,32 @@ const AppSidebar: React.FC = () => {
       icon: <Clipboard className="w-5 h-5" />,
         path: "/admin/claim",
       // Puedes agregar permisos si lo necesitas
-    }
+    },
+      {
+      name: t("admin.sidebar.requirements"),
+      icon: <Briefcase className="w-5 h-5" />,
+      //permissions: ["profesion_listar"],
+      subItems: [
+        {
+          name: t("admin.sidebar.documentsrequirements"),
+          path: "/admin/atributes",
+          icon: <Clipboard className="w-4 h-4 text-blue-500" />,
+        //  permissions: ["profesion_listar"]
+        },
+        {
+          name: t("admin.sidebar.documentscontractors"),
+          path: "/admin/atribute_contractor",
+          icon: <Users className="w-4 h-4 text-emerald-500" />,
+        //  permissions: ["profesion_listar"]
+        },
+        {
+          name: t("admin.sidebar.documentshomeowners","Documents Homeowners"),
+          path: "/admin/attribute_homeowner",
+          icon: <Clipboard className="w-4 h-4 text-blue-500" />,
+        //  permissions: ["profesion_listar"]
+        },
+          ],
+    },
   ];
 
   const webItems: MenuItem[] = [

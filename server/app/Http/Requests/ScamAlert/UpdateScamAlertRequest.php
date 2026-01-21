@@ -13,8 +13,12 @@ class UpdateScamAlertRequest extends FormRequest
 
     public function rules(): array
     {
+        $isAdmin = $this->user()?->hasRole('admin');
+
         return [
-            'homeowner_profile_id' => ['sometimes', 'required', 'integer', 'exists:homeowner_profiles,user_id'],
+            'homeowner_profile_id' => $isAdmin
+                ? ['sometimes', 'integer']
+                : ['sometimes', 'required', 'integer', 'exists:homeowner_profiles,user_id'],
             'contractor_id' => ['nullable', 'integer', 'exists:contractors,user_id'],
             'business_name' => ['sometimes', 'required', 'string', 'max:255'],
             'legal_name' => ['nullable', 'string', 'max:255'],

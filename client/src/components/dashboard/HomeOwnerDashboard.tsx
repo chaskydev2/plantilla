@@ -6,8 +6,6 @@ import { AttributeHomeownerUploadService } from "@/core/services/homeowner/attri
 import { DashboardHomeownerService } from "@/core/services/homeowner/dashboardHomeowner.service";
 
 import StatCard from "./StatCard";
-import QuickActionsPanel from "./QuickActionsPanel";
-import SupportChat from "./SupportChat";
 import UploadedDocumentItem from "./UploadedDocumentItem";
 
 interface HomeOwnerDashboardProps {
@@ -18,6 +16,8 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
   const [attributes, setAttributes] = useState<any[]>([]);
   const [uploadedAttributes, setUploadedAttributes] = useState<any[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
+  const [editingAttributeId, setEditingAttributeId] = useState<number | null>(null);
+  const [editingUploadId, setEditingUploadId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -34,6 +34,8 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
   const [services, setServices] = useState<any[]>([]);
   const [recentJobPosts, setRecentJobPosts] = useState<any[]>([]);
   const [recentClaims, setRecentClaims] = useState<any[]>([]);
+
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
 
   const homeownerProfile: any =
     (user as any)?.homeowner_profile ||
@@ -64,7 +66,11 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
       ? `${homeownerProfile.first_name} ${homeownerProfile.last_name}`
       : user?.name || user?.email || "";
 
-  const getDocumentUrl = (value: string) => `https://gud.zion-soft.com/${value}`;
+  const getDocumentUrl = (value: string): string => {
+    if (!value) return '';
+    if (value.startsWith('http://') || value.startsWith('https://')) return value;
+    return `${API_BASE}/${value.replace(/^\/?api(\/|$)/, '')}`;
+  };
 
   const extractArray = (source: any): any[] => {
     if (!source) return [];
@@ -244,7 +250,20 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
   }, [homeownerId, submitSuccess]);
 
   const handleFileChange = (key: string, file?: File | null) => {
-    setSelectedFiles(prev => ({ ...prev, [key]: file ?? null }));
+    if (!file) {
+      setSelectedFiles(prev => ({ ...prev, [key]: null }));
+      return;
+    }
+
+    // Validar tipo de archivo
+    const allowedTypes = ['application/pdf', 'image/jpeg'];
+    if (!allowedTypes.includes(file.type)) {
+      setSubmitError('Only PDF and JPG files are accepted');
+      setTimeout(() => setSubmitError(null), 3000);
+      return;
+    }
+
+    setSelectedFiles(prev => ({ ...prev, [key]: file }));
   };
 
   const allRequirementsUploaded =
@@ -312,6 +331,55 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
     }
   };
 
+  const handleEditSubmit = async (uploadId: number, attributeId: number, file: File | null) => {
+    if (!file) {
+      setSubmitError("Please select a file to replace");
+      return;
+    }
+
+    setSubmitLoading(true);
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    try {
+      if (!homeownerId) {
+        throw new Error("Homeowner not found");
+      }
+
+      await AttributeHomeownerUploadService.updateDocument(
+        uploadId,
+        homeownerId,
+        attributeId,
+        file,
+        localStorage.getItem("token") || localStorage.getItem("_tkn") || "",
+        {
+          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            if (progressEvent.total) {
+              setUploadProgress(
+                Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              );
+            }
+          },
+        }
+      );
+
+      setSubmitSuccess("Document updated successfully");
+      setEditingAttributeId(null);
+      setEditingUploadId(null);
+      setSelectedFiles({});
+      setUploadProgress(null);
+
+      // Recargar documentos subidos
+      const res = await AttributeHomeownerUploadService.getByHomeowner(homeownerId);
+      const data = res?.data?.data ?? res?.data ?? res;
+      setUploadedAttributes(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setSubmitError(err.message || "Update failed");
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {pdfViewerUrl && (
@@ -344,42 +412,72 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
               {loading && <p className="text-sm text-gray-500">Loading requirements...</p>}
               {error && <p className="text-sm text-red-500">{error}</p>}
 
+             
               <form onSubmit={handleSubmit} className="space-y-5">
                 {attributes.map(attr => {
                   const key = attr.slug || attr.name;
                   const uploaded = uploadedAttributes.find(
                     ua => ua.attribute_id === attr.id || ua.attribute?.id === attr.id
                   );
+                  const isEditing = editingAttributeId === attr.id;
 
                   return (
                     <div key={attr.id} className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
                       <p className="font-semibold mb-2">{attr.name}</p>
 
-                      {uploaded?.value ? (
-                        <button
-                          type="button"
-                          onClick={() => setPdfViewerUrl(getDocumentUrl(uploaded.value))}
-                          className="text-green-600 font-semibold underline"
-                        >
-                          ✔ View uploaded document
-                        </button>
+                      {uploaded?.value && !isEditing ? (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => setPdfViewerUrl(getDocumentUrl(uploaded.value))}
+                            className="text-green-600 font-semibold underline"
+                          >
+                            ✔ View uploaded document
+                          </button>
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setEditingAttributeId(attr.id)}
+                              className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        </div>
                       ) : (
-                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-yellow-300 rounded-xl p-5 cursor-pointer hover:bg-yellow-50 transition">
-                          <span className="material-icons text-3xl text-yellow-500">
-                            upload_file
-                          </span>
-                          <span className="text-sm font-semibold mt-2">Select file</span>
-                          <input
-                            type="file"
-                            hidden
-                            onChange={event => handleFileChange(key, event.target.files?.[0] ?? null)}
-                          />
-                        </label>
+                        <div className="space-y-3">
+                          <label className="flex flex-col items-center justify-center border-2 border-dashed border-yellow-300 rounded-xl p-5 cursor-pointer hover:bg-yellow-50 transition">
+                            <span className="material-icons text-3xl text-yellow-500">
+                              upload_file
+                            </span>
+                            <span className="text-sm font-semibold mt-2">
+                              {isEditing ? 'Replace file' : 'Select file'}
+                            </span>
+                            <input
+                              type="file"
+                              hidden
+                              accept="application/pdf,image/jpeg"
+                              onChange={event => handleFileChange(key, event.target.files?.[0] ?? null)}
+                            />
+                          </label>
+                          {isEditing && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingAttributeId(null);
+                                setSelectedFiles(prev => ({ ...prev, [key]: null }));
+                              }}
+                              className="w-full px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg font-semibold transition"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
                       )}
 
-                      {selectedFiles[key] && !uploaded?.value && (
+                      {selectedFiles[key] && (
                         <p className="text-sm text-green-600 mt-2">
-                          Selected file: {selectedFiles[key]?.name}
+                          {isEditing ? 'New file selected:' : 'Selected file:'} {selectedFiles[key]?.name}
                         </p>
                       )}
                     </div>
@@ -415,20 +513,90 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
               </form>
 
               {uploadedAttributes.length > 0 && (
-                <section className="mt-6">
-                  <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-yellow-100">
-                    Submitted documents
+                <section className="mt-8">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-yellow-100">
+                    ✅ Submitted Documents ({uploadedAttributes.length})
                   </h3>
-                  <ul className="space-y-2">
-                    {uploadedAttributes.map(item => (
-                      <UploadedDocumentItem
-                        key={item.id || `${item.attribute_id}-${item.value}`}
-                        item={item}
-                        allRequirementsUploaded={allRequirementsUploaded}
-                        getDocumentUrl={getDocumentUrl}
-                        setPdfViewerUrl={setPdfViewerUrl}
-                      />
-                    ))}
+                  <ul className="space-y-4">
+                    {uploadedAttributes.map(item => {
+                      const isEditing = editingUploadId === item.id;
+                      const editKey = `edit-${item.id}`;
+
+                      return (
+                        <div key={item.id || `${item.attribute_id}-${item.value}`} className="border rounded-xl p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                          {isEditing ? (
+                            <div className="space-y-3">
+                              <div>
+                                <p className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                  Editing: {item.attribute?.name || `Document #${item.attribute_id}`}
+                                </p>
+                                <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-5 cursor-pointer hover:bg-blue-50 transition">
+                                  <span className="material-icons text-3xl text-blue-500">
+                                    upload_file
+                                  </span>
+                                  <span className="text-sm font-semibold mt-2">Select new file</span>
+                                  <input
+                                    type="file"
+                                    hidden
+                                    accept="application/pdf,image/jpeg"
+                                    onChange={event => handleFileChange(editKey, event.target.files?.[0] ?? null)}
+                                  />
+                                </label>
+                              </div>
+
+                              {selectedFiles[editKey] && (
+                                <p className="text-sm text-green-600">
+                                  New file: {selectedFiles[editKey]?.name}
+                                </p>
+                              )}
+
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditSubmit(item.id, item.attribute_id, selectedFiles[editKey] || null)}
+                                  disabled={submitLoading || !selectedFiles[editKey]}
+                                  className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg font-semibold transition"
+                                >
+                                  {submitLoading ? "Updating..." : "Save"}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setEditingUploadId(null);
+                                    setSelectedFiles(prev => ({ ...prev, [editKey]: null }));
+                                  }}
+                                  className="flex-1 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg font-semibold transition"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+
+                              {uploadProgress !== null && (
+                                <div>
+                                  <div className="flex justify-between text-xs mb-1">
+                                    <span>Updating</span>
+                                    <span>{uploadProgress}%</span>
+                                  </div>
+                                  <div className="h-2 bg-gray-200 rounded-full">
+                                    <div
+                                      className="h-2 bg-blue-400 rounded-full"
+                                      style={{ width: `${uploadProgress}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <UploadedDocumentItem
+                              key={item.id || `${item.attribute_id}-${item.value}`}
+                              item={item}
+                              allRequirementsUploaded={allRequirementsUploaded}
+                              getDocumentUrl={getDocumentUrl}
+                              setPdfViewerUrl={setPdfViewerUrl}
+                              onEdit={() => setEditingUploadId(item.id)}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </ul>
                 </section>
               )}
@@ -518,12 +686,7 @@ const HomeOwnerDashboard: React.FC<HomeOwnerDashboardProps> = ({ user }) => {
           )}
         </main>
 
-        {user?.edit_profile && (
-          <aside className="w-full lg:w-96 space-y-6">
-            <QuickActionsPanel />
-            <SupportChat />
-          </aside>
-        )}
+ 
       </div>
     </div>
   );

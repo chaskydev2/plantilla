@@ -13,8 +13,6 @@ use Illuminate\Validation\Rule;
 class AttributeHomeownerController extends Controller
 {
 
-    
-
     public function index(Request $request): JsonResponse
     {
         $query = AttributeHomeowner::with(['homeowner.user', 'attribute']);

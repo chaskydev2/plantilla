@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\V1\HomeownerProfileServiceController;
 use App\Http\Controllers\Api\V1\ScamAlertController;
 use App\Http\Controllers\Api\V1\TextBlockController;
 use App\Http\Controllers\Api\V1\YoutubeVideoController;
+use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\ReviewController;
 
 use Illuminate\Support\Facades\Route;
@@ -119,6 +120,14 @@ Route::prefix('/v1')
         Route::get('categories/tree', [CategoryController::class, 'tree']);
         Route::get('categories/roots', [CategoryController::class, 'roots']);
         Route::get('categories/search', [CategoryController::class, 'search']);
+
+        // Dashboard routes (public statistics)
+        Route::get('dashboard/stats', [DashboardController::class, 'getStats']);
+        Route::get('dashboard/detailed-stats', [DashboardController::class, 'getDetailedStats']);
+        Route::get('dashboard/requirements', [DashboardController::class, 'getRequirements']);
+        Route::get('dashboard/job-contractors', [DashboardController::class, 'getJobContractors']);
+        Route::get('dashboard/professions', [DashboardController::class, 'getProfessions']);
+        Route::get('dashboard/job-posts', [DashboardController::class, 'getJobPosts']);
 
         Route::post('newsletters/send', [NewsletterController::class, 'send']);
 

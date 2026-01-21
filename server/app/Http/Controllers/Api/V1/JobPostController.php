@@ -350,42 +350,44 @@ class JobPostController extends Controller  {
     /**
      * Update the specified job post.
      */
-    public function update(Request $request, $id): JsonResponse
-    {
-        try {
-            $jobPost = JobPost::findOrFail($id);
-            $data = $this->validateData($request, true);
+public function update(Request $request, $id): JsonResponse
+{
+    try {
+        $jobPost = JobPost::findOrFail($id);
+        $data = $this->validateData($request, true);
 
-            $newImage = $this->persistImage($request, $jobPost->image_path);
-            if ($newImage === null) {
-                $data['image_path'] = null;
-            } elseif ($newImage !== '__keep') {
-                $data['image_path'] = $newImage;
-            }
+        // Remove non-column field
+        unset($data['image']);
 
-            // Actualizar y guardar cada campo individualmente
-            foreach ($data as $key => $value) {
-                $jobPost->$key = $value;
-                $jobPost->save();
-            }
-            $jobPost->load(['homeowner', 'service']);
-            return response()->json([
-                'message' => 'Publicación actualizada exitosamente',
-                'data' => $jobPost , 
-                 'datasent' => $request->all
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'message' => 'Publicación no encontrada',
-                'error' => "No se encontró una publicación con el ID: {$id}"
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al actualizar la publicación',
-                'error' => $e->getMessage()
-            ], 500);
+        $newImage = $this->persistImage($request, $jobPost->image_path);
+        if ($newImage === null) {
+            $data['image_path'] = null;
+        } elseif ($newImage !== '__keep') {
+            $data['image_path'] = $newImage;
         }
+
+        // Save once
+        $jobPost->fill($data);
+        $jobPost->save();
+
+        $jobPost->load(['homeowner', 'service']);
+        return response()->json([
+            'message' => 'Publicación actualizada exitosamente',
+            'data' => $jobPost,
+            'datasent' => $request->all(),
+        ]);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'message' => 'Publicación no encontrada',
+            'error' => "No se encontró una publicación con el ID: {$id}"
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error al actualizar la publicación',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Remove the specified job post.
@@ -452,7 +454,7 @@ class JobPostController extends Controller  {
             'address_line1' => ['nullable', 'string', 'max:200'],
             'address_line2' => ['nullable', 'string', 'max:200'],
             'city' => ['nullable', 'string', 'max:120'],
-            'state_code' => ['nullable', 'string', 'max:10'],
+            'state_code' => ['nullable', 'string'],
             'postal_code' => ['nullable', 'string', 'max:15'],
             'lat' => ['nullable', 'numeric', 'between:-90,90'],
             'lng' => ['nullable', 'numeric', 'between:-180,180'],

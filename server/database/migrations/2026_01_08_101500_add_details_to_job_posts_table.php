@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('address_line1', 200)->nullable()->after('currency');
             $table->string('address_line2', 200)->nullable()->after('address_line1');
             $table->string('city', 120)->nullable()->after('address_line2');
-            $table->string('state_code', 10)->nullable()->after('city');
+            $table->string('state_code', 100)->nullable()->after('city');
             $table->string('postal_code', 15)->nullable()->after('state_code');
             $table->decimal('lat', 9, 6)->nullable()->after('postal_code');
             $table->decimal('lng', 9, 6)->nullable()->after('lat');

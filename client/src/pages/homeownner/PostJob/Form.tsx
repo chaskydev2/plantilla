@@ -35,7 +35,7 @@ const jobPostSchema = Yup.object({
 
 
 /* =========================
-   GoogleMapPicker
+   GoogleMapPicker con búsqueda en tiempo real
 ========================= */
 function GoogleMapPicker() {
   const { setValue, watch } = useFormContext();
@@ -47,6 +47,12 @@ function GoogleMapPicker() {
   const markerInstance = useRef<any>(null);
 
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const debounceTimer = useRef<any>(null);
 
   const fetchAddress = async (lat: number, lng: number) => {
     try {
@@ -82,6 +88,176 @@ function GoogleMapPicker() {
     } catch {}
   };
 
+  const searchLocationByQuery = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await res.json();
+
+      if (data.status === 'OK' && data.results.length > 0) {
+        setSearchResults(data.results);
+        setShowResults(true);
+      } else if (data.status === 'ZERO_RESULTS') {
+        setSearchResults([]);
+        setShowResults(false);
+        toast.info('No results found for that search');
+      } else {
+        console.error('Geocoding error:', data.status);
+        setSearchResults([]);
+        setShowResults(false);
+        toast.error('Error searching for location');
+      }
+    } catch (err) {
+      console.error('Search location error:', err);
+      setSearchResults([]);
+      setShowResults(false);
+      toast.error('Error searching for location');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+
+    // Limpiar debounce anterior
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // Nuevo debounce
+    debounceTimer.current = setTimeout(() => {
+      searchLocationByQuery(value);
+    }, 500);
+  };
+
+  const handleSelectLocation = (result: any) => {
+    console.log('handleSelectLocation called with result:', result);
+    
+    const loc = result?.geometry?.location;
+    // Google Geocoding API returns lat/lng as numbers
+    const coords = loc
+      ? typeof loc.lat === 'function'
+        ? { lat: loc.lat(), lng: loc.lng() }
+        : { lat: Number(loc.lat), lng: Number(loc.lng) }
+      : null;
+
+    console.log('Extracted coords:', coords);
+
+    if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number' || isNaN(coords.lat) || isNaN(coords.lng)) {
+      toast.error('Could not get the selected location');
+      console.error('Invalid coordinates:', coords);
+      return;
+    }
+
+    // Update map and marker first, before updating form values
+    if (mapInstance.current && window.google?.maps) {
+      try {
+        const position = new window.google.maps.LatLng(coords.lat, coords.lng);
+        mapInstance.current.setCenter(position);
+        mapInstance.current.setZoom(17);
+        
+        if (markerInstance.current) {
+          markerInstance.current.setPosition(position);
+        }
+      } catch (err) {
+        console.error('Error updating map:', err);
+      }
+    }
+
+    // Update form values after map is centered
+    setValue('lat', coords.lat, { shouldValidate: false });
+    setValue('lng', coords.lng, { shouldValidate: false });
+
+    // Get address details from reverse geocoding
+    fetchAddress(coords.lat, coords.lng);
+    setSearchInput(result.formatted_address || '');
+    setShowResults(false);
+    setSearchResults([]);
+    
+    toast.success('✓ Location selected');
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        // Update map and marker
+        if (mapInstance.current && window.google?.maps) {
+          try {
+            const pos = new window.google.maps.LatLng(lat, lng);
+            mapInstance.current.setCenter(pos);
+            mapInstance.current.setZoom(17);
+            
+            if (markerInstance.current) {
+              markerInstance.current.setPosition(pos);
+            }
+          } catch (err) {
+            console.error('Error updating map:', err);
+          }
+        }
+
+        // Update form values
+        setValue('lat', lat, { shouldValidate: false });
+        setValue('lng', lng, { shouldValidate: false });
+
+        // Get address details
+        fetchAddress(lat, lng);
+        setGettingLocation(false);
+        toast.success('✓ Current location set');
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setGettingLocation(false);
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('Location permission denied. Please enable location access.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Location information unavailable.');
+            break;
+          case error.TIMEOUT:
+            toast.error('Location request timed out.');
+            break;
+          default:
+            toast.error('An error occurred while getting your location.');
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (window.google?.maps) {
       setMapLoaded(true);
@@ -95,15 +271,22 @@ function GoogleMapPicker() {
     script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
     script.async = true;
     script.onload = () => setMapLoaded(true);
+    script.onerror = () => {
+      console.error('Error loading Google Maps script');
+      toast.error('Error loading Google Maps');
+    };
     document.body.appendChild(script);
   }, []);
 
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
 
+    const latNum = typeof lat === 'number' ? lat : (typeof lat === 'string' && lat !== '' ? parseFloat(lat) : null);
+    const lngNum = typeof lng === 'number' ? lng : (typeof lng === 'string' && lng !== '' ? parseFloat(lng) : null);
+
     const center = {
-      lat: typeof lat === 'number' ? lat : 19.432608,
-      lng: typeof lng === 'number' ? lng : -99.133209,
+      lat: (latNum !== null && !isNaN(latNum)) ? latNum : 19.432608,
+      lng: (lngNum !== null && !isNaN(lngNum)) ? lngNum : -99.133209,
     };
 
     if (!mapInstance.current) {
@@ -121,39 +304,107 @@ function GoogleMapPicker() {
       markerInstance.current.addListener('dragend', (e: any) => {
         const newLat = e.latLng.lat();
         const newLng = e.latLng.lng();
-        setValue('lat', newLat);
-        setValue('lng', newLng);
+        setValue('lat', newLat, { shouldValidate: false });
+        setValue('lng', newLng, { shouldValidate: false });
         fetchAddress(newLat, newLng);
       });
 
       mapInstance.current.addListener('click', (e: any) => {
-        markerInstance.current.setPosition(e.latLng);
         const newLat = e.latLng.lat();
         const newLng = e.latLng.lng();
-        setValue('lat', newLat);
-        setValue('lng', newLng);
+        markerInstance.current.setPosition(e.latLng);
+        setValue('lat', newLat, { shouldValidate: false });
+        setValue('lng', newLng, { shouldValidate: false });
         fetchAddress(newLat, newLng);
       });
     } else {
-      mapInstance.current.setCenter(center);
-      markerInstance.current.setPosition(center);
+      // Only update if values are valid numbers
+      if (latNum !== null && lngNum !== null && !isNaN(latNum) && !isNaN(lngNum)) {
+        mapInstance.current.setCenter(center);
+        markerInstance.current.setPosition(center);
+      }
     }
   }, [mapLoaded, lat, lng]);
 
   return (
     <div>
-      <label className="block font-semibold mb-1">Location on map</label>
-      <div ref={mapRef} className="w-full h-[300px] rounded border" />
+      <label className="block font-semibold mb-3">Location on Map</label>
+      
+      {/* Location search with autocomplete */}
+      <div className="relative mb-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={handleSearchChange}
+            onFocus={() => searchResults.length > 0 && setShowResults(true)}
+            onBlur={() => setTimeout(() => setShowResults(false), 200)}
+            placeholder="Search address, city, postal code..."
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="button"
+            onClick={handleUseMyLocation}
+            disabled={gettingLocation}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2 whitespace-nowrap"
+          >
+            {gettingLocation ? (
+              <>
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Getting...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                My Location
+              </>
+            )}
+          </button>
+        </div>
+        
+        {/* Results dropdown */}
+        {showResults && searchResults.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+            {searchResults.map((result, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSelectLocation(result)}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+              >
+                <p className="text-sm font-medium text-gray-800 dark:text-white">
+                  {result.formatted_address}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {searching && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">Searching...</p>
+          </div>
+        )}
+      </div>
+
+      <div ref={mapRef} className="w-full h-[300px] rounded border dark:border-gray-600" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-        <InputField name="address_line1" label="Address Line 1" />
-        <InputField name="address_line2" label="Address Line 2" />
+        <InputField name="address_line1" label="Street" />
+        <InputField name="address_line2" label="Neighborhood/Locality" />
         <InputField name="city" label="City" />
-        <InputField name="state_code" label="State" />
+        <InputField name="state_code" label="State/Region" />
         <InputField name="postal_code" label="Postal Code" />
-        {/* Lat/Lng hidden, set by map only */}
-        <input type="hidden" name="lat" />
-        <input type="hidden" name="lng" />
+      </div>
+      <div className="grid grid-cols-2 gap-4 mt-3">
+        <InputField name="lat" label="Latitude" type="number" step="any" />
+        <InputField name="lng" label="Longitude" type="number" step="any" />
       </div>
     </div>
   );
@@ -190,7 +441,7 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
   const [serviceOptions, setServiceOptions] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
-    // Traer los servicios creados desde la API
+    // Fetch services from API
     import('@/core/services/service/service.service').then(({ ServiceService }) => {
       ServiceService.getAllServices().then((res: any) => {
 
@@ -257,19 +508,19 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
         cleanData.service_id = Number(cleanData.service_id);
       }
 
-      // Obtener homeowner_id desde localStorage user_data
+      // Get homeowner_id from localStorage user_data
       try {
         const userDataRaw = localStorage.getItem('user_data');
         if (userDataRaw) {
           const userData = JSON.parse(userDataRaw);
           if (userData?.id) {
             cleanData.homeowner_id = Number(userData.id);
-            console.log('homeowner_id enviado:', cleanData.homeowner_id);
+            console.log('homeowner_id sent:', cleanData.homeowner_id);
           }
         }
       } catch {}
 
-      // Normalizar deadline: si está vacío, poner null; si tiene valor, asegurar formato YYYY-MM-DD
+      // Normalize deadline: if empty set null; if value ensure YYYY-MM-DD format
       if (!cleanData.deadline || cleanData.deadline === '') {
         cleanData.deadline = null;
       } else if (typeof cleanData.deadline === 'string') {
@@ -284,7 +535,7 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
         cleanData.deadline = null;
       }
 
-      // Valor por defecto para currency si está vacío o null
+      // Default value for currency if empty or null
       if (!cleanData.currency || cleanData.currency === '') {
         cleanData.currency = 'MXN';
       }
@@ -299,8 +550,10 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
 
       let result;
       if (isEditing && initialData && initialData.id) {
+        console.log(payload);
         result = await updateJobPost(payload, initialData);
       } else {
+            console.log(payload);
         result = await createJobPost(payload, initialData);
       }
       console.log('API result:', result);
@@ -309,21 +562,23 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
         load();
         onClose();
       } else {
+        console.log(result);
         setBackendError(result?.message || 'Error saving the post');
       }
     } catch (err: any) {
       // axios error
       if (err.response && err.response.data && err.response.data.message) {
-        console.log('Error response data:', err.response.data);
+        console.log('Error response data:', err);
         setBackendError(err.response.data.message);
       } else {
+        console.log(err);
         setBackendError(err?.message || 'Network error');
       }
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Editar publicación' : 'Nueva publicación'} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Edit Post' : 'New Post'} size="lg">
       {/* ToastContainer should be rendered once in your app, ideally in App.tsx. If not, you can add it here for local usage: */}
       {/* <ToastContainer /> */}
       <FormProviderWrapper
@@ -336,9 +591,9 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{backendError}</div>
         )}
         <div className="space-y-8">
-          {/* Sección principal */}
+          {/* Basic Information Section */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Información básica</h2>
+            <h2 className="text-xl font-bold mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField name="title" label="Title" />
               <InputField name="price" label="Price" />
@@ -369,19 +624,19 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
             </div>
           </div>
 
-          {/* Sección de ubicación */}
+          {/* Location Section */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Ubicación</h2>
+            <h2 className="text-xl font-bold mb-4">Location</h2>
             <GoogleMapPicker />
           </div>
 
-          {/* Sección de imagen */}
+          {/* Image Section */}
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Imagen</h2>
+            <h2 className="text-xl font-bold mb-4">Image</h2>
             <InputFileField
               name="image"
-              label="Imagen (opcional)"
-              helperText="Formatos: JPG, PNG (máx 4MB). Deja vacío para mantener o quita para remover."
+              label="Image (optional)"
+              helperText="Formats: JPG, PNG (max 4MB). Leave empty to keep or remove to delete."
               accept="image/*"
             />
           </div>
