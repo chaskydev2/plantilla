@@ -30,11 +30,15 @@ interface AttributeContractorModalProps {
   setIsProcessing: (v: boolean) => void;
 }
 
-const getLocalUrl = (url: string | null | undefined) => {
-  if (!url) return '';
-  if (/^https?:\/\//i.test(url)) return url;
-  const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
-  return `http://localhost:8080/${cleanUrl}`;
+
+const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+const DEFAULT_FILE_URL = 'https://via.placeholder.com/150/cccccc/ffffff?text=File';
+
+const getLocalUrl = (value?: string | null): string => {
+  if (!value || value.trim() === '') return DEFAULT_FILE_URL;
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  const fullUrl = `${API_BASE}/${value.replace(/^\//, '')}`;
+  return fullUrl;
 };
 
 const AttributeContractorModal: React.FC<AttributeContractorModalProps> = ({
@@ -144,7 +148,7 @@ const AttributeContractorModal: React.FC<AttributeContractorModalProps> = ({
         ),
 
       // Vista de imagen
-      (/\.(jpg|jpeg|png|gif)$/i.test(viewFile ?? '') &&
+      (viewFile && /\.(jpg|jpeg|png|gif)$/i.test(viewFile) &&
         h('img', {
           src: getLocalUrl(viewFile),
           alt: 'Documento',
@@ -152,7 +156,7 @@ const AttributeContractorModal: React.FC<AttributeContractorModalProps> = ({
         })),
 
       // Vista PDF
-      (/\.pdf$/i.test(viewFile ?? '') &&
+      (viewFile && /\.pdf$/i.test(viewFile) &&
         h('iframe', {
           src: getLocalUrl(viewFile),
           title: 'Documento PDF',

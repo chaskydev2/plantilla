@@ -7,8 +7,15 @@ import { toastify } from "@/core/utils/toastify";
 import Form from "./Form";
 import { getJobPostsByHomeowner, deleteJobPostById } from '@/core/services/jobPost.service';
 
-// Get API base URL from env
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Image URL helpers
+const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+const DEFAULT_SERVICE_IMAGE = 'https://via.placeholder.com/150/0891b2/ffffff?text=Service';
+function getServiceImageUrl(image?: string | null): string {
+  if (!image || image.trim() === '') return DEFAULT_SERVICE_IMAGE;
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+  const fullUrl = `${API_BASE}/${image.replace(/^\//, '')}`;
+  return fullUrl;
+}
 // Custom hook for pagination, sorting, and search
 function useJobPostResource(homeownerId: number | null) {
   const [items, setItems] = useState<any[]>([]);
@@ -173,15 +180,10 @@ export default function JobPostList() {
     { key: "address_line1", header: "Address", render: (item: JobPost) => <div>{item.address_line1} {item.address_line2}</div>, sortable: false },
     { key: "city", header: "City", render: (item: JobPost) => <div>{item.city}</div>, sortable: true },
     { key: "image_path", header: "Image", render: (item: JobPost) => {
-      let src = item.image_path || '';
-      if (src && !src.startsWith('http') && !src.startsWith('https')) {
-        // Remove leading slash if present
-        src = src.startsWith('/') ? src.slice(1) : src;
-        src = `${API_BASE_URL.replace(/\/$/, '')}/${src}`;
-      }
-      return src ? (
+      const src = getServiceImageUrl(item.image_path);
+      return (
         <img src={src} alt={item.title} width={50} style={{ maxHeight: 50, objectFit: 'contain', borderRadius: 6, boxShadow: '0 1px 4px #0001' }} />
-      ) : null;
+      );
     }, sortable: false },
   ];
 
@@ -204,6 +206,12 @@ export default function JobPostList() {
     setDialogConfig(null);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCurrentItem(null);
+    fetchItems({ page: pagination.page, perPage: pagination.perPage, sort, search: searchInput });
+  };
+
   const handleEdit = (item: JobPost) => {
     setCurrentItem(item);
     setIsModalOpen(true);
@@ -224,7 +232,7 @@ export default function JobPostList() {
       const res = await deleteJobPostById(item.id);
       if (res.success) {
         toastify.success(res.message || `Post "${item.title}" deleted successfully.`);
-        fetchItems();
+        fetchItems({ page: pagination.page, perPage: pagination.perPage, sort, search: searchInput });
       } else {
         toastify.error(res.message || 'Error deleting post.');
       }
@@ -316,10 +324,7 @@ export default function JobPostList() {
       </div>
       <Form
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setCurrentItem(null);
-        }}
+        onClose={handleCloseModal}
         initialData={currentItem}
         load={fetchItems}
       />

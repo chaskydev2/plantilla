@@ -83,6 +83,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const serviceCarouselRef = useRef<HTMLDivElement | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(5);
 
   // Location State
   const [locationPredictions, setLocationPredictions] = useState<Array<{ description: string; place_id: string }>>([]);
@@ -490,6 +491,13 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
     return serviceFilters.filter((service) => service.name.toLowerCase().includes(query));
   }, [serviceFilters, serviceFiltersQuery]);
 
+  // Servicios limitados para mostrar progresivamente
+  const displayedServices = useMemo(() => {
+    return visibleQuickServices.slice(0, visibleCount);
+  }, [visibleQuickServices, visibleCount]);
+
+  const hasMoreServices = visibleQuickServices.length > visibleCount;
+
   const updateCarouselScrollState = () => {
     const container = serviceCarouselRef.current;
     if (!container) {
@@ -504,6 +512,19 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
 
   const handleCarouselScroll = () => updateCarouselScrollState();
 
+  const handleCarouselScrollEnd = () => {
+    const container = serviceCarouselRef.current;
+    if (!container) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const scrollPercentage = (scrollLeft + clientWidth) / scrollWidth;
+    
+    // Si llegó al 80% del scroll, cargar más servicios
+    if (scrollPercentage > 0.8 && hasMoreServices) {
+      setVisibleCount((prev) => Math.min(prev + 5, visibleQuickServices.length));
+    }
+  };
+
   const scrollCarousel = (direction: "left" | "right") => {
     const container = serviceCarouselRef.current;
     if (!container) return;
@@ -514,6 +535,11 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   useEffect(() => {
     updateCarouselScrollState();
   }, [serviceFilters, serviceFiltersLoading, serviceFiltersQuery]);
+
+  // Reiniciar contador cuando cambie la búsqueda
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [serviceFiltersQuery]);
 
   useEffect(() => {
     const onResize = () => updateCarouselScrollState();
@@ -673,12 +699,20 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
         <div className="relative">
           <div className="absolute inset-y-0 left-0 w-8 pointer-events-none " aria-hidden />
           <div className="absolute inset-y-0 right-0 w-8 pointer-events-none" aria-hidden />
-          <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2" ref={serviceCarouselRef} onScroll={handleCarouselScroll}>
+          <div 
+            className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2 max-w-full" 
+            style={{ maxWidth: 'calc(5 * 160px + 4 * 12px)' }}
+            ref={serviceCarouselRef} 
+            onScroll={() => {
+              handleCarouselScroll();
+              handleCarouselScrollEnd();
+            }}
+          >
             {serviceFiltersLoading
-              ? Array.from({ length: 6 }).map((_, idx) => (
+              ? Array.from({ length: 5 }).map((_, idx) => (
                   <div key={`service-skeleton-${idx}`} className="min-w-[160px] h-[84px] rounded-2xl bg-gray-100 animate-pulse" />
                 ))
-              : visibleQuickServices.map((service) => (
+              : displayedServices.map((service) => (
                   <ServiceQuickItem
                     key={`service-filter-${service.id}`}
                     label={service.name}
@@ -688,8 +722,13 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
                     onSelect={() => handleQuickServiceSelect(service)}
                   />
                 ))}
+            {!serviceFiltersLoading && hasMoreServices && (
+              <div className="min-w-[160px] h-[84px] flex items-center justify-center text-sm text-gray-400 italic">
+                {t("searchBar.quickServices.scrollMore", "Scroll for more...")}
+              </div>
+            )}
           </div>
-          {!serviceFiltersLoading && visibleQuickServices.length === 0 && (
+          {!serviceFiltersLoading && visibleQuickServices.length === 0 && serviceFiltersQuery.trim() && (
             <div className="text-sm text-gray-500 py-4 text-center">
               {t("searchBar.quickServices.emptyFilter", "No matches for your search.")}
             </div>

@@ -8,6 +8,8 @@ import { formatDateTime } from '@/core/utils/dateUtils';
 import { Search } from 'lucide-react';
 import CreateJobForm from './CreateJobForm.tsx';
 import { useState } from 'react';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { toastify } from '@/core/utils/toastify';
 
 
 
@@ -104,7 +106,7 @@ export default function JobList() {
             </button>
             <button
               className="btn btn-xs btn-error"
-              onClick={() => handleDelete(item)}
+              onClick={() => confirmDelete(item)}
             >
               Delete
             </button>
@@ -115,6 +117,8 @@ export default function JobList() {
   const [statusFilter, setStatusFilter] = useState('');
   const [serviceFilter, setServiceFilter] = useState('');
   const [editJob, setEditJob] = useState<IItemResource | null>(null);
+  const [jobToDelete, setJobToDelete] = useState<IItemResource | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const {
     items,
     loading,
@@ -139,13 +143,22 @@ export default function JobList() {
     setEditJob(job);
   };
 
-  const handleDelete = async (job: IItemResource) => {
-    if (!window.confirm('Are you sure you want to delete this job?')) return;
+  const confirmDelete = (job: IItemResource) => {
+    setJobToDelete(job);
+  };
+
+  const handleDelete = async () => {
+    if (!jobToDelete) return;
+    setIsProcessing(true);
     try {
-      await JobService.remove(job.id);
+      await JobService.remove(jobToDelete.id);
+      toastify.success(`Job "${jobToDelete.title}" deleted successfully.`);
       fetchItems();
-    } catch (err) {
-      alert('Error deleting job');
+      setJobToDelete(null);
+    } catch (err: any) {
+      toastify.error(err?.response?.data?.message || 'Error deleting job');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -218,6 +231,18 @@ export default function JobList() {
           loading={loading}
           renderTopToolbar={renderToolbar}
         />
+        {jobToDelete && (
+          <ConfirmDialog
+            isOpen={!!jobToDelete}
+            title="Delete Job"
+            message={`Are you sure you want to delete the job "${jobToDelete.title}"?`}
+            onConfirm={handleDelete}
+            onCancel={() => setJobToDelete(null)}
+            isProcessing={isProcessing}
+            variant="danger"
+            confirmText="Delete"
+          />
+        )}
       </div>
     </div>
   );

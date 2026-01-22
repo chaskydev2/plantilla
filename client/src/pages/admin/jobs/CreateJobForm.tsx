@@ -37,7 +37,6 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
     // Quitar cualquier /api o api al inicio
     return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
   }
-  const [loading, setLoading] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [services, setServices] = useState<IService[]>([]);
   const [isActive, setIsActive] = useState(false);
@@ -318,7 +317,6 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
       return;
     }
 
-    setLoading(true);
     try {
       const normalizedUrl = url.trim() ? url.trim() : undefined;
       const payload: IJobCreateRequest = {
@@ -347,7 +345,6 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
     } catch (err: any) {
       toastify.error(err?.response?.data?.message || err?.message || 'Failed to create the job entry');
     } finally {
-      setLoading(false);
     }
   };
 
@@ -442,13 +439,6 @@ const CreateJobForm: React.FC<CreateJobFormProps> = ({ creatorId, onCreated, job
                   onClick={() => setIsOpen(false)}
                 >
                   Close
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>

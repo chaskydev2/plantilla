@@ -155,6 +155,13 @@ class Contractor extends Model
             ->orderByDesc('last_message_at');
     }
 
+    public function homeownerMessageThreads(): HasMany
+    {
+        return $this->hasMany(ContractorMessageThread::class, 'contractor_user_id', 'user_id')
+            ->where('participant_type', 'homeowner')
+            ->orderByDesc('last_message_at');
+    }
+
     // Team relationships (self-referential)
     public function teamMembers()
     {
