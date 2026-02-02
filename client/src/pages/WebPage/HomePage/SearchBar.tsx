@@ -599,7 +599,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
   const locationRequiredErrorText = locationRequiredErrorKey ? t(`searchBar.errors.${locationRequiredErrorKey}`) : null;
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" id="profesionales-section">
       <motion.div
         initial={{ opacity: 0 }}
         animate={!isLoading ? { opacity: 1 } : {}}
@@ -683,26 +683,26 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
       <div className="mt-5">
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 min-w-[200px]">
-              <Tag className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+            <div className="relative flex-1 min-w-[120px] sm:min-w-[200px]">
+              <Tag className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
               <input
                 type="text"
                 placeholder={t("searchBar.quickServices.filterPlaceholder", "Search a service")}
                 value={serviceFiltersQuery}
                 onChange={(e) => setServiceFiltersQuery(e.target.value)}
-                className="w-full border border-gray-200 rounded-full py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1B16]"
+                className="w-full border border-gray-200 rounded-full py-1.5 sm:py-2 pl-8 sm:pl-10 pr-2 sm:pr-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1B16]"
               />
             </div>
           </div>
         </div>
 
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 w-8 pointer-events-none " aria-hidden />
-          <div className="absolute inset-y-0 right-0 w-8 pointer-events-none" aria-hidden />
-          <div 
-            className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2 max-w-full" 
-            style={{ maxWidth: 'calc(5 * 160px + 4 * 12px)' }}
-            ref={serviceCarouselRef} 
+          <div className="absolute inset-y-0 left-0 w-5 sm:w-8 pointer-events-none" aria-hidden />
+          <div className="absolute inset-y-0 right-0 w-5 sm:w-8 pointer-events-none" aria-hidden />
+          <div
+            className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-1 sm:pb-2 max-w-full"
+            style={{ maxWidth: '100vw' }}
+            ref={serviceCarouselRef}
             onScroll={() => {
               handleCarouselScroll();
               handleCarouselScrollEnd();
@@ -710,7 +710,7 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
           >
             {serviceFiltersLoading
               ? Array.from({ length: 5 }).map((_, idx) => (
-                  <div key={`service-skeleton-${idx}`} className="min-w-[160px] h-[84px] rounded-2xl bg-gray-100 animate-pulse" />
+                  <div key={`service-skeleton-${idx}`} className="min-w-[110px] sm:min-w-[160px] h-[48px] sm:h-[84px] rounded-2xl bg-gray-100 animate-pulse" />
                 ))
               : displayedServices.map((service) => (
                   <ServiceQuickItem
@@ -722,9 +722,14 @@ export default function SearchBar({ isLoading }: SearchBarProps) {
                     onSelect={() => handleQuickServiceSelect(service)}
                   />
                 ))}
+            {/* Show scroll message only if carousel is scrollable and has more items */}
             {!serviceFiltersLoading && hasMoreServices && (
-              <div className="min-w-[160px] h-[84px] flex items-center justify-center text-sm text-gray-400 italic">
-                {t("searchBar.quickServices.scrollMore", "Scroll for more...")}
+              <div className="min-w-[110px] sm:min-w-[160px] h-[48px] sm:h-[84px] flex items-center justify-center text-xs sm:text-sm text-gray-400 italic select-none">
+                <span className="block sm:hidden">{t("searchBar.quickServices.scrollMore", "Scroll for more...")}</span>
+                <span className="hidden sm:block">
+                  <span className="mr-2">{t("searchBar.quickServices.scrollMore", "")}</span>
+                 
+                </span>
               </div>
             )}
           </div>

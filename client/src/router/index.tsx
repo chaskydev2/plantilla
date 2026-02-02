@@ -61,7 +61,7 @@ import RegisterGuaraHowItWorks from "@/pages/WebPage/RegisterGuara/HowItWorks";
 import RegisterGuaraWhatCover from "@/pages/WebPage/RegisterGuara/WhatCover";
 
 import HomeownerPage from "@/pages/admin/homeowners/Main";
-import JobApplicationPage from "@/pages/admin/job-applications/Main";
+import JobApplicationPage from "@/pages/admin/job-applications/main";
 import JobContractsPage from "@/pages/admin/job-contracts/main";
 import JobPostsPage from "@/pages/admin/job-posts/main";
 

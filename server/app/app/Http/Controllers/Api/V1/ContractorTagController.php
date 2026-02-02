@@ -119,7 +119,7 @@ class ContractorTagController extends Controller
 
         return response()->json([
             'success' => $deleted > 0,
-            'message' => $deleted ? 'Etiqueta removida del contratista' : 'No se encontró la relación a eliminar',
+            'message' => $deleted ? 'Tag removed from contractor' : 'Relation to delete not found',
         ], Response::HTTP_OK);
     }
 }

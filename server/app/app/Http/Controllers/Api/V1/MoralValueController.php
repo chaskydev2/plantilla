@@ -59,7 +59,7 @@ class MoralValueController extends Controller
         return (new MoralValueResource($moralvalue))
             ->additional([
                 'success' => true,
-                'message' => 'Principios morales Creados Satisfactoriamente',
+                'message' => 'Moral values created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class MoralValueController extends Controller
         return (new MoralValueResource($moralvalue))
             ->additional([
                 'success' => true,
-                'message' => 'Principios morales actualizados Satisfactoriamente'
+                'message' => 'Moral values updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class MoralValueController extends Controller
         $moralvalue->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Principos morales Eliminados Satisfactoriamente'
+            'message' => 'Moral values deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

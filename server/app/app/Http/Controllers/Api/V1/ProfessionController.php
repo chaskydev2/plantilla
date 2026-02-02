@@ -128,7 +128,7 @@ class ProfessionController extends Controller
         $profession = Profession::create($data);
 
         return response()->json([
-            'message' => 'Profesión creada exitosamente',
+            'message' => 'Profession created successfully',
             'data' => new ProfessionResource($profession), 
             'datase' => $request->all()
         ], 201);
@@ -140,7 +140,7 @@ class ProfessionController extends Controller
     public function show(Request $request, $id): JsonResponse
     {
         try {
-            // Buscar por ID o por slug
+            // Search by ID or slug
             $profession = is_numeric($id) 
                 ? Profession::findOrFail($id)
                 : Profession::where('slug', $id)->firstOrFail();
@@ -151,17 +151,17 @@ class ProfessionController extends Controller
             }
 
             return response()->json([
-                'message' => 'Profesión encontrada',
+                'message' => 'Profession found',
                 'data' => new ProfessionResource($profession)
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Profesión no encontrada',
-                'error' => "No se encontró una profesión con el identificador: {$id}"
+                'message' => 'Profession not found',
+                'error' => "No profession found with identifier: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al obtener la profesión',
+                'message' => 'Error retrieving profession',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -175,7 +175,7 @@ class ProfessionController extends Controller
         try {
             $data = $request->validated();
 
-            // Buscar por ID o por slug
+            // Search by ID or slug
             $profession = is_numeric($id) 
                 ? Profession::findOrFail($id)
                 : Profession::where('slug', $id)->firstOrFail();
@@ -191,18 +191,18 @@ class ProfessionController extends Controller
             $profession->refresh()->load('service');
 
             return response()->json([
-                'message' => 'Profesión actualizada exitosamente',
+                'message' => 'Profession updated successfully',
                 'data' => new ProfessionResource($profession),
                 'datasent' => $request->all()
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Profesión no encontrada',
-                'error' => "No se encontró una profesión con el identificador: {$id}"
+                'message' => 'Profession not found',
+                'error' => "No profession found with identifier: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al actualizar la profesión',
+                'message' => 'Error updating profession',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -214,7 +214,7 @@ class ProfessionController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
-            // Buscar por ID o por slug
+            // Search by ID or slug
             $profession = is_numeric($id) 
                 ? Profession::findOrFail($id)
                 : Profession::where('slug', $id)->firstOrFail();
@@ -222,23 +222,23 @@ class ProfessionController extends Controller
             // Check if profession has associated contractors
             if ($profession->hasContractors()) {
                 return response()->json([
-                    'message' => 'No se puede eliminar la profesión porque tiene contratistas asociados'
+                    'message' => 'Cannot delete profession because it has associated contractors'
                 ], 422);
             }
             $this->deleteImageIfExists($profession->image);
             $profession->delete();
 
             return response()->json([
-                'message' => 'Profesión eliminada exitosamente'
+                'message' => 'Profession deleted successfully'
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Profesión no encontrada',
-                'error' => "No se encontró una profesión con el identificador: {$id}"
+                'message' => 'Profession not found',
+                'error' => "No profession found with identifier: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al eliminar la profesión',
+                'message' => 'Error deleting profession',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -396,7 +396,7 @@ class ProfessionController extends Controller
         $professions = Profession::select('id', 'name', 'slug')->get();
         
         return response()->json([
-            'message' => 'Profesiones disponibles',
+            'message' => 'Available professions',
             'count' => $professions->count(),
             'data' => $professions
         ]);

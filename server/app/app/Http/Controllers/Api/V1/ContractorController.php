@@ -91,7 +91,7 @@ class ContractorController extends Controller
         $contractor->load('user');
 
         return response()->json([
-            'message' => 'Contractor creado exitosamente',
+            'message' => 'Contractor created successfully',
             'data' => new ContractorResource($contractor)
         ], 201);
     }
@@ -114,7 +114,7 @@ class ContractorController extends Controller
         $contractor->load('user');
 
         return response()->json([
-            'message' => 'Contractor actualizado exitosamente',
+            'message' => 'Contractor updated successfully',
             'data' => new ContractorResource($contractor)
         ]);
     }
@@ -127,7 +127,7 @@ class ContractorController extends Controller
         $contractor->delete();
 
         return response()->json([
-            'message' => 'Contractor eliminado exitosamente'
+            'message' => 'Contractor deleted successfully'
         ]);
     }
 
@@ -139,13 +139,13 @@ class ContractorController extends Controller
         if ($contractor->approve()) {
             $contractor->load('user');
             return response()->json([
-                'message' => 'Contractor aprobado exitosamente',
+                'message' => 'Contractor approved successfully',
                 'data' => new ContractorResource($contractor)
             ]);
         }
 
         return response()->json([
-            'message' => 'Error al aprobar el contractor'
+            'message' => 'Error approving contractor'
         ], 500);
     }
 
@@ -157,13 +157,13 @@ class ContractorController extends Controller
         if ($contractor->reject()) {
             $contractor->load('user');
             return response()->json([
-                'message' => 'Contractor rechazado exitosamente',
+                'message' => 'Contractor rejected successfully',
                 'data' => new ContractorResource($contractor)
             ]);
         }
 
         return response()->json([
-            'message' => 'Error al rechazar el contractor'
+            'message' => 'Error rejecting contractor'
         ], 500);
     }
 
@@ -175,13 +175,13 @@ class ContractorController extends Controller
         if ($contractor->suspend()) {
             $contractor->load('user');
             return response()->json([
-                'message' => 'Contractor suspendido exitosamente',
+                'message' => 'Contractor suspended successfully',
                 'data' => new ContractorResource($contractor)
             ]);
         }
 
         return response()->json([
-            'message' => 'Error al suspender el contractor'
+            'message' => 'Error suspending contractor'
         ], 500);
     }
 
@@ -198,7 +198,7 @@ class ContractorController extends Controller
         ];
 
         if (!in_array($status, $validStatuses)) {
-            abort(400, 'Estado no válido');
+            abort(400, 'Invalid status');
         }
 
         $query = Contractor::with([
@@ -388,8 +388,8 @@ class ContractorController extends Controller
         return response()->json([
             'success' => true,
             'message' => empty($dirty)
-                ? 'No hubo cambios para actualizar'
-                : 'Contractor actualizado correctamente',
+                ? 'No changes to update'
+                : 'Contractor updated successfully',
             'data' => $contractor
         ]);
     }
@@ -418,7 +418,7 @@ class ContractorController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Información completa del contractor obtenida correctamente',
+            'message' => 'Full contractor information retrieved successfully',
             'data' => new ContractorResource($contractor),
         ]);
     }
@@ -437,7 +437,7 @@ class ContractorController extends Controller
         if (!$baseContractor) {
             return response()->json([
                 'success' => false,
-                'message' => 'Contractor no encontrado',
+                'message' => 'Contractor not found',
                 'data' => [],
             ], 404);
         }
@@ -445,7 +445,7 @@ class ContractorController extends Controller
         if ($baseContractor->lat === null || $baseContractor->lng === null) {
             return response()->json([
                 'success' => false,
-                'message' => 'El contractor base no tiene coordenadas (lat/lng) definidas',
+                'message' => 'Base contractor does not have coordinates (lat/lng) defined',
                 'data' => [],
             ], 400);
         }
@@ -477,8 +477,7 @@ class ContractorController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Contractors cercanos obtenidos correctamente',
-            // Si no hay ninguno, esto será simplemente una colección vacía
+            'message' => 'Nearby contractors retrieved successfully',
             'data' => ContractorResource::collection($contractors),
         ]);
     }

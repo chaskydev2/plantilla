@@ -59,7 +59,7 @@ class ContactController extends Controller
         return (new ContactResource($contact))
             ->additional([
                 'success' => true,
-                'message' => 'Contacto Creado Satisfactoriamente',
+                'message' => 'Contact created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class ContactController extends Controller
         return (new ContactResource($contact))
             ->additional([
                 'success' => true,
-                'message' => 'Contacto actualizado Satisfactoriamente'
+                'message' => 'Contact updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class ContactController extends Controller
         $contact->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Contacto Eliminado Satisfactoriamente'
+            'message' => 'Contact deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

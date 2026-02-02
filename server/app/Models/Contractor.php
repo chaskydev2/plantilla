@@ -155,13 +155,6 @@ class Contractor extends Model
             ->orderByDesc('last_message_at');
     }
 
-    public function homeownerMessageThreads(): HasMany
-    {
-        return $this->hasMany(ContractorMessageThread::class, 'contractor_user_id', 'user_id')
-            ->where('participant_type', 'homeowner')
-            ->orderByDesc('last_message_at');
-    }
-
     // Team relationships (self-referential)
     public function teamMembers()
     {
@@ -359,5 +352,15 @@ class Contractor extends Model
       
         $this->average_rating = round($avg, 2);
         $this->save();
+    }
+
+    public function chatThreads()
+    {
+        return $this->hasMany(ChatThread::class, 'contractor_id', 'user_id');
+    }
+
+    public function chatMessages()
+    {
+        return $this->morphMany(ChatMessage::class, 'sender');
     }
 }

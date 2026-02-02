@@ -133,8 +133,8 @@ class AttributeController extends Controller
 
         if (!$attributeModel) {
             return response()->json([
-                'message' => 'Atributo no encontrado',
-                'error' => "No se encontró el atributo: {$attribute}"
+                'message' => 'Attribute not found',
+                'error' => "Attribute not found: {$attribute}"
             ], 404);
         }
 
@@ -171,7 +171,7 @@ class AttributeController extends Controller
         
         if ($contractorsCount > 0 || $homeownersCount > 0) {
             return response()->json([
-                'message' => 'No se puede eliminar este atributo porque está siendo utilizado.',
+                'message' => 'Cannot delete this attribute because it is being used.',
                 'details' => [
                     'contractors_using' => $contractorsCount,
                     'homeowners_using' => $homeownersCount,
@@ -183,7 +183,7 @@ class AttributeController extends Controller
         $attribute->delete();
 
         return response()->json([
-            'message' => 'Atributo eliminado correctamente.'
+            'message' => 'Attribute deleted successfully.'
         ]);
     }
 

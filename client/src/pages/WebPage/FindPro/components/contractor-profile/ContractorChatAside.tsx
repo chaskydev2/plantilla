@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { ShieldCheck, MessageCircle, Send, Sparkles } from "lucide-react";
+import { MessageService } from "@/core/services/messages/message.service";
 
-export type ChatSender = "support" | "contractor";
+export type ChatSender = "support" | "contractor" | "homeowner";
 
 export interface ChatMessage {
   id: number;
@@ -14,13 +15,16 @@ export interface ChatMessage {
 interface ContractorChatAsideProps {
   messages: ChatMessage[];
   messageDraft: string;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
   onDraftChange: (event: ChangeEvent<HTMLInputElement>) => void;
   quickReplies?: string[];
   onQuickReplySelect?: (value: string) => void;
   rating?: number;
   onRatingChange?: (value: number) => void;
   onRatingSubmit?: (rating: number) => Promise<void> | void;
+  contractorId: number | string;
+  onMessageSent?: (message: any) => void;
+  isLoadingChat?: boolean;
 }
 
 export function ContractorChatAside({
@@ -30,12 +34,62 @@ export function ContractorChatAside({
   onDraftChange,
   quickReplies,
   onQuickReplySelect,
+  contractorId,
+  onMessageSent,
+  isLoadingChat = false,
 }: ContractorChatAsideProps) {
   const replies = quickReplies ?? [
     "Could you share today's update?",
     "Need help scheduling a visit.",
     "Let's review outstanding items.",
   ];
+
+  const [sending, setSending] = useState(false);
+
+  const handleInternalSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    
+    if (!isAuthenticated || !messageDraft.trim() || sending) return;
+
+    // Si hay un onSubmit personalizado, usarlo
+    if (onSubmit) {
+      onSubmit(event);
+      return;
+    }
+
+    // Lógica interna de envío usando MessageService
+    const trimmedMessage = messageDraft.trim();
+    setSending(true);
+
+    console.log(contractorId);
+    try {
+      const response = await MessageService.sendMessage(contractorId, {
+        message: trimmedMessage,
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || "Failed to send message.");
+      }
+
+      // Limpiar el input
+      const clearEvent = {
+        target: { value: "" },
+      } as unknown as ChangeEvent<HTMLInputElement>;
+      onDraftChange(clearEvent);
+
+      // Notificar al padre si hay callback
+      if (onMessageSent && response.data) {
+        onMessageSent(response.data.message);
+      }
+
+    } catch (error: any) {
+      console.error("Chat send error:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || "No se pudo enviar el mensaje.";
+      alert(errorMessage);
+    } finally {
+      setSending(false);
+    }
+  };
 
   const sections = useMemo(() => {
     if (!messages.length) return [] as Array<{ dayLabel: string; items: Array<ChatMessage & { timeLabel: string }> }>;
@@ -75,18 +129,23 @@ export function ContractorChatAside({
     ? window.localStorage.getItem("authToken") ?? window.localStorage.getItem("_tkn")
     : null;
   let storedName = "";
+  let isContractorRole = false;
   if (typeof window !== "undefined") {
     const rawUser = window.localStorage.getItem("user_data");
     if (rawUser) {
       try {
         const parsed = JSON.parse(rawUser);
         storedName = (parsed?.name ?? parsed?.username ?? parsed?.user_name ?? "").trim();
+        const roleName = parsed?.role_name?.toLowerCase() || "";
+        const roles = parsed?.roles || [];
+        isContractorRole = roleName.includes("contractor") || 
+          roles.some((role: any) => role.name?.toLowerCase() === "contractor");
       } catch {
         storedName = "";
       }
     }
   }
-  const isAuthenticated = Boolean(authToken && storedName);
+  const isAuthenticated = Boolean(authToken && storedName && !isContractorRole);
   const loginHref = "/login";
   const registerHref = "/formulario_solicitud";
 
@@ -105,7 +164,7 @@ export function ContractorChatAside({
     onDraftChange(syntheticEvent);
   };
 
-  const isSendDisabled = !isAuthenticated || !messageDraft.trim().length;
+  const isSendDisabled = !isAuthenticated || !messageDraft.trim().length || sending;
 
   return (
     <aside className="flex flex-col rounded-3xl border border-[#F5D238]/35 bg-gradient-to-br from-[#181818] via-[#111] to-[#1f1f1f] p-5 text-white shadow-[0_18px_48px_rgba(0,0,0,0.46)] lg:mx-auto lg:max-w-md lg:w-auto lg:self-start lg:sticky lg:top-28">
@@ -127,68 +186,91 @@ export function ContractorChatAside({
 
       {!isAuthenticated && (
         <div className="mt-4 rounded-2xl border border-[#F5D238]/40 bg-[#1E1E17]/70 px-4 py-4 text-sm text-white/80">
-          <p className="text-[#F5D238] font-semibold uppercase tracking-wide text-xs">Sign in required</p>
-          <p className="mt-2 text-xs">
-            Create an account or log in to message this contractor. Once you are signed in, the conversation will unlock automatically.
+          <p className="text-[#F5D238] font-semibold uppercase tracking-wide text-xs">
+            {isContractorRole ? "Access restricted" : "Sign in required"}
           </p>
-          <div className="mt-3 flex gap-2">
-            <a
-              href={loginHref}
-              className="inline-flex flex-1 items-center justify-center rounded-full border border-[#F5D238] bg-[#F5D238] px-3 py-2 text-xs font-bold text-[#1E1E17] transition hover:bg-[#f7df52]"
-            >
-              Log in
-            </a>
-            <a
-              href={registerHref}
-              className="inline-flex flex-1 items-center justify-center rounded-full border border-white/25 bg-transparent px-3 py-2 text-xs font-semibold text-white transition hover:border-[#F5D238]/60 hover:text-[#F5D238]"
-            >
-              Register
-            </a>
-          </div>
+          <p className="mt-2 text-xs">
+            {isContractorRole 
+              ? "Contractors cannot send messages from this chat. Only homeowners can initiate conversations with contractors."
+              : "Create an account or log in to message this contractor. Once you are signed in, the conversation will unlock automatically."
+            }
+          </p>
+          {!isContractorRole && (
+            <div className="mt-3 flex gap-2">
+              <a
+                href={loginHref}
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-[#F5D238] bg-[#F5D238] px-3 py-2 text-xs font-bold text-[#1E1E17] transition hover:bg-[#f7df52]"
+              >
+                Log in
+              </a>
+              <a
+                href={registerHref}
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-white/25 bg-transparent px-3 py-2 text-xs font-semibold text-white transition hover:border-[#F5D238]/60 hover:text-[#F5D238]"
+              >
+                Register
+              </a>
+            </div>
+          )}
         </div>
       )}
 
       <div className="mt-4 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner">
         <div className="flex max-h-[420px] flex-col gap-4 overflow-y-auto pr-1" role="log" aria-live="polite">
-          {sections.map((section) => (
-            <div key={section.dayLabel} className="space-y-3">
-              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">
-                <span className="h-px flex-1 bg-white/10" />
-                {section.dayLabel}
-                <span className="h-px flex-1 bg-white/10" />
-              </div>
-              {section.items.map((message) => {
-                const isSupport = message.sender === "support";
-                return (
-                  <div key={message.id} className={`flex ${isSupport ? "justify-start" : "justify-end"}`}>
-                    <div
-                      className={`relative max-w-[78%] rounded-2xl px-4 py-3 text-sm shadow-sm transition ${
-                        isSupport
-                          ? "border border-white/20 bg-white text-[#101010]"
-                          : "border border-[#F5D238]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
-                      }`}
-                    >
-                      <p className="whitespace-pre-line leading-relaxed">{message.text}</p>
-                      <span
-                        className={`mt-3 flex items-center gap-2 text-[10px] uppercase tracking-wider ${
-                          isSupport ? "text-[#101010]/55" : "text-white/60"
-                        }`}
-                      >
-                        <MessageCircle className="h-3 w-3" aria-hidden />
-                        {message.timeLabel}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-
-          {!messages.length && (
+          {isLoadingChat ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 text-center text-xs text-white/60">
-              <Sparkles className="h-6 w-6 text-[#F5D238]" aria-hidden />
-              <p>Start a conversation with support and we&apos;ll reply in minutes.</p>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#F5D238]" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#F5D238] animation-delay-100" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#F5D238] animation-delay-200" />
+              </div>
+              <p>Cargando chats...</p>
             </div>
+          ) : (
+            <>
+              {sections.map((section) => (
+                <div key={section.dayLabel} className="space-y-3">
+                  <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">
+                    <span className="h-px flex-1 bg-white/10" />
+                    {section.dayLabel}
+                    <span className="h-px flex-1 bg-white/10" />
+                  </div>
+                  {section.items.map((message) => {
+                    const isSupport = message.sender === "support";
+                    const isHomeowner = message.sender === "homeowner";
+                    return (
+                      <div key={message.id} className={`flex ${isSupport ? "justify-start" : "justify-end"}`}>
+                        <div
+                          className={`relative max-w-[78%] rounded-2xl px-4 py-3 text-sm shadow-sm transition ${
+                            isSupport
+                              ? "border border-white/20 bg-white text-[#101010]"
+                              : isHomeowner
+                              ? "border border-[#F5D238]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
+                              : "border border-[#F5D238]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
+                          }`}
+                        >
+                          <p className="whitespace-pre-line leading-relaxed">{message.text}</p>
+                          <span
+                            className={`mt-3 flex items-center gap-2 text-[10px] uppercase tracking-wider ${
+                              isSupport ? "text-[#101010]/55" : "text-white/60"
+                            }`}
+                          >
+                            <MessageCircle className="h-3 w-3" aria-hidden />
+                            {message.timeLabel}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+
+              {!messages.length && (
+                <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 text-center text-xs text-white/60">
+                  <Sparkles className="h-6 w-6 text-[#F5D238]" aria-hidden />
+                  <p>Start a conversation with support and we&apos;ll reply in minutes.</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -210,13 +292,7 @@ export function ContractorChatAside({
       )}
 
       <form
-        onSubmit={(event) => {
-          if (!isAuthenticated) {
-            event.preventDefault();
-            return;
-          }
-          onSubmit(event);
-        }}
+        onSubmit={handleInternalSubmit}
         className="mt-4 flex gap-2"
         aria-label="Enviar mensaje al equipo de soporte"
       >
@@ -238,7 +314,7 @@ export function ContractorChatAside({
           disabled={isSendDisabled}
           aria-disabled={isSendDisabled}
         >
-          Send
+          {sending ? "Sending..." : "Send"}
           <Send className="h-4 w-4" aria-hidden />
         </button>
       </form>

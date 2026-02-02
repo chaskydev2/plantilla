@@ -23,7 +23,7 @@ class JobPostController extends Controller  {
         if (!$jobPost) {
             return response()->json([
                 'success' => false,
-                'message' => 'No se encontró la publicación.'
+                'message' => 'No found job post.'
             ], 404);
         }
 
@@ -32,7 +32,7 @@ class JobPostController extends Controller  {
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado de aprobación actualizado.',
+            'message' => 'Approval status updated.',
             'data' => $jobPost
         ]);
     }
@@ -92,7 +92,7 @@ class JobPostController extends Controller  {
         if (!is_array($ids) || empty($ids)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Debes enviar un array de IDs a eliminar.'
+                'message' => 'You must send an array of IDs to delete.'
             ], 400);
         }
 
@@ -101,7 +101,7 @@ class JobPostController extends Controller  {
             if (!$jobPost) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se encontró la publicación con el ID proporcionado.'
+                    'message' => 'No job post found with the provided ID.'
                 ], 404);
             }
             $this->deleteImageIfExists($jobPost->image_path);
@@ -109,7 +109,7 @@ class JobPostController extends Controller  {
             return response()->json([
                 'success' => true,
                 'deleted' => 1,
-                'message' => 'Se eliminó la publicación correctamente.'
+                'message' => 'Job post deleted successfully.'
             ]);
         }
 
@@ -124,7 +124,7 @@ class JobPostController extends Controller  {
         return response()->json([
             'success' => true,
             'deleted' => $deleted,
-            'message' => "Se eliminaron {$deleted} publicaciones."
+            'message' => "{$deleted} job posts deleted."
         ]);
     }
     public function showFull($id): JsonResponse
@@ -156,13 +156,13 @@ class JobPostController extends Controller  {
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Publicación no encontrada',
-                'error' => "No se encontró una publicación con el ID: {$id}"
+                'message' => 'Job post not found',
+                'error' => "No job post found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener la publicación',
+                'message' => 'Error retrieving job post',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -235,7 +235,7 @@ class JobPostController extends Controller  {
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se pudo determinar el homeowner autenticado.'
+                    'message' => 'Could not determine authenticated homeowner.'
                 ], 401);
             }
         }
@@ -292,17 +292,17 @@ class JobPostController extends Controller  {
         try {
             $jobPost = JobPost::with(['homeowner', 'service'])->findOrFail($id);
             return response()->json([
-                'message' => 'Publicación encontrada',
+                'message' => 'Job post found',
                 'data' => $jobPost
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Publicación no encontrada',
-                'error' => "No se encontró una publicación con el ID: {$id}"
+                'message' => 'Job post not found',
+                'error' => "No job post found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al obtener la publicación',
+                'message' => 'Error retrieving job post',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -336,12 +336,12 @@ class JobPostController extends Controller  {
             $jobPost = JobPost::create($data);
             $jobPost->load(['homeowner', 'service']);
             return response()->json([
-                'message' => 'Publicación creada exitosamente',
+                'message' => 'Job post created successfully',
                 'data' => $jobPost
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear la publicación',
+                'message' => 'Error creating job post',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -350,42 +350,44 @@ class JobPostController extends Controller  {
     /**
      * Update the specified job post.
      */
-    public function update(Request $request, $id): JsonResponse
-    {
-        try {
-            $jobPost = JobPost::findOrFail($id);
-            $data = $this->validateData($request, true);
+public function update(Request $request, $id): JsonResponse
+{
+    try {
+        $jobPost = JobPost::findOrFail($id);
+        $data = $this->validateData($request, true);
 
-            $newImage = $this->persistImage($request, $jobPost->image_path);
-            if ($newImage === null) {
-                $data['image_path'] = null;
-            } elseif ($newImage !== '__keep') {
-                $data['image_path'] = $newImage;
-            }
+        // Remove non-column field
+        unset($data['image']);
 
-            // Actualizar y guardar cada campo individualmente
-            foreach ($data as $key => $value) {
-                $jobPost->$key = $value;
-                $jobPost->save();
-            }
-            $jobPost->load(['homeowner', 'service']);
-            return response()->json([
-                'message' => 'Publicación actualizada exitosamente',
-                'data' => $jobPost , 
-                 'datasent' => $request->all
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'message' => 'Publicación no encontrada',
-                'error' => "No se encontró una publicación con el ID: {$id}"
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al actualizar la publicación',
-                'error' => $e->getMessage()
-            ], 500);
+        $newImage = $this->persistImage($request, $jobPost->image_path);
+        if ($newImage === null) {
+            $data['image_path'] = null;
+        } elseif ($newImage !== '__keep') {
+            $data['image_path'] = $newImage;
         }
+
+        // Save once
+        $jobPost->fill($data);
+        $jobPost->save();
+
+        $jobPost->load(['homeowner', 'service']);
+        return response()->json([
+            'message' => 'Job post updated successfully',
+            'data' => $jobPost,
+            'datasent' => $request->all(),
+        ]);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'message' => 'Job post not found',
+            'error' => "No job post found with ID: {$id}"
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error updating job post',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Remove the specified job post.
@@ -397,16 +399,16 @@ class JobPostController extends Controller  {
             $this->deleteImageIfExists($jobPost->image_path);
             $jobPost->delete();
             return response()->json([
-                'message' => 'Publicación eliminada exitosamente'
+                'message' => 'Job post deleted successfully'
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Publicación no encontrada',
-                'error' => "No se encontró una publicación con el ID: {$id}"
+                'message' => 'Job post not found',
+                'error' => "No job post found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al eliminar la publicación',
+                'message' => 'Error deleting job post',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -422,17 +424,17 @@ class JobPostController extends Controller  {
                 $this->deleteImageIfExists($jobPost->image_path);
                 $jobPost->forceDelete();
                 return response()->json([
-                    'message' => 'Publicación eliminada permanentemente',
+                    'message' => 'Job post permanently deleted',
                     'success' => true
                 ]);
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 return response()->json([
-                    'message' => 'Publicación no encontrada',
-                    'error' => "No se encontró una publicación con el ID: {$id}"
+                    'message' => 'Job post not found',
+                    'error' => "No job post found with ID: {$id}"
                 ], 404);
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Error al eliminar permanentemente la publicación',
+                    'message' => 'Error permanently deleting job post',
                     'error' => $e->getMessage(),
                     'success' => false
                 ], 500);
@@ -452,7 +454,7 @@ class JobPostController extends Controller  {
             'address_line1' => ['nullable', 'string', 'max:200'],
             'address_line2' => ['nullable', 'string', 'max:200'],
             'city' => ['nullable', 'string', 'max:120'],
-            'state_code' => ['nullable', 'string', 'max:10'],
+            'state_code' => ['nullable', 'string'],
             'postal_code' => ['nullable', 'string', 'max:15'],
             'lat' => ['nullable', 'numeric', 'between:-90,90'],
             'lng' => ['nullable', 'numeric', 'between:-180,180'],

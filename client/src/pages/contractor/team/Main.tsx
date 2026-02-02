@@ -47,7 +47,7 @@ const resolveLeaderName = (item: WithRelations): string => {
     raw?.leader_user?.name ||
     raw?.leader?.user_name ||
     raw?.leader_name ||
-    `Usuario #${item.leader_user_id}`
+    `User #${item.leader_user_id}`
   );
 };
 
@@ -57,7 +57,7 @@ const resolveLeaderEmail = (item: WithRelations): string => {
     item.leader?.user?.email ||
     raw?.leader_user?.email ||
     raw?.leader_email ||
-    'Sin email'
+    'No email'
   );
 };
 
@@ -68,7 +68,7 @@ const resolveMemberName = (item: WithRelations): string => {
     raw?.member?.name ||
     raw?.member_user?.name ||
     raw?.member_name ||
-    `Usuario #${item.member_user_id}`
+    `User #${item.member_user_id}`
   );
 };
 
@@ -78,7 +78,7 @@ const resolveMemberEmail = (item: WithRelations): string => {
     item.member?.user?.email ||
     raw?.member_user?.email ||
     raw?.member_email ||
-    'Sin email'
+    'No email'
   );
 };
 
@@ -203,7 +203,7 @@ const ContractorTeam: React.FC = () => {
 
   const actions: ITableAction<WithRelations>[] = [
     {
-      label: 'Ver',
+      label: 'View',
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: WithRelations) => {
         setViewItem(item);
@@ -212,7 +212,7 @@ const ContractorTeam: React.FC = () => {
       show: () => true,
     },
     {
-      label: 'Eliminar',
+      label: 'Delete',
       icon: <Trash className="w-4 h-4" />,
       onClick: (item: WithRelations) => askDelete(item.member_user_id),
       variant: 'danger',
@@ -223,7 +223,7 @@ const ContractorTeam: React.FC = () => {
   const columns: ITableColumn<WithRelations>[] = [
     {
       key: 'leader_user_id',
-      header: 'Líder',
+      header: 'Leader',
       render: (item: WithRelations) => (
         <div className="flex flex-col">
           <span className="font-semibold text-gray-900 dark:text-gray-100">
@@ -238,7 +238,7 @@ const ContractorTeam: React.FC = () => {
     },
     {
       key: 'member_user_id',
-      header: 'Miembro',
+      header: 'Member',
       render: (item: WithRelations) => (
         <div className="flex flex-col">
           <span className="font-semibold text-gray-900 dark:text-gray-100">
@@ -253,7 +253,7 @@ const ContractorTeam: React.FC = () => {
     },
     {
       key: 'compania',
-      header: 'Compañía',
+      header: 'Company',
       render: (item: WithRelations) => (
         <div className="text-gray-900 dark:text-gray-100">
           {item.compania || item.leader?.company_name || '-'}
@@ -264,7 +264,7 @@ const ContractorTeam: React.FC = () => {
     },
     {
       key: 'status',
-      header: 'Estado',
+      header: 'Status',
       render: (item: WithRelations) => {
         const status = item.status || 'pending';
         const badge = status === 'active'
@@ -278,11 +278,11 @@ const ContractorTeam: React.FC = () => {
     },
     {
       key: 'created_at',
-      header: 'Creado',
+      header: 'Created',
       render: (item: WithRelations) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {item.created_at
-            ? new Date(item.created_at).toLocaleDateString('es-ES', {
+            ? new Date(item.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -302,7 +302,7 @@ const ContractorTeam: React.FC = () => {
           onClick={() => setIsModalOpen(true)}
         >
           <Plus className="w-5 h-5" />
-          Agregar miembro
+          Add member
         </button>
       </div>
       <div className="relative w-full sm:w-64">
@@ -311,7 +311,7 @@ const ContractorTeam: React.FC = () => {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600 rounded-xl"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
@@ -364,7 +364,7 @@ const ContractorTeam: React.FC = () => {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Mi equipo" />
+      <PageBreadcrumb pageTitle="My team" />
       <DataTable<WithRelations> {...tableProps} />
       <TeamMemberForm
         isOpen={isModalOpen}
@@ -374,10 +374,10 @@ const ContractorTeam: React.FC = () => {
       />
       <ConfirmDialog
         isOpen={confirmOpen}
-        title="Eliminar miembro"
-        message="Esta acción quitará al miembro del equipo."
-        confirmText="Eliminar"
-        cancelText="Cancelar"
+        title="Delete member"
+        message="This action will remove the member from the team."
+        confirmText="Delete"
+        cancelText="Cancel"
         variant="danger"
         isProcessing={deleting}
         onConfirm={handleDelete}

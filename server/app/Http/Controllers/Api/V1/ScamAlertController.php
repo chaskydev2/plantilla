@@ -121,6 +121,14 @@ class ScamAlertController extends Controller
     public function update(UpdateScamAlertRequest $request, ScamAlert $scamAlert): JsonResponse
     {
         $data = $request->validated();
+
+        $user = $request->user();
+        $isAdmin = $user?->hasRole('admin');
+
+        if ($isAdmin) {
+            unset($data['homeowner_profile_id']);
+        }
+
         $scamAlert->update($data);
         $scamAlert->load(['contractor.user', 'homeownerProfile.user']);
 

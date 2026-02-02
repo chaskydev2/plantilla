@@ -135,7 +135,7 @@ class AttributeContractorController extends Controller
         ]);
         return response()->json([
             'success' => false,
-            'message' => 'Error al guardar los datos',
+            'message' => 'Error saving data',
             'error' => $e->getMessage(),
         ], 500);
     }
@@ -161,7 +161,7 @@ class AttributeContractorController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado actualizado correctamente',
+            'message' => 'Status updated successfully',
             'data' => $attributeContractor
         ]);
     }
@@ -179,7 +179,7 @@ class AttributeContractorController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comentario actualizado correctamente',
+            'message' => 'Comment updated successfully',
             'data' => $attributeContractor
         ]);
     }
@@ -267,7 +267,7 @@ class AttributeContractorController extends Controller
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar los datos',
+                'message' => 'Error updating data',
                 'error' => $e->getMessage(),
             ], 500);
         }

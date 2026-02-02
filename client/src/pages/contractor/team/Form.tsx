@@ -39,7 +39,7 @@ const defaultValues: FormValues = {
 const validationSchema = yup.object({
   member_user_id: yup
     .string()
-    .required('Ingresa el ID del miembro'),
+    .required('Enter the member ID'),
   status: yup
     .string()
     .oneOf(['pending'])
@@ -82,11 +82,11 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
 
   const handleSubmit = async () => {
     if (!resolvedLeaderId) {
-      toastify.error('No se encontró el líder');
+      toastify.error('Leader not found');
       return;
     }
     if (!values.member_user_id) {
-      toastify.error('Ingresa el ID del miembro');
+      toastify.error('Enter the member ID');
       return;
     }
 
@@ -100,12 +100,12 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
       });
 
       console.log();
-      toastify.success('Miembro agregado');
+      toastify.success('Member added');
       onCreated();
       onClose();
       setValues(defaultValues);
     } catch (error: any) {
-      toastify.error(error?.response?.data?.message || 'Error al agregar miembro');
+      toastify.error(error?.response?.data?.message || 'Error adding member');
     } finally {
       setSubmitting(false);
     }
@@ -139,12 +139,12 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
       const list = Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : [];
       const mapped = list.map((c: any) => ({
         id: c?.user?.id ?? c?.id,
-        name: c?.user?.name ?? c?.name ?? 'Sin nombre',
+        name: c?.user?.name ?? c?.name ?? 'No name',
         email: c?.user?.email ?? c?.email,
       }));
       setSearchResults(mapped);
     } catch (error: any) {
-      toastify.error(error?.response?.data?.message || 'Error al buscar contratistas');
+      toastify.error(error?.response?.data?.message || 'Error searching contractors');
     } finally {
       setSearching(false);
     }
@@ -154,7 +154,7 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Agregar miembro"
+      title="Add member"
       size="sm"
     >
       <FormProviderWrapper
@@ -165,12 +165,12 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
       >
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Buscar contratista</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Search contractor</label>
             <div className="flex gap-2 items-center">
               <input
                 list="contractor-options"
                 className="input flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
-                placeholder="Escribe el nombre (mín. 2 letras)"
+                placeholder="Type the name (min. 2 letters)"
                 value={searchTerm}
                 onChange={(e) => handleSelectOption(e.target.value)}
               />
@@ -209,15 +209,15 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Estado</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
             <div className="input bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-500">
-              Pendiente (predeterminado)
+              Pending (default)
             </div>
           </div>
           <InputField
             name="compania"
-            label="Compañía (opcional)"
-            placeholder="Nombre de la compañía"
+            label="Company (optional)"
+            placeholder="Company name"
             value={values.compania}
             onChange={(e) => setValues({ ...values, compania: e.target.value })}
           />
@@ -228,7 +228,7 @@ const TeamMemberForm = ({ isOpen, onClose, leaderUserId, onCreated }: Props) => 
               onClick={handleSubmit}
               disabled={submitting}
             >
-              {submitting ? 'Guardando...' : 'Guardar'}
+              {submitting ? 'Saving...' : 'Save'}
             </button>
             {submitting && <span className="loading loading-spinner loading-sm" />}
           </div>

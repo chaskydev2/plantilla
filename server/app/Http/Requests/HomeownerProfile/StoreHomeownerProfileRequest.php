@@ -64,10 +64,10 @@ class StoreHomeownerProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.unique' => 'Este usuario ya tiene un perfil de propietario.',
-            'country_code.in' => 'El código de país debe ser válido.',
-            'lat.between' => 'La latitud debe estar entre -90 y 90.',
-            'lng.between' => 'La longitud debe estar entre -180 y 180.',
+            'user_id.unique' => 'This user already has a homeowner profile.',
+            'country_code.in' => 'The country code must be valid.',
+            'lat.between' => 'Latitude must be between -90 and 90.',
+            'lng.between' => 'Longitude must be between -180 and 180.',
         ];
     }
 }

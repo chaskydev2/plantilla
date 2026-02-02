@@ -105,12 +105,7 @@ const AppSidebar: React.FC = () => {
     {
       name: t("homeowner.sidebar.chats", "Chats"),
       icon: <MessageSquare className="w-5 h-5 text-blue-500" />,
-      path: "/homeowner/chats",
-    },
-    {
-      name: t("homeowner.sidebar.notifications", "Notifications"),
-      icon: <Bell className="w-5 h-5 text-amber-500" />,
-      path: "/homeowner/notifications",
+      path: "/contractor/chats",
     }
   ];
 
@@ -298,7 +293,7 @@ const AppSidebar: React.FC = () => {
           icon: <Clipboard className="w-4 h-4 text-blue-500" />,
         //  permissions: ["profesion_listar"]
         },
-          ],
+      ],
     },
   ];
 

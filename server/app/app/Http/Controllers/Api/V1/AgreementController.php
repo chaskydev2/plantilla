@@ -58,7 +58,7 @@ class AgreementController extends Controller
         return (new AgreementResource($agreement))
             ->additional([
                 'success' => true,
-                'message' => 'Acuerdo creado Satisfactoriamente',
+                'message' => 'Agreement created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -74,7 +74,7 @@ class AgreementController extends Controller
         return (new AgreementResource($agreement))
             ->additional([
                 'success' => true,
-                'message' => 'Acuerdo actualizado Satisfactoriamente'
+                'message' => 'Agreement updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -88,7 +88,7 @@ class AgreementController extends Controller
         $agreement->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Acuerdo eliminado Satisfactoriamente'
+            'message' => 'Agreement deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

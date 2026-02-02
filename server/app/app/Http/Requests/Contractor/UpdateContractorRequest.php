@@ -103,11 +103,11 @@ class UpdateContractorRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'license_number.unique' => 'Este número de licencia ya está registrado.',
-            'approval_date.after_or_equal' => 'La fecha de aprobación debe ser posterior o igual a la fecha de afiliación.',
-            'lat.between' => 'La latitud debe estar entre -90 y 90 grados.',
-            'lng.between' => 'La longitud debe estar entre -180 y 180 grados.',
-            'average_rating.between' => 'La calificación debe estar entre 0 y 5.',
+            'license_number.unique' => 'This license number is already in use.',
+            'approval_date.after_or_equal' => 'The approval date must be after or equal to the affiliation date.',
+            'lat.between' => 'The latitude must be between -90 and 90 degrees.',
+            'lng.between' => 'The longitude must be between -180 and 180 degrees.',
+            'average_rating.between' => 'The rating must be between 0 and 5.',
         ];
     }
 }

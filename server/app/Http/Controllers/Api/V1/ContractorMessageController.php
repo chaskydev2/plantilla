@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Contractor;
 use App\Models\ContractorMessage;
-use App\Models\ContractorMessageThread;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -31,14 +30,11 @@ class ContractorMessageController extends Controller
             'sender_user_id' => 'nullable|integer|exists:users,id',
             'guest_email' => 'nullable|email|max:255',
             'status' => 'nullable|string|max:50',
-            'thread_id' => 'nullable|integer|exists:contractor_message_threads,id',
-            'participant_user_id' => 'nullable|integer|exists:users,id',
-            'participant_type' => 'nullable|string|max:50',
         ]);
 
-        $query = ContractorMessage::with(['senderUser', 'thread'])
+        $query = ContractorMessage::with('senderUser')
             ->where('contractor_user_id', $contractor->user_id)
-            ->orderBy('message_number');
+            ->orderBy('created_at', 'asc');
 
         if (!empty($validated['sender_user_id'])) {
             $query->where('sender_user_id', $validated['sender_user_id']);
@@ -50,22 +46,6 @@ class ContractorMessageController extends Controller
 
         if (!empty($validated['status'])) {
             $query->where('status', $validated['status']);
-        }
-
-        if (!empty($validated['thread_id'])) {
-            $query->where('thread_id', $validated['thread_id']);
-        }
-
-        if (!empty($validated['participant_user_id']) || !empty($validated['participant_type'])) {
-            $query->whereHas('thread', function ($threadQuery) use ($validated) {
-                if (!empty($validated['participant_user_id'])) {
-                    $threadQuery->where('participant_user_id', $validated['participant_user_id']);
-                }
-
-                if (!empty($validated['participant_type'])) {
-                    $threadQuery->where('participant_type', $validated['participant_type']);
-                }
-            });
         }
 
         $messages = $query->get();
@@ -104,51 +84,17 @@ class ContractorMessageController extends Controller
             'links' => 'nullable|array',
             'links.*' => 'nullable|string',
             'status' => 'nullable|string|max:50',
-            'thread_id' => 'nullable|integer|exists:contractor_message_threads,id',
-            'participant_user_id' => 'nullable|integer|exists:users,id',
-            'participant_type' => 'nullable|string|max:50',
         ]);
 
-        $participantType = $validated['participant_type'] ?? null;
-        $thread = null;
-
-        if (!empty($validated['thread_id'])) {
-            $thread = ContractorMessageThread::where('id', $validated['thread_id'])
-                ->where('contractor_user_id', $contractor->user_id)
-                ->first();
-
-            if (!$thread) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'El hilo no pertenece a este contractor',
-                    'data' => null,
-                ], 404);
-            }
-
-            $participantType = $participantType ?? $thread->participant_type;
-        } elseif (!empty($validated['participant_user_id'])) {
-            $participantType = $participantType ?? 'homeowner';
-
-            $thread = ContractorMessageThread::firstOrCreate(
-                [
-                    'contractor_user_id' => $contractor->user_id,
-                    'participant_type' => $participantType,
-                    'participant_user_id' => $validated['participant_user_id'],
-                ],
-                [
-                    'status' => 'open',
-                ]
-            );
+        // Asegurar un sender_type por defecto
+        if (empty($validated['sender_type'])) {
+            $validated['sender_type'] = $validated['sender_user_id'] ? 'user' : 'guest';
         }
-
-        $senderType = $validated['sender_type']
-            ?? ($validated['sender_user_id'] ? ($participantType === 'homeowner' ? 'homeowner' : 'user') : 'guest');
 
         // Crear el mensaje
         $message = ContractorMessage::create([
             'contractor_user_id' => $contractor->user_id,
-            'thread_id' => $thread?->id,
-            'sender_type' => $senderType,
+            'sender_type' => $validated['sender_type'] ?? 'guest',
             'sender_user_id' => $validated['sender_user_id'] ?? null,
             'guest_name' => $validated['guest_name'] ?? null,
             'guest_email' => $validated['guest_email'] ?? null,

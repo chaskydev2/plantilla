@@ -59,7 +59,7 @@ class SocialNetworkController extends Controller
         return (new SocialNetworkResource($socialnetwork))
             ->additional([
                 'success' => true,
-                'message' => 'Red Social creada Satisfactoriamente',
+                'message' => 'Social network created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class SocialNetworkController extends Controller
         return (new SocialNetworkResource($socialnetwork))
             ->additional([
                 'success' => true,
-                'message' => 'Red Social actualizada Satisfactoriamente'
+                'message' => 'Social network updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class SocialNetworkController extends Controller
         $socialnetwork->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Red Social eliminada Satisfactoriamente'
+            'message' => 'Social network deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

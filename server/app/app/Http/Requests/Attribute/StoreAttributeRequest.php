@@ -56,15 +56,15 @@ class StoreAttributeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'El nombre del atributo es obligatorio.',
-            'name.string' => 'El nombre del atributo debe ser una cadena de texto.',
-            'name.max' => 'El nombre del atributo no puede tener más de 255 caracteres.',
-            'name.unique' => 'Ya existe un atributo con este nombre.',
-            'description.string' => 'La descripción debe ser una cadena de texto.',
-            'description.max' => 'La descripción no puede tener más de 1000 caracteres.',
-            'required_for.required' => 'Debe especificar para quién es requerido el atributo.',
-            'required_for.string' => 'El campo requerido para debe ser una cadena de texto.',
-            'required_for.in' => 'El campo requerido para debe ser: contractor, homeowner o both.'
+            'name.required' => 'The name is required.',
+            'name.string' => 'The attribute name must be a string.',
+            'name.max' => 'The attribute name cannot exceed 255 characters.',
+            'name.unique' => 'An attribute with this name already exists.',
+            'description.string' => 'The description must be a string.',
+            'description.max' => 'The description cannot exceed 1000 characters.',
+            'required_for.required' => 'The required_for field is required.',
+            'required_for.string' => 'The required_for field must be a string.',
+            'required_for.in' => 'The required_for field must be one of: contractor, homeowner or both.'
         ];
     }
 

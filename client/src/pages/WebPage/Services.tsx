@@ -14,7 +14,7 @@ function getServiceImageUrl(image?: string | null): string {
 }
 
 const getServiceDescription = (service: IService): string => {
-  return (service.description ?? '').trim() || 'Details coming soon for this service.';
+  return (service.description ?? '').trim() || '';
 };
 
 const Services: React.FC = () => {

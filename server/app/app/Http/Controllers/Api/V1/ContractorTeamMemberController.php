@@ -65,7 +65,7 @@ class ContractorTeamMemberController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado actualizado correctamente',
+            'message' => 'Status updated successfully',
             'data' => $pivot->only(['leader_user_id', 'member_user_id', 'status', 'compania']),
         ], Response::HTTP_OK);
     }
@@ -113,7 +113,7 @@ class ContractorTeamMemberController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Miembro agregado al equipo correctamente',
+            'message' => 'Member added to team successfully',
             'data' => $pivot->only(['leader_user_id', 'member_user_id', 'status', 'compania']),
         ], Response::HTTP_CREATED);
     }
@@ -170,13 +170,13 @@ class ContractorTeamMemberController extends Controller
         if (!$deleted) {
             return response()->json([
                 'success' => false,
-                'message' => 'Miembro no encontrado en el equipo',
+                'message' => 'Member not found in team',
             ], Response::HTTP_NOT_FOUND);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Miembro removido del equipo',
+            'message' => 'Member removed from team',
         ], Response::HTTP_OK);
     }
 }

@@ -48,13 +48,13 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 			setIsProcessing(true);
 			const response = await ItemService.updateStatus(viewItem.id, newStatus);
 			if (response.success) {
-				toastify.success("Estado actualizado");
+				toastify.success("Status updated");
 				fetchItems();
 			} else {
-				toastify.error(response.message || "Error al cambiar estado");
+				toastify.error(response.message || "Error changing status");
 			}
 		} catch (err: any) {
-			toastify.error(err?.response?.data?.message || err?.message || "Error al cambiar estado");
+			toastify.error(err?.response?.data?.message || err?.message || "Error changing status");
 		} finally {
 			setIsProcessing(false);
 		}
@@ -62,20 +62,20 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 
 	const handleUpload = async (file: File) => {
 		if (!viewItem?.id || !viewItem.homeowner_id || !viewItem.attribute_id) {
-			toastify.error("Datos incompletos para actualizar documento");
+			toastify.error("Missing data to update the document");
 			return;
 		}
 
-		// Validar tipo de archivo
+		// Validate file type
 		const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
 		if (!allowedTypes.includes(file.type)) {
-			toastify.error('Solo se permiten archivos PDF e imágenes (JPG, PNG)');
+			toastify.error('Only PDF files and images (JPG, PNG) are allowed');
 			return;
 		}
 
-		// Validar tamaño máx 10MB
+		// Validate max size (10MB)
 		if (file.size > 10 * 1024 * 1024) {
-			toastify.error('El archivo no puede superar los 10MB');
+			toastify.error('The file cannot exceed 10MB');
 			return;
 		}
 
@@ -89,16 +89,16 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 			const res = await ItemService.updateDocument(viewItem.id, formData);
 			
 			if (res.success) {
-				toastify.success(res.message || "Documento actualizado");
+				toastify.success(res.message || "Document updated");
 				setViewFile(null);
 				fetchItems();
 			} else {
-				toastify.error(res.message || "Error al actualizar documento");
+				toastify.error(res.message || "Error updating document");
 			}
 
 		} catch (err: any) {
 			
-			toastify.error(err?.response?.data?.message || err?.message || "Error al actualizar documento");
+			toastify.error(err?.response?.data?.message || err?.message || "Error updating document");
 		} finally {
 			
 			setUploading(false);
@@ -112,10 +112,10 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-bold ${viewItem.status ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}
 					>
-						{viewItem.status ? "Activo" : "Desactivado"}
+						{viewItem.status ? "Active" : "Disabled"}
 					</span>
 					<label className="flex items-center gap-2 text-sm">
-						<span>Desactivado</span>
+						<span>Disabled</span>
 						<input
 							type="checkbox"
 							className="toggle toggle-success"
@@ -123,19 +123,19 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 							onChange={(e) => handleStatusToggle(e.target.checked)}
 							disabled={isProcessing}
 						/>
-						<span>Activo</span>
+						<span>Active</span>
 					</label>
 				</div>
 			)}
 
 			{viewFile && /\.(jpg|jpeg|png|gif)$/i.test(viewFile) && (
-				<img src={getLocalUrl(viewFile)} alt="Documento" className="max-w-full max-h-[60vh] mx-auto" />
+				<img src={getLocalUrl(viewFile)} alt="Document" className="max-w-full max-h-[60vh] mx-auto" />
 			)}
 
 			{viewFile && /\.pdf$/i.test(viewFile) && (
 				<iframe
 					src={getLocalUrl(viewFile)}
-					title="Documento PDF"
+					title="PDF Document"
 					className="w-full h-[60vh] border rounded"
 				/>
 			)}
@@ -147,12 +147,12 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 					rel="noopener noreferrer"
 					className="text-blue-600 underline"
 				>
-					Abrir / Descargar archivo
+					Open / Download file
 				</a>
 			)}
 
 			<div className="flex flex-col gap-2">
-				<label className="font-semibold text-sm">Comentario</label>
+				<label className="font-semibold text-sm">Comment</label>
 				<textarea
 					className="textarea textarea-bordered w-full bg-gray-100"
 					value={comentario}
@@ -163,7 +163,7 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<label className="font-semibold text-sm">Actualizar documento</label>
+				<label className="font-semibold text-sm">Update document</label>
 				<input
 					type="file"
 					accept="application/pdf,image/jpeg,image/png,image/jpg"
@@ -188,18 +188,18 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 							disabled={uploading || isProcessing}
 							className="btn btn-primary btn-sm"
 						>
-							{uploading ? "Subiendo..." : "Subir"}
+							{uploading ? "Uploading..." : "Upload"}
 						</button>
 						<button
 							onClick={() => setSelectedFile(null)}
 							disabled={uploading || isProcessing}
 							className="btn btn-outline btn-sm"
 						>
-							Cancelar
+							Cancel
 						</button>
 					</div>
 				)}
-				{uploading && <p className="text-sm text-blue-600">Actualizando documento...</p>}
+				{uploading && <p className="text-sm text-blue-600">Updating document...</p>}
 			</div>
 		</div>
 	);
@@ -211,7 +211,7 @@ const AttributeHomeownerModal: React.FC<Props> = ({
 				setViewFile(null);
 				setViewItem(null);
 			}}
-			title="Archivo enviado"
+			title="Uploaded file"
 			size="lg"
 		>
 			{viewFile ? renderContent() : null}

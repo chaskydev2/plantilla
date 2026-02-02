@@ -64,17 +64,17 @@ class HomeownerProfileController extends Controller
             $homeownerProfile = HomeownerProfile::with('user')->findOrFail($userId);
             
             return response()->json([
-                'message' => 'Perfil de propietario encontrado',
+                'message' => 'Homeowner profile found',
                 'data' => new HomeownerProfileResource($homeownerProfile)
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Perfil de propietario no encontrado',
-                'error' => "No se encontró un perfil con el ID: {$userId}"
+                'message' => 'Homeowner profile not found',
+                'error' => "No profile found with ID: {$userId}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al obtener el perfil',
+                'message' => 'Error retrieving profile',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -97,12 +97,12 @@ class HomeownerProfileController extends Controller
             $homeownerProfile->load('user');
             
             return response()->json([
-                'message' => 'Perfil de propietario creado exitosamente',
+                'message' => 'Homeowner profile created successfully',
                 'data' => new HomeownerProfileResource($homeownerProfile)
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear el perfil',
+                'message' => 'Error creating profile',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -121,17 +121,17 @@ class HomeownerProfileController extends Controller
             $homeownerProfile->load('user');
             
             return response()->json([
-                'message' => 'Perfil de propietario actualizado exitosamente',
+                'message' => 'Homeowner profile updated successfully',
                 'data' => new HomeownerProfileResource($homeownerProfile)
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Perfil de propietario no encontrado',
-                'error' => "No se encontró un perfil con el ID: {$userId}"
+                'message' => 'Homeowner profile not found',
+                'error' => "No profile found with ID: {$userId}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al actualizar el perfil',
+                'message' => 'Error updating profile',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -147,16 +147,16 @@ class HomeownerProfileController extends Controller
             $homeownerProfile->delete();
             
             return response()->json([
-                'message' => 'Perfil de propietario eliminado exitosamente'
+                'message' => 'Homeowner profile deleted successfully'
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Perfil de propietario no encontrado',
-                'error' => "No se encontró un perfil con el ID: {$userId}"
+                'message' => 'Homeowner profile not found',
+                'error' => "No profile found with ID: {$userId}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al eliminar el perfil',
+                'message' => 'Error deleting profile',
                 'error' => $e->getMessage()
             ], 500);
         }

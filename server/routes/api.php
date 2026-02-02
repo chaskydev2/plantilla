@@ -31,6 +31,8 @@ use App\Http\Controllers\Api\V1\RolePermissionController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserRoleController;
 use App\Http\Controllers\Api\V1\TagController;
+use App\Http\Controllers\Api\V1\UserNotificationController;
+use App\Http\Controllers\Api\V1\ContractorNotificationController;
 use App\Http\Controllers\Api\V1\HomeownerProfileController;
 use App\Http\Controllers\Api\V1\DashboardHomeownerProfileController;
 use App\Http\Controllers\Api\V1\DashboardContractorController;
@@ -51,6 +53,8 @@ use App\Http\Controllers\Api\V1\HomeownerProfileServiceController;
 use App\Http\Controllers\Api\V1\ScamAlertController;
 use App\Http\Controllers\Api\V1\TextBlockController;
 use App\Http\Controllers\Api\V1\YoutubeVideoController;
+use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\ReviewController;
 
 use Illuminate\Support\Facades\Route;
@@ -120,6 +124,14 @@ Route::prefix('/v1')
         Route::get('categories/roots', [CategoryController::class, 'roots']);
         Route::get('categories/search', [CategoryController::class, 'search']);
 
+        // Dashboard routes (public statistics)
+        Route::get('dashboard/stats', [DashboardController::class, 'getStats']);
+        Route::get('dashboard/detailed-stats', [DashboardController::class, 'getDetailedStats']);
+        Route::get('dashboard/requirements', [DashboardController::class, 'getRequirements']);
+        Route::get('dashboard/job-contractors', [DashboardController::class, 'getJobContractors']);
+        Route::get('dashboard/professions', [DashboardController::class, 'getProfessions']);
+        Route::get('dashboard/job-posts', [DashboardController::class, 'getJobPosts']);
+
         Route::post('newsletters/send', [NewsletterController::class, 'send']);
 
                 Route::get('contractors/{id}/full-info', [ContractorController::class, 'showFullInfo']);
@@ -129,11 +141,54 @@ Route::prefix('/v1')
                 // Mensajes hacia contractors (chat/conversación)
                 Route::get('contractors/{id}/messages', [ContractorMessageController::class, 'index']);
                 Route::post('contractors/{id}/messages', [ContractorMessageController::class, 'store']);
+                   Route::get('contractors/{contractorId}/rating-summary', [ReviewController::class, 'getContractorRatingSummary']);
         
-              Route::post('reviews', [ReviewController::class, 'store']);
-          
+               
                  
          Route::middleware(['auth:api'])->group(function () {
+
+             // Rutas públicas de Reviews (Ver calificaciones)
+                Route::get('contractors/{contractorId}/reviews', [ReviewController::class, 'getContractorReviews']);
+               Route::post('reviews', [ReviewController::class, 'store']);
+          
+
+            // ============================================
+            // REVIEWS ROUTES (Calificaciones) - Auth Required
+            // ============================================
+            Route::post('reviews/contractor/{contractorId}', [ReviewController::class, 'store']);
+            Route::get('reviews/contractor/{contractorId}/my-review', [ReviewController::class, 'getMyReview']);
+            Route::delete('reviews/contractor/{contractorId}', [ReviewController::class, 'destroy']);
+
+            // ============================================
+            // CHAT ROUTES - HomeownerProfile & Contractor
+            // ============================================
+            
+            // Rutas para HomeownerProfile (propietario)
+            Route::post('chat/contractor/{contractorId}/message', [ChatController::class, 'sendMessage']);
+            Route::get('chat/contractor/{contractorId}', [ChatController::class, 'getConversation']);
+            Route::get('chat/threads', [ChatController::class, 'getThreads']);
+            Route::get('chat/unread-count', [ChatController::class, 'getUnreadCount']);
+            
+            // Rutas para Contractor (contratista)
+            Route::post('chat/thread/{threadId}/reply', [ChatController::class, 'contractorReply']);
+            Route::get('chat/contractor/threads', [ChatController::class, 'contractorThreads']);
+            Route::get('chat/contractor/thread/{threadId}', [ChatController::class, 'contractorConversation']);
+            Route::get('chat/contractor/unread-count', [ChatController::class, 'contractorUnreadCount']);
+          
+            Route::post('chat/contractor/{contractorId}/thread/{threadId}/reply', [ChatController::class, 'replyAsContractor']);
+            Route::post('chat/homeowner/{homeownerId}/thread/{threadId}/reply', [ChatController::class, 'replyAsHomeowner']);
+            
+            // Rutas para obtener todas las conversaciones de un Contractor o HomeownerProfile específico
+            Route::get('chat/contractor/{contractorId}/all-threads', [ChatController::class, 'getContractorAllThreads']);
+            Route::get('chat/homeowner/{homeownerId}/all-threads', [ChatController::class, 'getHomeownerAllThreads']);
+            
+            // Ruta administrativa - Obtener todas las conversaciones con estadísticas
+            Route::get('chat/threads/all/statistics', [ChatController::class, 'getAllThreadsWithStats']);
+
+            // DELETE routes for chat (delete message / delete thread)
+            Route::delete('chat/threads/{threadId}/messages/{messageId}', [ChatController::class, 'deleteMessage']);
+            Route::delete('chat/threads/{threadId}', [ChatController::class, 'deleteThread']);
+
 
             // Perfil del homeowner logueado
             Route::get('homeowner-profile/claims', [ScamAlertController::class, 'myHomeownerScanAlerts']);
@@ -143,8 +198,6 @@ Route::prefix('/v1')
             Route::get('contractor-profile/dashboard', [DashboardContractorController::class, 'myDashboard']);
 
          
-            Route::apiResource('job-posts', JobPostController::class);
-
             Route::post('me', [AuthController::class, 'me']);
 
             Route::post('profile', [ProfileController::class, 'profile']);
@@ -163,7 +216,13 @@ Route::prefix('/v1')
             Route::delete('job-applications/{id}/force', [JobApplicationController::class, 'forceDelete']);
             Route::delete('job-contracts/{id}/force', [JobContractController::class, 'forceDelete']);
             Route::delete('job-posts/{id}/force', [JobPostController::class, 'forceDelete']);
-
+            // CRUD separado para job-posts
+            Route::get('job-posts', [JobPostController::class, 'index']);
+            Route::post('job-posts', [JobPostController::class, 'store']);
+            Route::get('job-posts/{job_post}', [JobPostController::class, 'show']);
+            Route::put('job-posts/{job_post}', [JobPostController::class, 'update']);
+            Route::patch('job-posts/{job_post}', [JobPostController::class, 'update']);
+            Route::delete('job-posts/{job_post}', [JobPostController::class, 'destroy']);
 
             // CRUD resource routes for jobs
             Route::apiResource('job-applications', JobApplicationController::class);
@@ -179,6 +238,24 @@ Route::prefix('/v1')
             Route::get('users/{id}/info', [UserController::class, 'getUserInformation']);
             
             Route::apiResource('users', UserController::class);
+
+            // User notifications (API)
+            Route::get('users/{id}/notifications', [UserNotificationController::class, 'index']);
+            Route::post('users/{id}/notifications', [UserNotificationController::class, 'store']);
+            Route::get('users/{id}/notifications/{notificationId}', [UserNotificationController::class, 'show']);
+            Route::patch('users/{id}/notifications/{notificationId}/read', [UserNotificationController::class, 'markRead']);
+            Route::patch('users/{id}/notifications/read-all', [UserNotificationController::class, 'markAllRead']);
+            Route::delete('users/{id}/notifications/{notificationId}', [UserNotificationController::class, 'destroy']);
+            Route::delete('users/{id}/notifications', [UserNotificationController::class, 'destroyAll']);
+
+            // Backwards-compatible contractor routes (alias)
+            Route::get('contractors/{id}/notifications', [ContractorNotificationController::class, 'index']);
+            Route::post('contractors/{id}/notifications', [ContractorNotificationController::class, 'store']);
+            Route::get('contractors/{id}/notifications/{notificationId}', [ContractorNotificationController::class, 'show']);
+            Route::patch('contractors/{id}/notifications/{notificationId}/read', [ContractorNotificationController::class, 'markRead']);
+            Route::patch('contractors/{id}/notifications/read-all', [ContractorNotificationController::class, 'markAllRead']);
+            Route::delete('contractors/{id}/notifications/{notificationId}', [ContractorNotificationController::class, 'destroy']);
+            Route::delete('contractors/{id}/notifications', [ContractorNotificationController::class, 'destroyAll']);
 
             Route::apiResource('users.academictrainings', AcademicTrainingController::class);
 
@@ -345,6 +422,8 @@ Route::prefix('/v1')
             Route::patch('attribute-contractors/{id}/comentario', [AttributeContractorController::class, 'updateComentario']);                
             
             Route::post('attribute-contractors/{id}/update-document', [AttributeContractorController::class, 'updateDocument']);
+
+            Route::delete('attribute-contractors/{id}', [AttributeContractorController::class, 'destroy']);
 
           
               

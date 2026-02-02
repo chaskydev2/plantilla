@@ -72,13 +72,13 @@ class AddSubcategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'subcategories.required' => 'Debe especificar al menos una subcategoría.',
-            'subcategories.array' => 'Las subcategorías deben enviarse como un arreglo.',
-            'subcategories.min' => 'Debe especificar al menos una subcategoría.',
-            'subcategories.max' => 'No se pueden agregar más de 50 subcategorías a la vez.',
-            'subcategories.*.required' => 'Cada subcategoría es obligatoria.',
-            'subcategories.*.integer' => 'El ID de la subcategoría debe ser un número.',
-            'subcategories.*.exists' => 'Una de las subcategorías especificadas no existe.',
+            'subcategories.required' => 'Should specify at least one subcategory.',
+            'subcategories.array' => 'The subcategories must be sent as an array.',
+            'subcategories.min' => 'You must specify at least one subcategory.',
+            'subcategories.max' => 'You cannot add more than 50 subcategories at once.',
+            'subcategories.*.required' => 'Each subcategory is required.',
+            'subcategories.*.integer' => 'The ID of the subcategory must be a number.',
+            'subcategories.*.exists' => 'One of the specified subcategories does not exist.',
         ];
     }
 }

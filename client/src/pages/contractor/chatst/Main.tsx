@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Eye, MessageSquare, Search, X } from "lucide-react";
+import { Eye, MessageSquare, Search, Trash2 } from "lucide-react";
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import DataTable from "@/components/table/DataTable";
 import type { ITableAction, ITableColumn, ITableProps, ITableSort } from "@/core/types/ITable";
 import type { IPagination } from "@/core/types/IApi";
+import { MessageService } from "@/core/services/messages/message.service";
+import ChatModal from "./ChatModal";
 
 interface ChatMessage {
   id: number;
@@ -22,134 +25,9 @@ interface ChatThread {
   created_at: string;
   updated_at: string;
   messages: ChatMessage[];
+  homeowner_profile_id?: number;
+  contractor_id?: number;
 }
-
-const mockChats: ChatThread[] = [
-  {
-    id: 1,
-    contractorName: "ConstruMar SRL",
-    homeownerName: "Laura Pérez",
-    projectName: "Remodelación de cocina",
-    lastMessage: "Perfecto, nos vemos el jueves a las 10am",
-    unreadCount: 1,
-    created_at: "2024-09-01T10:05:00Z",
-    updated_at: "2024-09-12T14:30:00Z",
-    messages: [
-      {
-        id: 11,
-        sender: "homeowner",
-        content: "Hola, ¿podemos reagendar la visita?",
-        timestamp: "2024-09-12T13:42:00Z",
-      },
-      {
-        id: 12,
-        sender: "contractor",
-        content: "Claro Laura, ¿te funciona el jueves a las 10am?",
-        timestamp: "2024-09-12T14:02:00Z",
-      },
-      {
-        id: 13,
-        sender: "homeowner",
-        content: "Perfecto, nos vemos entonces 🙂",
-        timestamp: "2024-09-12T14:30:00Z",
-      },
-    ],
-  },
-  {
-    id: 2,
-    contractorName: "Electricistas Norte",
-    homeownerName: "Carlos Gutiérrez",
-    projectName: "Instalación de luminarias",
-    lastMessage: "Envié el presupuesto actualizado",
-    unreadCount: 0,
-    created_at: "2024-08-21T09:12:00Z",
-    updated_at: "2024-09-10T16:15:00Z",
-    messages: [
-      {
-        id: 21,
-        sender: "contractor",
-        content: "Envié el presupuesto actualizado",
-        timestamp: "2024-09-10T16:15:00Z",
-      },
-      {
-        id: 22,
-        sender: "homeowner",
-        content: "Lo revisaré esta noche, gracias",
-        timestamp: "2024-09-10T16:31:00Z",
-      },
-    ],
-  },
-  {
-    id: 3,
-    contractorName: "Jardines Vivos",
-    homeownerName: "Mariana Flores",
-    projectName: "Diseño de jardín",
-    lastMessage: "¿Podemos adelantar la entrega dos días?",
-    unreadCount: 2,
-    created_at: "2024-07-02T11:18:00Z",
-    updated_at: "2024-09-05T09:55:00Z",
-    messages: [
-      {
-        id: 31,
-        sender: "homeowner",
-        content: "¿Podemos adelantar la entrega dos días?",
-        timestamp: "2024-09-05T09:55:00Z",
-      },
-      {
-        id: 32,
-        sender: "contractor",
-        content: "Déjame revisar con el equipo y te confirmo",
-        timestamp: "2024-09-05T10:05:00Z",
-      },
-    ],
-  },
-];
-
-const ChatPreviewPanel = ({ chat, onClose }: { chat: ChatThread | null; onClose: () => void }) => {
-  if (!chat) return null;
-
-  return (
-    <div className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-xl">
-      <div className="flex items-center justify-between border-b px-6 py-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Conversación</p>
-          <h3 className="text-lg font-bold text-gray-900">{chat.projectName}</h3>
-        </div>
-        <button type="button" onClick={onClose} className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-
-      <div className="px-6 py-4 text-sm text-gray-600">
-        <p>
-          <span className="font-semibold text-gray-900">Profesional:</span> {chat.contractorName}
-        </p>
-        <p>
-          <span className="font-semibold text-gray-900">Propietario:</span> {chat.homeownerName}
-        </p>
-      </div>
-
-      <div className="max-h-80 overflow-y-auto px-6 pb-6 space-y-4">
-        {chat.messages.map((message) => (
-          <div
-            key={message.id}
-            className={`w-full rounded-2xl border px-4 py-3 text-sm leading-relaxed ${
-              message.sender === "contractor" ? "border-sky-100 bg-sky-50" : "border-emerald-100 bg-emerald-50"
-            }`}
-          >
-            <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
-              <span className="font-semibold text-gray-700">
-                {message.sender === "contractor" ? "Tú" : chat.homeownerName}
-              </span>
-              <span>{new Date(message.timestamp).toLocaleString()}</span>
-            </div>
-            {message.content}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const ContractorChats: React.FC = () => {
   const [items, setItems] = useState<ChatThread[]>([]);
@@ -164,26 +42,137 @@ const ContractorChats: React.FC = () => {
     total_pages: 0,
   });
   const [activeChat, setActiveChat] = useState<ChatThread | null>(null);
+  const [showConfirmDeleteThread, setShowConfirmDeleteThread] = useState(false);
+  const [deleteThreadId, setDeleteThreadId] = useState<number | null>(null);
+  const [processingDelete, setProcessingDelete] = useState(false);
 
-  const fetchData = async () => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async (page: number = 1, perPage: number = 10) => {
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      setItems(mockChats);
-      setPagination((prev) => ({
-        ...prev,
-        total: mockChats.length,
-        count: mockChats.length,
-        total_pages: Math.max(1, Math.ceil(mockChats.length / prev.per_page)),
-      }));
+      // Obtener el ID del contractor del localStorage
+      const userDataStr = localStorage.getItem("user_data");
+      if (!userDataStr) {
+        console.error("❌ No user data found");
+        setLoading(false);
+        return;
+      }
+
+      const userData = JSON.parse(userDataStr);
+      const contractorId = userData?.id;
+
+      if (!contractorId) {
+        console.error("❌ No contractor ID found in user data:", userData);
+        setLoading(false);
+        return;
+      }
+
+      console.log("🔄 Fetching contractor chats for ID:", contractorId, "Page:", page, "Per Page:", perPage);
+
+      // Consumir la API
+      const response = await MessageService.getContractorAllThreads(contractorId, page, perPage);
+      console.log("📨 Full chat threads response:", response);
+
+      if (!response) {
+        console.error("❌ Response is null or undefined");
+        setLoading(false);
+        return;
+      }
+
+      if (!response.success) {
+        console.error("❌ API returned success=false. Message:", response.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!response.data?.threads) {
+        console.error("❌ No threads data in response. Response.data:", response.data);
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Threads fetched successfully:", response.data.threads);
+
+      const apiData = response.data;
+      const contractorName = userData?.name || userData?.username || "You";
+
+      // Mapear los datos del API a la estructura de ChatThread
+      const mappedThreads: ChatThread[] = apiData.threads.map((thread: any) => {
+        const homeownerName = thread.homeowner_profile?.user?.name || "Unknown User";
+        const lastMessage = thread.latest_message?.message || "No messages";
+        const lastMessageTime = thread.latest_message?.created_at || thread.last_message_at;
+
+        console.log("📌 Mapping thread:", {
+          threadId: thread.id,
+          homeownerName,
+          lastMessage,
+          unreadCount: thread.unread_count,
+        });
+
+        return {
+          id: thread.id,
+          contractorName,
+          homeownerName,
+          projectName: `Project ${thread.id}`,
+          lastMessage,
+          unreadCount: thread.unread_count || 0,
+          created_at: thread.created_at || new Date().toISOString(),
+          updated_at: lastMessageTime || thread.last_message_at || new Date().toISOString(),
+          messages: thread.latest_message
+            ? [
+                {
+                  id: thread.latest_message.id,
+                  sender: thread.latest_message.sender_type === "App\\Models\\Contractor" ? "contractor" : "homeowner",
+                  content: thread.latest_message.message,
+                  timestamp: thread.latest_message.created_at,
+                },
+              ]
+            : [],
+          homeowner_profile_id: thread.homeowner_profile_id,
+          contractor_id: thread.contractor_id,
+        };
+      });
+
+      console.log("📦 Mapped threads count:", mappedThreads.length);
+      setItems(mappedThreads);
+
+      // Actualizar paginación
+      if (apiData.pagination) {
+        setPagination({
+          total: apiData.pagination.total,
+          count: mappedThreads.length,
+          per_page: apiData.pagination.per_page,
+          current_page: apiData.pagination.current_page,
+          total_pages: apiData.pagination.last_page,
+        });
+      }
+    } catch (error) {
+      console.error("❌ Error fetching contractor chats:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message, error.stack);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const handleMessageSent = () => {
+    console.log("✅ Message sent, refreshing data");
+    fetchData(pagination.current_page, pagination.per_page);
+  };
+
+  const handleOpenChat = (chat: ChatThread) => {
+    console.log("Opening chat:", chat.id);
+    setActiveChat(chat);
+  };
+
+  const handleCloseChat = () => {
+    console.log("Closing chat");
+    setActiveChat(null);
+  };
 
   const filteredItems = useMemo(() => {
     const query = searchInput.trim().toLowerCase();
@@ -210,34 +199,43 @@ const ContractorChats: React.FC = () => {
 
   const actions: ITableAction<ChatThread>[] = [
     {
-      label: "Ver chat",
+      label: "View chat",
       icon: <Eye className="w-4 h-4" />,
-      onClick: (chat) => setActiveChat(chat),
+      onClick: handleOpenChat,
       variant: "secondary",
+    },
+    {
+      label: "Delete",
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (item) => {
+        setDeleteThreadId(item.id);
+        setShowConfirmDeleteThread(true);
+      },
+      variant: "danger",
     },
   ];
 
   const columns: ITableColumn<ChatThread>[] = [
     {
       key: "participant",
-      header: "Propietario",
+      header: "Homeowner",
       render: (item) => (
         <div>
           <p className="font-semibold text-gray-900">{item.homeownerName}</p>
-          <p className="text-xs text-gray-500">Proyecto: {item.projectName}</p>
+          <p className="text-xs text-gray-500">Project: {item.projectName}</p>
         </div>
       ),
     },
     {
       key: "lastMessage",
-      header: "Último mensaje",
+      header: "Last message",
       render: (item) => (
         <div className="text-sm text-gray-600 line-clamp-2">{item.lastMessage}</div>
       ),
     },
     {
       key: "unreadCount",
-      header: "Sin leer",
+      header: "Unread",
       render: (item) => (
         <span className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-3 py-1 text-xs font-semibold ${item.unreadCount ? "bg-rose-100 text-rose-700" : "bg-gray-100 text-gray-500"}`}>
           {item.unreadCount}
@@ -247,7 +245,7 @@ const ContractorChats: React.FC = () => {
     },
     {
       key: "updated_at",
-      header: "Actualizado",
+      header: "Updated",
       render: (item) => (
         <div className="text-xs text-gray-500">{new Date(item.updated_at).toLocaleString()}</div>
       ),
@@ -263,7 +261,7 @@ const ContractorChats: React.FC = () => {
         </div>
         <input
           type="text"
-          placeholder="Buscar chats, proyectos o propietarios"
+          placeholder="Search chats, projects or homeowners"
           className="input w-full rounded-xl border border-gray-300 bg-white pl-11 text-sm text-gray-900 focus:border-gray-500 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
@@ -281,14 +279,18 @@ const ContractorChats: React.FC = () => {
     onFilterChange: () => undefined,
     onSearch: setSearchInput,
     pagination,
-    onPageChange: (page) => setPagination((prev) => ({ ...prev, current_page: page })),
-    onLimitChange: (limit) =>
+    onPageChange: (page) => {
+      setPagination((prev) => ({ ...prev, current_page: page }));
+      fetchData(page, pagination.per_page);
+    },
+    onLimitChange: (limit) => {
       setPagination((prev) => ({
         ...prev,
         per_page: limit,
         current_page: 1,
-        total_pages: Math.max(1, Math.ceil(filteredItems.length / limit)),
-      })),
+      }));
+      fetchData(1, limit);
+    },
     loading,
     renderTopToolbar: renderToolbar,
     availableLimits: [10, 20, 50],
@@ -296,9 +298,39 @@ const ContractorChats: React.FC = () => {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Mis Chats" icon={<MessageSquare className="h-5 w-5" />} />
+      <PageBreadcrumb pageTitle="My Chats" icon={<MessageSquare className="h-5 w-5" />} />
       <DataTable<ChatThread> {...tableProps} />
-      <ChatPreviewPanel chat={activeChat} onClose={() => setActiveChat(null)} />
+      <ChatModal 
+        chat={activeChat} 
+        onClose={handleCloseChat}
+        onMessageSent={handleMessageSent}
+      />
+      <ConfirmDialog
+        isOpen={showConfirmDeleteThread}
+        title="Delete conversation"
+        message="Are you sure you want to delete this conversation and all its messages? This cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isProcessing={processingDelete}
+        variant="danger"
+        onCancel={() => { setShowConfirmDeleteThread(false); setDeleteThreadId(null); }}
+        onConfirm={async () => {
+          if (deleteThreadId === null) return;
+          setProcessingDelete(true);
+          try {
+            const res = await MessageService.deleteThread(deleteThreadId);
+            if (!res.success) throw new Error(res.message || 'Delete failed');
+            // refresh table
+            fetchData(pagination.current_page, pagination.per_page);
+          } catch (e: any) {
+            console.error('Failed to delete thread', e);
+          } finally {
+            setProcessingDelete(false);
+            setShowConfirmDeleteThread(false);
+            setDeleteThreadId(null);
+          }
+        }}
+      />
     </div>
   );
 };

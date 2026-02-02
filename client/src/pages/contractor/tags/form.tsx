@@ -65,7 +65,7 @@ const TagModal = ({
 
   const handleSubmit = async (data: FormValues) => {
     if (!contractorId) {
-      toastify.error('No se encontró el ID del contratista');
+      toastify.error('Contractor ID not found');
       return;
     }
     const cleanData = Object.fromEntries(
@@ -87,11 +87,11 @@ const TagModal = ({
           // Create a new tag with the edited data to assign as new_tag_id
           const createRes = await ItemService.create(cleanData as ICreateRequest);
           targetTagId = Number((createRes?.data as any)?.id);
-          toastify.success(createRes?.message || 'Etiqueta creada');
+          toastify.success(createRes?.message || 'Tag created');
         }
 
         if (!targetTagId) {
-          toastify.error('No se pudo determinar la etiqueta a asignar');
+          toastify.error('Could not determine the tag to assign');
           return;
         }
 
@@ -101,7 +101,7 @@ const TagModal = ({
           new_tag_id: targetTagId,
         });
 
-        toastify.success(response?.message || 'Etiqueta actualizada para el contratista');
+        toastify.success(response?.message || 'Tag updated for contractor');
         onClose();
         load();
         return;
@@ -113,7 +113,7 @@ const TagModal = ({
           contractor_user_id: contractorId,
           tag_id: Number(selectedTagId),
         });
-        toastify.success(response?.message || 'Etiqueta asignada');
+        toastify.success(response?.message || 'Tag assigned');
         onClose();
         load();
         return;
@@ -128,11 +128,11 @@ const TagModal = ({
           tag_id: Number(newTagId),
         });
       }
-      toastify.success(createRes?.message || 'Etiqueta creada y asignada');
+      toastify.success(createRes?.message || 'Tag created and assigned');
       onClose();
       load();
     } catch (error: any) {
-      toastify.error(error.response?.data?.message || 'Error al guardar la etiqueta');
+      toastify.error(error.response?.data?.message || 'Error saving tag');
     }
   };
 
@@ -145,7 +145,7 @@ const TagModal = ({
         const list = Array.isArray(response?.data) ? response.data : [];
         setAllTags(list as IItemResponse[]);
       } catch (error: any) {
-        console.error('Error cargando etiquetas', error);
+        console.error('Error loading tags', error);
       } finally {
         setIsLoadingTags(false);
       }
@@ -158,7 +158,7 @@ const TagModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar etiqueta' : 'Nueva etiqueta'}
+      title={isEditing ? 'Edit tag' : 'New tag'}
       size="md"
     >
       <FormProviderWrapper
@@ -176,20 +176,20 @@ const TagModal = ({
         />
         <div className="grid grid-cols-1 gap-6">
           <div>
-            <InputField name="name" label="Nombre de la etiqueta" placeholder="Ej: Pintura" required />
+            <InputField name="name" label="Tag name" placeholder="E.g.: Painting" required />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              El nombre debe ser único.
+              The name must be unique.
             </p>
           </div>
 
           <div>
             <InputField
               name="slug"
-              label="Slug (opcional)"
-              placeholder="Se genera automáticamente del nombre"
+              label="Slug (optional)"
+              placeholder="Automatically generated from name"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Si se deja vacío, se generará automáticamente del nombre.
+              If left empty, it will be generated automatically from the name.
             </p>
           </div>
         </div>
@@ -236,7 +236,7 @@ const ExistingTagSelect = ({ tags, loading, initialSelectedId = '', onSelect }: 
   return (
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-        Etiquetas existentes
+        Existing tags
       </label>
       <select
         className="input w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
@@ -244,8 +244,8 @@ const ExistingTagSelect = ({ tags, loading, initialSelectedId = '', onSelect }: 
         onChange={(e) => handleChange(e.target.value)}
         disabled={loading || tags.length === 0}
       >
-        <option value="">Selecciona una etiqueta</option>
-        {loading && <option value="" disabled>Cargando...</option>}
+        <option value="">Select a tag</option>
+        {loading && <option value="" disabled>Loading...</option>}
         {tags.map((tag) => (
           <option key={tag.id} value={tag.id}>
             {tag.name}
@@ -253,7 +253,7 @@ const ExistingTagSelect = ({ tags, loading, initialSelectedId = '', onSelect }: 
         ))}
       </select>
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-        Selecciona una etiqueta para rellenar automáticamente el nombre y el slug.
+        Select a tag to automatically fill in the name and slug.
       </p>
     </div>
   );

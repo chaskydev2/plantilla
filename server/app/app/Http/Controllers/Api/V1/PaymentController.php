@@ -71,7 +71,7 @@ class PaymentController extends Controller
         if (!empty($nonExistingUsers)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Los siguientes usuarios no existen: ' . implode(', ', $nonExistingUsers),
+                'message' => 'The following users do not exist: ' . implode(', ', $nonExistingUsers),
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $createdPayments = [];
@@ -91,7 +91,7 @@ class PaymentController extends Controller
         return PaymentResource::collection($createdPayments)
             ->additional([
                 'success' => true,
-                'message' => count($createdPayments) . ' pagos creados satisfactoriamente',
+                'message' => count($createdPayments) . ' payments created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -119,7 +119,7 @@ class PaymentController extends Controller
         return (new PaymentResource($payment))
             ->additional([
                 'success' => true,
-                'message' => 'Pago actualizado correctamente',
+                'message' => 'Payment updated successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -134,7 +134,7 @@ class PaymentController extends Controller
         $result->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Pago Eliminado Satisfactoriamente'
+            'message' => 'Payment deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

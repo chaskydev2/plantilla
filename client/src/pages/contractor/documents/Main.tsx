@@ -37,7 +37,7 @@ const AttributeContractor: React.FC = () => {
     total_pages: 0,
   });
 
-  // Estados para el modal
+  // Modal state
   const [viewFile, setViewFile] = useState<string | null>(null);
   const [viewItem, setViewItem] = useState<WithRelations | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -89,11 +89,11 @@ const AttributeContractor: React.FC = () => {
 
   const actions: ITableAction<WithRelations>[] = [
     {
-      label: 'Ver',
+      label: 'View',
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: WithRelations) => {
         if (item.value) {
-          console.log('Ver documento:', item);
+          console.log('View document:', item);
           setViewFile(String(item.value));
           setViewItem(item);
         }
@@ -116,7 +116,7 @@ const AttributeContractor: React.FC = () => {
     },
     {
       key: 'contractor_name',
-      header: 'Nombre del Contratista',
+      header: 'Contractor Name',
       render: (item: WithRelations) => (
         <div className="text-gray-900 dark:text-gray-100">
           {item.contractor?.user?.name ?? '-'}
@@ -126,7 +126,7 @@ const AttributeContractor: React.FC = () => {
     },
     {
       key: 'attribute_name',
-      header: 'Nombre del Atributo',
+      header: 'Attribute Name',
       render: (item: WithRelations) => (
         <div className="text-gray-900 dark:text-gray-100">
           {item.attribute?.name ?? '-'}
@@ -136,11 +136,11 @@ const AttributeContractor: React.FC = () => {
     },
     {
       key: 'created_at',
-      header: 'Creado',
+      header: 'Created',
       render: (item: WithRelations) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {item.created_at
-            ? new Date(item.created_at).toLocaleDateString('es-ES', {
+            ? new Date(item.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -152,11 +152,11 @@ const AttributeContractor: React.FC = () => {
     },
     {
       key: 'updated_at',
-      header: 'Actualizado',
+      header: 'Updated',
       render: (item: WithRelations) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {item.updated_at
-            ? new Date(item.updated_at).toLocaleDateString('es-ES', {
+            ? new Date(item.updated_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -176,7 +176,7 @@ const AttributeContractor: React.FC = () => {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600 rounded-xl"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
@@ -219,10 +219,10 @@ const AttributeContractor: React.FC = () => {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Mis Documentos" />
+      <PageBreadcrumb pageTitle="My Documents" />
       <DataTable<WithRelations> {...tableProps} />
       
-      {/* Modal para ver documentos */}
+      {/* Modal to view documents */}
       <AttributeContractorModal
         viewFile={viewFile}
         viewItem={viewItem}

@@ -59,7 +59,7 @@ class BeginningController extends Controller
         return (new BeginningResource($beginning))
             ->additional([
                 'success' => true,
-                'message' => 'Principios Creados Satisfactoriamente',
+                'message' => 'Principles created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class BeginningController extends Controller
         return (new BeginningResource($beginning))
             ->additional([
                 'success' => true,
-                'message' => 'Principios actualizados Satisfactoriamente'
+                'message' => 'Principles updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class BeginningController extends Controller
         $beginning->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Principios Eliminados Satisfactoriamente'
+            'message' => 'Principles deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

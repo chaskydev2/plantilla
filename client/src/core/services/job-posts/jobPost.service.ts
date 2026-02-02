@@ -93,6 +93,7 @@ const buildFormData = (request: any, options?: { includeRemoveFlags?: boolean })
 export const jobPostService = {
   async getPublicJobPosts(): Promise<any[]> {
     const response = await axios.get('/v1/job-posts/public');
+    console.log('Public job posts response:', response.data);
     return response.data?.data || [];
   },
   async getAllPaginated(
@@ -114,8 +115,15 @@ export const jobPostService = {
     };
   },
   async remove(id: number) {
-    const response = await axios.delete(`/v1/job-posts/${id}`);
-    return response.data;
+    const url = `/v1/job-posts/${id}`;
+    try {
+      console.log('DELETE URL:', url);
+      const response = await axios.delete(url);
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      throw error;
+    }
   },
   async create(data: any) {
     // Always use FormData for image upload

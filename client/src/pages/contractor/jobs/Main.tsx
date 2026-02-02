@@ -85,49 +85,49 @@ const columns = [
   },
   {
     key: 'title',
-    header: 'Título',
+    header: 'Title',
     render: (item: IItemResource) => <div className="font-semibold">{item.title}</div>,
     sortable: true,
   },
   {
     key: 'service_type',
-    header: 'Servicio',
+    header: 'Service',
     render: (item: IItemResource) => <div>{item.service_type}</div>,
     sortable: true,
   },
   {
     key: 'location',
-    header: 'Ubicación',
+    header: 'Location',
     render: (item: IItemResource) => <div>{item.location}</div>,
     sortable: true,
   },
   {
     key: 'job_date',
-    header: 'Fecha de trabajo',
+    header: 'Job date',
     render: (item: IItemResource) => (
-      <div className="text-sm">{item.job_date ? formatDateTime(item.job_date) : 'Sin definir'}</div>
+      <div className="text-sm">{item.job_date ? formatDateTime(item.job_date) : 'Not defined'}</div>
     ),
     sortable: true,
   },
   {
     key: 'amount_paid',
-    header: 'Monto pagado',
-    render: (item: IItemResource) => <div>{item.amount_paid ?? 'N/D'}</div>,
+    header: 'Amount paid',
+    render: (item: IItemResource) => <div>{item.amount_paid ?? 'N/A'}</div>,
     sortable: true,
   },
   {
     key: 'status',
-    header: 'Estado',
+    header: 'Status',
     render: (item: IItemResource) => {
       const active = item.is_active ?? (item.status ? item.status !== 'inactive' : false);
       const label = item.status
         ? item.status
             .replace('_', ' ')
-            .replace('pending', 'Pendiente')
-            .replace('in_progress', 'En progreso')
-            .replace('completed', 'Completado')
-            .replace('cancelled', 'Cancelado')
-        : active ? 'Activo' : 'Inactivo';
+            .replace('pending', 'Pending')
+            .replace('in_progress', 'In progress')
+            .replace('completed', 'Completed')
+            .replace('cancelled', 'Cancelled')
+        : active ? 'Active' : 'Inactive';
 
       const badge = item.status === 'completed'
         ? 'badge-success'
@@ -145,9 +145,9 @@ const columns = [
   },
   {
     key: 'created_at',
-    header: 'Creado',
+    header: 'Created',
     render: (item: IItemResource) => (
-      <div className="text-xs text-gray-500">{item.created_at ? formatDateTime(item.created_at) : 'N/D'}</div>
+      <div className="text-xs text-gray-500">{item.created_at ? formatDateTime(item.created_at) : 'N/A'}</div>
     ),
     sortable: true,
   },
@@ -191,13 +191,13 @@ export default function JobList() {
       setDeleting(true);
       const res = await JobCreatorService.remove(deleteTargetId);
       if (res?.success) {
-        toastify.success('Trabajo eliminado');
+        toastify.success('Job deleted');
         fetchItems();
       } else {
-        toastify.error(res?.message || 'No se pudo eliminar');
+        toastify.error(res?.message || 'Could not delete');
       }
     } catch (err: any) {
-      toastify.error(err?.response?.data?.message || 'Error al eliminar');
+      toastify.error(err?.response?.data?.message || 'Delete error');
     } finally {
       setDeleting(false);
       setDeleteTargetId(null);
@@ -207,19 +207,19 @@ export default function JobList() {
 
   const actions: ITableAction<IItemResource>[] = [
     {
-      label: 'Ver',
+      label: 'View',
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: IItemResource) => setViewJob(item),
       variant: 'secondary',
     },
     {
-      label: 'Editar',
+      label: 'Edit',
       icon: <Pencil className="w-4 h-4" />,
       onClick: (item: IItemResource) => setEditJob(item),
       variant: 'primary',
     },
     {
-      label: 'Eliminar',
+      label: 'Delete',
       icon: <Trash className="w-4 h-4" />,
       onClick: (item: IItemResource) => {
         if (deleting) return;
@@ -237,7 +237,7 @@ export default function JobList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search jobs, services or locations..."
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -249,7 +249,7 @@ export default function JobList() {
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-12">
-        <PageBreadcrumb pageTitle="Trabajos" />
+        <PageBreadcrumb pageTitle="Jobs" />
         <CreateJobForm
           creatorId={userId}
           onCreated={fetchItems}
@@ -274,10 +274,10 @@ export default function JobList() {
         <JobDetailModal item={viewJob} onClose={() => setViewJob(null)} />
         <ConfirmDialog
           isOpen={confirmOpen}
-          title="Confirmar eliminación"
-          message="¿Estás seguro de eliminar este trabajo? Esta acción no se puede deshacer."
-          confirmText="Eliminar"
-          cancelText="Cancelar"
+          title="Confirm deletion"
+          message="Are you sure you want to delete this job? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
           onCancel={() => {
             setConfirmOpen(false);
             setDeleteTargetId(null);

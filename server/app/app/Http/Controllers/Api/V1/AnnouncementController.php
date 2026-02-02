@@ -60,7 +60,7 @@ class AnnouncementController extends Controller
         return (new AnnouncementResource($announcement))
             ->additional([
                 'success' => true,
-                'message' => 'Comunicado Creado Satisfactoriamente',
+                'message' => 'Announcement created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -76,7 +76,7 @@ class AnnouncementController extends Controller
         return (new AnnouncementResource($announcement))
             ->additional([
                 'success' => true,
-                'message' => 'Comunicado actualizado Satisfactoriamente'
+                'message' => 'Announcement updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -90,7 +90,7 @@ class AnnouncementController extends Controller
         $announcement->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Comunicado Eliminado Satisfactoriamente'
+            'message' => 'Announcement deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

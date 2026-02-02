@@ -166,8 +166,38 @@ class UserController extends Controller
         // Reuse the delete permission — change to a more restrictive permission if desired
         Gate::authorize('usuario_eliminar');
         $user = User::withTrashed()->findOrFail($id);
+        $userId = (int) $user->id;
 
-        \DB::transaction(function () use ($user) {
+        \DB::transaction(function () use ($user, $userId) {
+            // Delete any records that reference the user but are configured as ON DELETE SET NULL
+            // (we want full removal of user information)
+            try { \DB::table('announcements')->where('published_by', $userId)->delete(); } catch (\Throwable $e) {}
+            try { \DB::table('event_attendances')->where('user_id', $userId)->delete(); } catch (\Throwable $e) {}
+            try { \DB::table('courses')->where('instructor_id', $userId)->delete(); } catch (\Throwable $e) {}
+
+            // Contractor chat/messages where this user participated/sent messages
+            // (these FKs are configured as SET NULL, so delete explicitly for full purge)
+            try { \DB::table('contractor_messages')->where('sender_user_id', $userId)->delete(); } catch (\Throwable $e) {}
+            try { \DB::table('contractor_message_threads')->where('participant_user_id', $userId)->delete(); } catch (\Throwable $e) {}
+
+            // Delete Passport/OAuth artifacts (tables don't have FK constraints to users)
+            try {
+                $accessTokenIds = \DB::table('oauth_access_tokens')
+                    ->where('user_id', $userId)
+                    ->pluck('id')
+                    ->all();
+
+                if (!empty($accessTokenIds)) {
+                    \DB::table('oauth_refresh_tokens')->whereIn('access_token_id', $accessTokenIds)->delete();
+                }
+
+                \DB::table('oauth_access_tokens')->where('user_id', $userId)->delete();
+                \DB::table('oauth_auth_codes')->where('user_id', $userId)->delete();
+                \DB::table('oauth_device_codes')->where('user_id', $userId)->delete();
+            } catch (\Throwable $e) {
+                // ignore if Passport tables are not present
+            }
+
             // Detach many-to-many relations (professions via contractor_professions)
             try {
                 if (method_exists($user, 'professions')) {
@@ -205,7 +235,7 @@ class UserController extends Controller
             // Remove roles/permissions assignments
             try { $user->syncRoles([]); } catch (\Throwable $e) {}
 
-            // Delete API/Passport tokens if present
+            // Delete API/Passport tokens relation if present (extra safety)
             try { if (method_exists($user, 'tokens')) { $user->tokens()->delete(); } } catch (\Throwable $e) {}
 
             // Finally, force delete the user record
@@ -240,7 +270,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Información de usuario obtenida correctamente',
+            'message' => 'User information retrieved successfully',
             'data' => $merged
         ], Response::HTTP_OK);
     }
@@ -253,7 +283,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado de edición de perfil actualizado',
+            'message' => 'Profile edit status updated',
             'data' => $user
         ]);
     }
@@ -266,7 +296,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado de verificación actualizado',
+            'message' => 'Verification status updated',
             'data' => $user
         ]);
     }

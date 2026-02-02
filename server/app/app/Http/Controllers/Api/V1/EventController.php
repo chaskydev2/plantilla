@@ -60,7 +60,7 @@ class EventController extends Controller
         return (new EventResource($event))
             ->additional([
                 'success' => true,
-                'message' => 'Evento Creado Satisfactoriamente',
+                'message' => 'Event created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -76,7 +76,7 @@ class EventController extends Controller
         return (new EventResource($event))
             ->additional([
                 'success' => true,
-                'message' => 'Evento actualizado Satisfactoriamente'
+                'message' => 'Event updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -90,7 +90,7 @@ class EventController extends Controller
         $event->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Evento Eliminado Satisfactoriamente'
+            'message' => 'Event deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

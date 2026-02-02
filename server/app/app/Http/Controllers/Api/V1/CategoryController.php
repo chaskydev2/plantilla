@@ -105,7 +105,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría creada exitosamente.',
+                'message' => 'Category created successfully.',
                 'data' => new CategoryResource($category->load('parent')),
             ], 201);
 
@@ -114,7 +114,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la categoría.',
+                'message' => 'Error creating category.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -147,7 +147,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría actualizada exitosamente.',
+                'message' => 'Category updated successfully.',
                 'data' => new CategoryResource($category->fresh(['parent', 'children'])),
             ]);
 
@@ -156,7 +156,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar la categoría.',
+                'message' => 'Error updating category.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -174,7 +174,7 @@ class CategoryController extends Controller
             if ($category->children()->exists()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se puede eliminar una categoría que tiene subcategorías.',
+                    'message' => 'Cannot delete a category that has subcategories.',
                 ], 422);
             }
 
@@ -185,7 +185,7 @@ class CategoryController extends Controller
             if ($hasContractors || $hasProfessions) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se puede eliminar una categoría que está siendo utilizada.',
+                    'message' => 'Cannot delete a category that is being used.',
                     'details' => [
                         'contractors_count' => $hasContractors ? $category->contractors()->count() : 0,
                         'professions_count' => $hasProfessions ? $category->professions()->count() : 0,
@@ -199,7 +199,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría eliminada exitosamente.',
+                'message' => 'Category deleted successfully.',
             ]);
 
         } catch (\Exception $e) {
@@ -207,7 +207,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar la categoría.',
+                'message' => 'Error deleting category.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -252,14 +252,14 @@ class CategoryController extends Controller
                 function ($attribute, $value, $fail) use ($category) {
                     // No puede ser padre de sí misma
                     if ($value && $value == $category->id) {
-                        $fail('Una categoría no puede ser padre de sí misma.');
+                        $fail('A category cannot be its own parent.');
                     }
 
                     // No puede ser padre de sus descendientes
                     if ($value) {
                         $descendants = $category->getDescendants();
                         if ($descendants->contains('id', $value)) {
-                            $fail('No se puede mover una categoría a uno de sus descendientes.');
+                            $fail('Cannot move a category to one of its descendants.');
                         }
                     }
                 },
@@ -277,7 +277,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría movida exitosamente.',
+                'message' => 'Category moved successfully.',
                 'data' => new CategoryResource($category->fresh(['parent', 'children'])),
             ]);
 
@@ -286,7 +286,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al mover la categoría.',
+                'message' => 'Error moving category.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -353,7 +353,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Se agregaron {$results['added']} subcategorías exitosamente.",
+                'message' => "{$results['added']} subcategories added successfully.",
                 'data' => [
                     'category' => new CategoryResource($category),
                     'results' => $results
@@ -364,7 +364,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al agregar subcategorías.',
+                'message' => 'Error adding subcategories.',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -382,11 +382,11 @@ class CategoryController extends Controller
                 'exists:categories,id',
                 function ($attribute, $value, $fail) use ($category) {
                     if ($value && $value == $category->id) {
-                        $fail('Una categoría no puede ser padre de sí misma.');
+                        $fail('A category cannot be its own parent.');
                     }
                     
                     if ($value && $category->descendants()->where('id', $value)->exists()) {
-                        $fail('No se puede mover a un descendiente.');
+                        $fail('Cannot move to a descendant.');
                     }
                 },
             ],
@@ -407,13 +407,13 @@ class CategoryController extends Controller
                 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Categoría movida exitosamente.',
+                    'message' => 'Category moved successfully.',
                     'data' => new CategoryResource($category)
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se pudo mover la categoría.'
+                    'message' => 'Could not move the category.'
                 ], 400);
             }
         } catch (\Exception $e) {
@@ -421,7 +421,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al mover la categoría.',
+                'message' => 'Error moving category.',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -442,7 +442,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener las rutas de navegación.',
+                'message' => 'Error getting breadcrumbs.',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -465,7 +465,7 @@ class CategoryController extends Controller
             if ($deleteChildren) {
                 // Usar el método deleteWithChildren del modelo
                 $category->deleteWithChildren();
-                $message = 'Categoría y sus subcategorías eliminadas exitosamente.';
+                $message = 'Category and its subcategories deleted successfully.';
             } else {
                 // Solo eliminar la categoría, mover hijos al padre
                 $children = $category->children;
@@ -474,7 +474,7 @@ class CategoryController extends Controller
                 }
                 
                 $category->delete();
-                $message = 'Categoría eliminada exitosamente. Las subcategorías fueron movidas al nivel superior.';
+                $message = 'Category deleted successfully. Subcategories were moved to the top level.';
             }
 
             DB::commit();
@@ -488,7 +488,7 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar la categoría.',
+                'message' => 'Error deleting category.',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -25,7 +25,7 @@ class JobContractorController extends Controller
             ->limit(10)
             ->get();
         return response()->json([
-            'message' => 'Últimos 10 contratos activos',
+            'message' => 'Latest 10 active contracts',
             'data' => $contracts
         ]);
     }

@@ -1,16 +1,17 @@
 import { Link, useLocation, useParams } from "react-router-dom";
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, Users, Briefcase, Download } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { ArrowLeft, Users, Briefcase, Download, Star } from "lucide-react";
 
 // Servicios
 import { ContractorService } from "@/core/services/contractor/contractor.service";
-import { ReviewService } from "@/core/services/ReviewService"; 
+import { ReviewService } from "@/core/services/ReviewService";
+import { MessageService } from "@/core/services/messages/message.service"; 
 
 // Tipos
 import type { IApiResponse } from "@/core/types/IApi";
 import type { ContractorFullInfo, NearbyContractorCard } from "@/types/contractor";
 import type { ContractorProfileViewModel } from "@/pages/WebPage/FindPro/utils/contractorProfile";
-
+import { borderPrimary } from "@/components/form-registration";
 // Componentes
 import { ContractorProfileSkeleton } from "@/pages/WebPage/FindPro/components/contractor-profile/ContractorProfileSkeleton";
 import { ContractorPrimaryInfo } from "@/pages/WebPage/FindPro/components/contractor-profile/ContractorPrimaryInfo";
@@ -39,6 +40,7 @@ export default function ContractorProfilePage() {
   // Estados de Chat
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [messageDraft, setMessageDraft] = useState("");
+  const [isLoadingChat, setIsLoadingChat] = useState(true);
 
   // Estados de Nearby Contractors
   const [nearbyContractors, setNearbyContractors] = useState<NearbyContractorCard[]>([]);
@@ -48,7 +50,27 @@ export default function ContractorProfilePage() {
   // Estado de Rating
   const [currentRating, setCurrentRating] = useState(0);
   const [exportingCv, setExportingCv] = useState(false);
+  const [isHomeowner, setIsHomeowner] = useState(false);
+  const [cvRating, setCvRating] = useState(0);
+ 
+  const [isContractor, setIsContractor] = useState(false);
 
+  // Traer la review previa del homeowner para este contractor
+  const fetchMyReview = useCallback(async (contractorId: number) => {
+    try {
+      const api = await ReviewService.getMyReview(contractorId);
+      if (api?.success && api.data) {
+        setCvRating(api.data.rating ?? 0);
+      }
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 404) {
+        setCvRating(0);
+        return;
+      }
+      console.error("Failed to load my review:", err);
+    }
+  }, []);
   // ViewModel
   const profile = useMemo<ContractorProfileViewModel | null>(
     () => (contractor ? createContractorProfileViewModel(contractor) : null),
@@ -69,6 +91,27 @@ export default function ContractorProfilePage() {
     }
     return "/findpro";
   }, [location.state, location.search]);
+
+  // Verificar si el usuario es homeowner o contractor
+  useEffect(() => {
+    try {
+      const userDataStr = localStorage.getItem("user_data");
+      if (userDataStr) {
+        const userData = JSON.parse(userDataStr);
+        const roleName = userData.role_name?.toLowerCase() || "";
+        const roles = userData.roles || [];
+        const hasHomeownerRole = roleName.includes("homeowner") ||
+          roles.some((role: any) => role.name?.toLowerCase() === "homeowner");
+        setIsHomeowner(hasHomeownerRole);
+
+        const hasContractorRole = roleName.includes("contractor") ||
+          roles.some((role: any) => role.name?.toLowerCase() === "contractor");
+        setIsContractor(hasContractorRole);
+      }
+    } catch (error) {
+      console.error("Error checking user role:", error);
+    }
+  }, []);
 
   // --- 1. CARGA INICIAL DEL CONTRACTOR ---
   useEffect(() => {
@@ -98,21 +141,92 @@ export default function ContractorProfilePage() {
     return () => { active = false; };
   }, [id]);
 
-  // --- 2. MENSAJE DE BIENVENIDA DEL CHAT ---
+  // --- 1.1 CARGA DE MI REVIEW (para prellenar las estrellas) ---
   useEffect(() => {
-    if (!profile) return;
-    setChatMessages((prev) => {
-      if (prev.length) return prev;
-      return [
-        {
-          id: Date.now(),
-          sender: "support",
-          text: `Hi ${profile.displayName}, we are here to help. What do you need today?`,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        },
-      ];
-    });
-  }, [profile]);
+    if (!isHomeowner || !id) return;
+    const contractorId = contractor?.user_id ?? contractor?.user?.id ?? Number(id);
+    if (!contractorId) return;
+
+    fetchMyReview(contractorId);
+  }, [contractor?.user_id, contractor?.user?.id, fetchMyReview, id, isHomeowner]);
+
+  // --- 2. CARGA DE MENSAJES DEL CHAT ---
+  useEffect(() => {
+    if (!isHomeowner || !id || !profile) return;
+    let active = true;
+    const controller = new AbortController();
+
+    setIsLoadingChat(true);
+    console.log("🔄 Loading chat messages for contractor ID:", id);
+
+    MessageService.getConversation(id, { signal: controller.signal })
+      .then((response) => {
+        if (!active) return;
+        console.log("📨 Chat response:", response);
+        const api = response as IApiResponse<any>;
+        if (!api?.success) {
+          console.log("⚠️ API response not successful, showing welcome message");
+          // Si no hay éxito, mostrar mensaje de bienvenida
+          setChatMessages([
+            {
+              id: Date.now(),
+              sender: "support",
+              text: `Hi ${profile.displayName}, we are here to help. What do you need today?`,
+              timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ]);
+          setIsLoadingChat(false);
+          return;
+        }
+
+        const data = api.data;
+        console.log("📦 Chat data:", data);
+        if (data?.messages && Array.isArray(data.messages) && data.messages.length > 0) {
+          console.log("✅ Found", data.messages.length, "messages");
+          const mappedMessages: ChatMessage[] = data.messages.map((msg: any) => {
+            console.log("Message sender_type:", msg.sender_type);
+            return {
+              id: msg.id || Date.now(),
+              sender: msg.sender_type === "App\\Models\\HomeownerProfile" || msg.sender_type === "HomeownerProfile" ? "homeowner" : "support",
+              text: msg.message || "",
+              timestamp: msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            };
+          });
+          setChatMessages(mappedMessages);
+        } else {
+          console.log("ℹ️ No messages found, showing welcome message");
+          // Si no hay mensajes previos, mostrar mensaje de bienvenida
+          setChatMessages([
+            {
+              id: Date.now(),
+              sender: "support",
+              text: `Hi ${profile.displayName}, we are here to help. What do you need today?`,
+              timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ]);
+        }
+        setIsLoadingChat(false);
+      })
+      .catch((err: any) => {
+        if (!active || err?.name === "CanceledError") return;
+        console.error("❌ Failed to load chat messages:", err);
+        // En caso de error, mostrar mensaje de bienvenida
+        setChatMessages([
+          {
+            id: Date.now(),
+            sender: "support",
+            text: `Hi ${profile.displayName}, we are here to help. What do you need today?`,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ]);
+        setIsLoadingChat(false);
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [id, isHomeowner, profile]);
 
   // --- 3. CARGA DE CONTRACTORS CERCANOS ---
   useEffect(() => {
@@ -157,22 +271,6 @@ export default function ContractorProfilePage() {
   }, [contractor?.user_id, contractor?.user?.id, id]);
 
   // --- HANDLERS DEL CHAT ---
-  const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!messageDraft.trim()) return;
-    const trimmedMessage = messageDraft.trim();
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        sender: "contractor",
-        text: trimmedMessage,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      },
-    ]);
-    setMessageDraft("");
-  };
-
   const handleDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
     setMessageDraft(event.target.value);
   };
@@ -187,7 +285,7 @@ export default function ContractorProfilePage() {
         rating: ratingValue,
       });
 
-      alert("Thanks! Your rating has been submitted.");
+      await fetchMyReview(targetUserId);
 
       if (id) {
         const updatedResponse = await ContractorService.getFullInfo(id);
@@ -282,19 +380,34 @@ export default function ContractorProfilePage() {
             {/* --- COLUMNA DERECHA: Chat + Equipo + Trabajos --- */}
             <div className="flex flex-col gap-6">
               
-              {/* 1. CHAT (Arriba en la columna derecha) */}
-              <ContractorChatAside
-                messages={chatMessages}
-                messageDraft={messageDraft}
-                onSubmit={handleSendMessage}
-                onDraftChange={handleDraftChange}
-                rating={currentRating}
-                onRatingChange={setCurrentRating}
-                onRatingSubmit={handleRatingSubmit}
-              />
+              {/* 1. CHAT (Arriba en la columna derecha) - Solo visible si NO es contractor */}
+              {!isContractor && (
+                <ContractorChatAside
+                  messages={chatMessages}
+                  messageDraft={messageDraft}
+                  onDraftChange={handleDraftChange}
+                  rating={currentRating}
+                  onRatingChange={setCurrentRating}
+                  onRatingSubmit={handleRatingSubmit}
+                  contractorId={contractor?.user_id ?? contractor?.user?.id ?? Number(id) ?? 0}
+                  isLoadingChat={isLoadingChat}
+                  onMessageSent={(message) => {
+                    // Agregar el mensaje a la lista local
+                    const newMessage: ChatMessage = {
+                      id: message.id || Date.now(),
+                      sender: "contractor",
+                      text: message.message || messageDraft,
+                      timestamp: message.created_at || new Date().toISOString(),
+                    };
+                    setChatMessages((prev) => [...prev, newMessage]);
+                  }}
+                />
+              )}
 
               {/* 2. SECCIÓN: NUESTRO EQUIPO (Debajo del chat) */}
-              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-3xl border px-8 py-8 shadow-md"
+                style={{ background: "white", color: "var(--color-secondary)", ...borderPrimary }}
+              >
                 <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
                   <Users className="h-5 w-5" />
                   Our Team
@@ -329,7 +442,9 @@ export default function ContractorProfilePage() {
               </div>
 
               {/* 3. SECCIÓN: TRABAJOS RECIENTES (Debajo del equipo) */}
-              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="rounded-3xl border px-8 py-8 shadow-md"
+                style={{ background: "white", color: "var(--color-secondary)", ...borderPrimary }}
+              >
                 <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#1E1E17]">
                   <Briefcase className="h-5 w-5" />
                   Recent Jobs
@@ -366,23 +481,73 @@ export default function ContractorProfilePage() {
               </div>
 
               {/* 4. DESCARGAR CV (Debajo de trabajos) */}
-              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-2">
-                    <Download className="h-5 w-5 text-[#1E1E17]" />
-                    <div>
-                      <h3 className="text-xl font-bold text-[#1E1E17]">Descargar CV</h3>
-                      <p className="text-xs text-gray-600">Genera el CV en PDF con experiencia, referencias y equipo.</p>
+             
+              <div className="rounded-[2rem] border-2 border-[#F5D238]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-lg bg-gradient-to-r from-[#F5D238]/20 to-[#F5D238]/10 border border-[#F5D238]/30">
+                        <Download className="h-5 w-5 text-[#F5D238]" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-black text-white">Download CV</h3>
+                        <p className="text-xs text-white/60">Generate PDF with experience, references and team.</p>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={handleExportCv}
+                      disabled={exportingCv}
+                      className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F5D238] to-[#E5C228] px-5 py-2.5 text-sm font-bold text-[#1E1E17] shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-60 border border-[#F5D238] flex-shrink-0"
+                    >
+                      <Download className="h-4 w-4" />
+                      {exportingCv ? "Generating..." : "Download CV (PDF)"}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleExportCv}
-                    disabled={exportingCv}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#F5D238] px-4 py-2 text-sm font-bold text-[#1E1E17] shadow hover:bg-[#e6c12e] disabled:opacity-60"
-                  >
-                    {exportingCv ? "Generando..." : "Descargar CV (PDF)"}
-                  </button>
+
+                  {/* Rating Section - Solo para Homeowners */}
+                  {isHomeowner && (
+                    <div className="border-t border-white/10 pt-6">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <h4 className="text-sm font-bold text-white">Rate this Contractor</h4>
+                          <p className="text-xs text-white/50">Share your experience with others</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setCvRating(star)}
+                                className="transition-all hover:scale-110"
+                              >
+                                <Star
+                                  className={`h-6 w-6 ${
+                                    star <= cvRating
+                                      ? "fill-[#F5D238] text-[#F5D238]"
+                                      : "text-white/30"
+                                  }`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          {cvRating > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleRatingSubmit(cvRating);
+                                setCvRating(0);
+                              }}
+                              className="ml-2 rounded-lg bg-white/10 px-4 py-1.5 text-xs font-semibold text-white hover:bg-white/20 transition-all border border-white/20"
+                            >
+                              Submit
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

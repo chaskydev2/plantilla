@@ -24,7 +24,7 @@ class DashboardHomeownerProfileController extends Controller
         if (!$user->homeownerProfile) {
             return response()->json([
                 'success' => false,
-                'message' => 'El usuario no tiene un perfil de propietario'
+                'message' => 'User does not have a homeowner profile'
             ], Response::HTTP_FORBIDDEN);
         }
 

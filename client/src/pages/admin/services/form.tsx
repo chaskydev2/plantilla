@@ -71,8 +71,8 @@ const ServiceModal = ({ isOpen, onClose, initialData = null, load }: ServiceModa
 
         console.log(payload);
         const response = await ItemService.update(initialData!.id, payload);
-        console.log(response, "mi api ");
-        toastify.success(response.message || 'Servicio actualizado');
+        console.log(response, "api response");
+        toastify.success(response.message || 'Service updated');
       } else {
         const payload: IServiceCreateRequest = {
           name: cleanData.name!,
@@ -81,14 +81,14 @@ const ServiceModal = ({ isOpen, onClose, initialData = null, load }: ServiceModa
           image: cleanData.image || undefined,
         };
         const response = await ItemService.create(payload);
-        console.log(response, "mi api  ");
-        toastify.success(response.message || 'Servicio creado');
+        console.log(response, "api response");
+        toastify.success(response.message || 'Service created');
       }
 
       onClose();
       load();
     } catch (error: any) {
-      toastify.error(error?.response?.data?.message || 'Error al guardar el servicio');
+      toastify.error(error?.response?.data?.message || 'Error saving service');
     }
   };
 
@@ -96,7 +96,7 @@ const ServiceModal = ({ isOpen, onClose, initialData = null, load }: ServiceModa
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar servicio' : 'Nuevo servicio'}
+      title={isEditing ? 'Edit service' : 'New service'}
       size={isEditing ? 'lg' : 'md'}
     >
       <FormProviderWrapper
@@ -109,28 +109,28 @@ const ServiceModal = ({ isOpen, onClose, initialData = null, load }: ServiceModa
         <div className="grid grid-cols-1 gap-6">
           <InputField
             name="name"
-            label="Nombre"
-            placeholder="Nombre del servicio"
+            label="Name"
+            placeholder="Service name"
             required
           />
 
           <InputField
             name="slug"
-            label="Slug (opcional)"
-            placeholder="Se genera automáticamente si lo dejas vacío"
+            label="Slug (optional)"
+            placeholder="Automatically generated if left empty"
           />
 
           <InputFileField
             name="icon"
-            label="Icono (opcional)"
-            helperText="Formatos: JPG, PNG, WEBP (máx 4MB). Deja vacío para mantener o quita para remover."
+            label="Icon (optional)"
+            helperText="Formats: JPG, PNG, WEBP (max 4MB). Leave empty to keep or clear to remove."
             accept="image/*"
           />
 
           <InputFileField
             name="image"
-            label="Imagen (opcional)"
-            helperText="Formatos: JPG, PNG, WEBP (máx 4MB). Deja vacío para mantener o quita para remover."
+            label="Image (optional)"
+            helperText="Formats: JPG, PNG, WEBP (max 4MB). Leave empty to keep or clear to remove."
             accept="image/*"
           />
         </div>

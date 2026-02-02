@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 import { getFullInfo, updateAllFields } from '@/core/services/contractor/contractor.service';
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 // Para Autocomplete
@@ -39,12 +40,7 @@ interface ContractorLocationFormProps {
   onSave: (data: ContractorLocationFormData) => void;
 }
 
-const statusOptions = [
-  { value: "pendiente", label: "Pendiente" },
-  { value: "aprobado", label: "Aprobado" },
-  { value: "rechazado", label: "Rechazado" },
-  { value: "suspendido", label: "Suspendido" },
-];
+// Removed unused statusOptions variable to fix TS6133 error
 
 
 // Helper to format ISO date to yyyy-mm-dd
@@ -90,10 +86,16 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
     initialData.lng ?? -99.1332
   ]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false); // Nuevo estado para guardar
   const [error, setError] = useState<string | null>(null);
   const [fullInfo, setFullInfo] = useState<any>(null); // Store full API response for debug
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
+
+  // Limpia los campos autocompletados
+  const handleClearAutoFilled = () => {
+    setAutoFilledFields(new Set());
+  };
 
   // Fetch full contractor info when modal opens
   useEffect(() => {
@@ -112,7 +114,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           }
         }
       } catch (err: any) {
-        setError('Error al obtener la información completa del contratista.');
+        setError('Error fetching full contractor information.');
       } finally {
         setLoading(false);
       }
@@ -132,7 +134,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           setForm((prev) => ({ ...prev, lat: latitude, lng: longitude }));
         },
         () => {
-          // Si falla, usar Cochabamba como fallback
+          // If fails, use Cochabamba as fallback
           const cochabambaLat = -17.3895;
           const cochabambaLng = -66.1568;
           setMapPosition([cochabambaLat, cochabambaLng]);
@@ -153,12 +155,12 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           setForm((prev) => ({ ...prev, lat: latitude, lng: longitude }));
         },
         () => {
-          setError('No se pudo obtener la ubicación actual.');
+          setError('Could not get current location.');
         },
         { enableHighAccuracy: true }
       );
     } else {
-      setError('La geolocalización no está soportada en este navegador.');
+      setError('Geolocation is not supported in this browser.');
     }
   };
 
@@ -224,7 +226,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
         {
           input: e.target.value,
           types: ['geocode', 'establishment'],
-          language: 'es'
+          language: 'en'
         },
         (predictions, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
@@ -246,7 +248,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
     setManualSuggestions([]);
     
     if (!placesService) {
-      setError("Servicio de lugares no disponible");
+      setError("Places service not available");
       return;
     }
 
@@ -298,13 +300,13 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
               }));
             }
           } else {
-            setError("No se pudo obtener la ubicación seleccionada.");
+            setError("Could not get the selected location.");
           }
         }
       );
     } catch (err) {
       console.error("Error al obtener detalles del lugar:", err);
-      setError("No se pudo obtener la ubicación seleccionada.");
+      setError("Could not get the selected location.");
     }
   };
 
@@ -315,7 +317,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
       const lng = e.latLng.lng();
       setMapPosition([lat, lng]);
       
-      // Usar Geocoder para obtener la dirección completa desde las coordenadas
+      // Use Geocoder to get full address from coordinates
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ location: { lat, lng } }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
@@ -357,7 +359,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           const fieldsToLock = ['address_line1', 'city', 'state_code', 'preferred_zip', 'country_code'];
           setAutoFilledFields(new Set(fieldsToLock));
         } else {
-          // Si falla la geocodificación, solo actualizar las coordenadas
+          // If geocoding fails, just update coordinates
           setForm((prev) => ({ ...prev, lat, lng }));
           fetchCountry(lat, lng).then((country_code) => setForm((prev) => ({ ...prev, country_code })));
           setAutoFilledFields(new Set());
@@ -396,6 +398,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
@@ -412,16 +415,17 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
     });
     try {
       await updateAllFields(form.user_id, cleanedForm);
-      setSuccessMessage('¡Información guardada correctamente!');
+      setSuccessMessage('Information saved successfully!');
       onSave(cleanedForm);
       setTimeout(() => {
         onClose();
       }, 1500);
     } catch (err: any) {
       console.error("Error al guardar:", err);
-      setError(err.response?.data?.message || 'Error al guardar los cambios.');
+      setError(err.response?.data?.message || 'Error saving changes.');
     } finally {
       setLoading(false);
+      setSaving(false);
     }
   };
   // Update form state if initialData changes
@@ -438,96 +442,134 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
   const safeLng = typeof mapPosition[1] === 'number' && !isNaN(mapPosition[1]) ? mapPosition[1] : -99.1332;
 
   return (
-    <Modal isOpen={open} onClose={onClose} title="Editar información de localización" size="lg">
-      {loading && <div className="my-2 text-center text-gray-500">Cargando información...</div>}
+    <Modal isOpen={open} onClose={onClose} title="Edit Location Information" size="lg">
+      {loading && !saving && <div className="my-2 text-center text-gray-500">Loading information...</div>}
+      {/* Mensaje modal centrado al guardar */}
+      {saving && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg px-8 py-6 flex flex-col items-center">
+            <span className="text-blue-600 text-lg font-semibold mb-2 animate-pulse">Saving information...</span>
+            <span className="text-gray-500 text-sm">Please wait while your data is being saved.</span>
+          </div>
+        </div>
+      )}
       {error && <div className="alert alert-error my-2">{error}</div>}
       {successMessage && <div className="alert alert-success my-2">{successMessage}</div>}
-      {/* Mostrar la info completa de la API para depuración */}
+      {/* Show full API info for debugging */}
       <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
         <input type="hidden" name="user_id" value={form.user_id} />
-        <label>
-          Código Postal
-          <input 
-            className="input input-bordered w-full" 
-            name="preferred_zip" 
-            value={form.preferred_zip || ""} 
-            onChange={handleChange}
-            disabled={autoFilledFields.has('preferred_zip')}
-            title={autoFilledFields.has('preferred_zip') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
-          />
+        {/* Mejoras visuales para campos autocompletados */}
+        <label className="relative">
+          Zip Code
+          <div className="relative">
+            <input
+              className={`input input-bordered w-full ${autoFilledFields.has('preferred_zip') ? 'bg-blue-50 border-blue-400 pr-8' : ''}`}
+              name="preferred_zip"
+              value={form.preferred_zip || ""}
+              onChange={handleChange}
+              disabled={autoFilledFields.has('preferred_zip')}
+              title={autoFilledFields.has('preferred_zip') ? 'Auto-filled from map. Click the map again to change.' : ''}
+            />
+            {autoFilledFields.has('preferred_zip') && (
+              <span className="absolute right-2 top-2 text-blue-500" title="Autocompletado desde el mapa">
+                <AiOutlineInfoCircle />
+              </span>
+            )}
+          </div>
+        </label>
+        <label className="relative">
+          Address 1
+          <div className="relative">
+            <input
+              className={`input input-bordered w-full ${autoFilledFields.has('address_line1') ? 'bg-blue-50 border-blue-400 pr-8' : ''}`}
+              name="address_line1"
+              value={form.address_line1 || ""}
+              onChange={handleChange}
+              disabled={autoFilledFields.has('address_line1')}
+              title={autoFilledFields.has('address_line1') ? 'Auto-filled from map. Click the map again to change.' : ''}
+            />
+            {autoFilledFields.has('address_line1') && (
+              <span className="absolute right-2 top-2 text-blue-500" title="Autocompletado desde el mapa">
+                <AiOutlineInfoCircle />
+              </span>
+            )}
+          </div>
         </label>
         <label>
-          Dirección 1
-          <input 
-            className="input input-bordered w-full" 
-            name="address_line1" 
-            value={form.address_line1 || ""} 
-            onChange={handleChange}
-            disabled={autoFilledFields.has('address_line1')}
-            title={autoFilledFields.has('address_line1') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
-          />
-        </label>
-        <label>
-          Dirección 2
+          Address 2
           <input className="input input-bordered w-full" name="address_line2" value={form.address_line2 || ""} onChange={handleChange} />
         </label>
-        <label>
-          Ciudad
-          <input 
-            className="input input-bordered w-full" 
-            name="city" 
-            value={form.city || ""} 
-            onChange={handleChange}
-            disabled={autoFilledFields.has('city')}
-            title={autoFilledFields.has('city') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
-          />
+        <label className="relative">
+          City
+          <div className="relative">
+            <input
+              className={`input input-bordered w-full ${autoFilledFields.has('city') ? 'bg-blue-50 border-blue-400 pr-8' : ''}`}
+              name="city"
+              value={form.city || ""}
+              onChange={handleChange}
+              disabled={autoFilledFields.has('city')}
+              title={autoFilledFields.has('city') ? 'Auto-filled from map. Click the map again to change.' : ''}
+            />
+            {autoFilledFields.has('city') && (
+              <span className="absolute right-2 top-2 text-blue-500" title="Autocompletado desde el mapa">
+                <AiOutlineInfoCircle />
+              </span>
+            )}
+          </div>
         </label>
         <label>
-          Empresa
+          Company
           <input className="input input-bordered w-full" name="company_name" value={form.company_name || ""} onChange={handleChange} />
         </label>
         <label>
-          Licencia
+          License
           <input className="input input-bordered w-full" name="license_number" value={form.license_number || ""} onChange={handleChange} />
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" name="is_insured" checked={!!form.is_insured} onChange={handleChange} />
-          ¿Asegurado?
+          Insured?
         </label>
         <label>
-          Área de servicio
+          Service Area
           <input className="input input-bordered w-full" name="service_area" value={form.service_area || ""} onChange={handleChange} />
         </label>
         <label>
-          Rating promedio
+          Average Rating
           <input className="input input-bordered w-full" name="average_rating" type="number" step="0.01" value={form.average_rating ?? ""} onChange={handleChange} />
         </label>
-        <label>
-          Estado
-          <input 
-            className="input input-bordered w-full" 
-            name="state_code" 
-            value={form.state_code || ""} 
-            onChange={handleChange}
-            disabled={autoFilledFields.has('state_code')}
-            title={autoFilledFields.has('state_code') ? 'Auto-completado desde el mapa. Edita nuevamente el mapa para cambiar.' : ''}
-          />
+        <label className="relative">
+          State
+          <div className="relative">
+            <input
+              className={`input input-bordered w-full ${autoFilledFields.has('state_code') ? 'bg-blue-50 border-blue-400 pr-8' : ''}`}
+              name="state_code"
+              value={form.state_code || ""}
+              onChange={handleChange}
+              disabled={autoFilledFields.has('state_code')}
+              title={autoFilledFields.has('state_code') ? 'Auto-filled from map. Click the map again to change.' : ''}
+            />
+            {autoFilledFields.has('state_code') && (
+              <span className="absolute right-2 top-2 text-blue-500" title="Autocompletado desde el mapa">
+                <AiOutlineInfoCircle />
+              </span>
+            )}
+          </div>
         </label>
         <div className="md:col-span-2">
-          <label className="block mb-2 font-semibold">Ubicación en el mapa</label>
+          <label className="block mb-2 font-semibold">Location on map</label>
           <button type="button" className="btn btn-sm btn-secondary mb-2" onClick={handleUseCurrentLocation}>
-            Usar mi ubicación actual
+            Use my current location
           </button>
 
-          {/* Buscador de direcciones alternativo */}
+          {/* Alternative address search */}
           <div className="mb-2" style={{ position: "relative" }}>
             <input
               className="input input-bordered w-full"
-              placeholder="Buscar dirección o lugar..."
+              placeholder="Search address or place..."
               value={manualSearch}
               onChange={handleManualInput}
             />
-            {manualLoading && <div className="text-xs text-gray-400">Buscando...</div>}
+            {manualLoading && <div className="text-xs text-gray-400">Searching...</div>}
             {manualSuggestions.length > 0 && (
               <ul className="bg-white border rounded shadow max-h-48 overflow-y-auto absolute z-50 w-full">
                 {manualSuggestions.map((sug) => (
@@ -544,11 +586,11 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           </div>
           {loadError && (
             <div className="alert alert-error my-2">
-              Error al cargar Google Maps. Verifica tu conexión o la API Key.
+              Error loading Google Maps. Check your connection or API Key.
             </div>
           )}
           {!loadError && !isLoaded && (
-            <div className="my-2 text-center text-gray-500">Cargando mapa...</div>
+            <div className="my-2 text-center text-gray-500">Loading map...</div>
           )}
           {GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== "TU_API_KEY_AQUI" && isLoaded && !loadError && (
             <GoogleMap
@@ -562,7 +604,7 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
           )}
           {(!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY === "TU_API_KEY_AQUI") && (
             <div className="alert alert-warning my-2">
-              Debes configurar la variable de entorno <b>VITE_GOOGLE_MAPS_API_KEY</b> para ver el mapa.
+              You must set the <b>VITE_GOOGLE_MAPS_API_KEY</b> environment variable to view the map.
             </div>
           )}
           <div className="mt-2 flex flex-wrap gap-4">
@@ -573,60 +615,28 @@ const ContractorLocationForm: React.FC<ContractorLocationFormProps> = ({ open, o
               <span className="font-medium">Lng:</span> {form.lng ?? ""}
             </div>
             <div>
-              <span className="font-medium">País:</span> {form.country_code ?? ""}
+              <span className="font-medium">Country:</span> {form.country_code ?? ""}
             </div>
           </div>
           {autoFilledFields.size > 0 && (
-            <div className="alert alert-info my-2">
-              <span>Los campos de dirección fueron auto-completados desde el mapa y no pueden editarse. Haz click nuevamente en el mapa para actualizar.</span>
+            <div className="alert alert-info my-2 flex items-center gap-2">
+              <span>Address fields were auto-filled from the map and cannot be edited. Click the map again to actualizar o </span>
+              <button
+                type="button"
+                className="btn btn-xs btn-outline btn-info ml-2"
+                onClick={handleClearAutoFilled}
+                title="Desbloquear campos autocompletados"
+              >
+                Limpiar autocompletado
+              </button>
             </div>
           )}
-          <small className="text-gray-500 block mt-1">Haz click en el mapa o busca una dirección para seleccionar la ubicación.</small>
+          <small className="text-gray-500 block mt-1">Click on the map or search for an address to select the location.</small>
         </div>
-        <label>
-          Teléfono móvil
-          <input className="input input-bordered w-full" name="mobile_number" value={form.mobile_number || ""} onChange={handleChange} />
-        </label>
-        <label>
-          Teléfono fijo
-          <input className="input input-bordered w-full" name="phone_number" value={form.phone_number || ""} onChange={handleChange} />
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="has_driving_license" checked={!!form.has_driving_license} onChange={handleChange} />
-          ¿Tiene licencia de conducir?
-        </label>
-        <label>
-          Categoría de licencia
-          <input className="input input-bordered w-full" name="driving_license_category" value={form.driving_license_category || ""} onChange={handleChange} />
-        </label>
-        <label>
-          LinkedIn
-          <input className="input input-bordered w-full" name="linkedin_url" value={form.linkedin_url || ""} onChange={handleChange} />
-        </label>
-        <label>
-          Portafolio
-          <input className="input input-bordered w-full" name="portfolio_url" value={form.portfolio_url || ""} onChange={handleChange} />
-        </label>
-        <label>
-          Fecha de afiliación
-          <input className="input input-bordered w-full" name="affiliation_date" type="date" value={form.affiliation_date || ""} onChange={handleChange} />
-        </label>
-        <label>
-          Fecha de aprobación
-          <input className="input input-bordered w-full" name="approval_date" type="date" value={form.approval_date || ""} onChange={handleChange} />
-        </label>
-        <label>
-          Estado del contrato
-          <select className="input input-bordered w-full" name="contract_status" value={form.contract_status || ""} onChange={handleChange}>
-            <option value="">Seleccionar</option>
-            {statusOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </label>
+        {/* Removed section: mobile phone, landline phone, driving license, license category, LinkedIn, portfolio, affiliation date, approval date, contract status */}
         <div className="md:col-span-2 flex justify-end gap-2 mt-4">
-          <button type="button" className="btn btn-outline" onClick={onClose}>Cancelar</button>
-          <button type="button" className="btn btn-primary" onClick={handleSubmit}>Guardar</button>
+          <button type="button" className="btn btn-outline" onClick={onClose}>Cancel</button>
+          <button type="button" className="btn btn-primary" onClick={handleSubmit}>Save</button>
         </div>
       </form>
     </Modal>

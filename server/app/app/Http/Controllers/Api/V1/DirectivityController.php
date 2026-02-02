@@ -59,7 +59,7 @@ class DirectivityController extends Controller
         return (new DirectivityResource($directivity))
             ->additional([
                 'success' => true,
-                'message' => 'directiva creada Satisfactoriamente',
+                'message' => 'Directivity created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class DirectivityController extends Controller
         return (new DirectivityResource($directivity))
             ->additional([
                 'success' => true,
-                'message' => 'directiva actualizada Satisfactoriamente'
+                'message' => 'Directivity updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class DirectivityController extends Controller
         $directivity->delete();
         return response()->json([
             'success' => true,
-            'message' => 'directiva eliminada Satisfactoriamente'
+            'message' => 'Directivity deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

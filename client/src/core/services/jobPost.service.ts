@@ -1,55 +1,34 @@
-// Change aprobation status for a job post
+
 import type { JobPost } from '@/pages/homeownner/PostJob/Main';
 import axios from '@/core/config/axios';
+import type { IApiResponse, IPaginationRequest } from '@/core/types/IApi';
 
 export interface IJobPostRequest {
   [key: string]: any;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-
-
-export const changeJobPostAprobationStatus = async (
-  jobPostId: number,
-  status_aprobation: boolean
-): Promise<any> => {
-  //const url = `${API_BASE_URL}/job-posts/${jobPostId}/aprobation`;
-    const url = `${API_BASE_URL}/v1/job-posts/${jobPostId}/aprobation`;
-    const res = await axios.post(url, { status_aprobation });
-  console.log('Response from changeJobPostAprobationStatus:', res);
-  
-  return res.data;
-};
-
-
+// Helper for FormData
 const buildJobPostFormData = (data: any, initialData?: JobPost | null) => {
   const formData = new FormData();
-
   Object.entries(data).forEach(([key, value]) => {
-    if (key === 'image') return; // Handled separately below
+    if (key === 'image') return;
     if (key === 'remove_image') {
       if (value) formData.append('remove_image', '1');
       return;
     }
-    // Permitir null y string vacía, solo omitir undefined
     if (value === undefined) return;
-    // Si es un objeto vacío (excepto File/Blob), omitir
     if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Blob)) return;
-    // Si es Blob, agregar
     if (value instanceof Blob) {
       formData.append(key, value);
       return;
     }
-    // Si es string, number o boolean, agregar como string (permitir null y '')
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null) {
       formData.append(key, value === null ? '' : String(value));
     }
   });
-  // homeowner_id: solo agregar si no está en data
   if (!('homeowner_id' in data)) {
     formData.append('homeowner_id', initialData?.homeowner_id?.toString() || '1');
   }
-  // Imagen
   const imageValue = data.image;
   if (imageValue instanceof File) {
     formData.append('image', imageValue);
@@ -58,87 +37,109 @@ const buildJobPostFormData = (data: any, initialData?: JobPost | null) => {
   } else if (imageValue instanceof Blob) {
     formData.append('image', imageValue);
   } else if (typeof imageValue === 'string' && imageValue.startsWith('data:image/')) {
-    // Laravel acepta base64 y lo transforma en archivo
     formData.append('image', imageValue);
   } else if (imageValue === null) {
-    // Si image es null explícito, enviar para eliminar
     formData.append('image', '');
   }
   return formData;
 };
 
+// --- Service methods ---
 
-// Get all job posts (admin)
-export const getAllJobPosts = async () => {
-  const url = `${API_BASE_URL}/v1/job-posts`;
-  const res = await axios.get(url);
-  console.log('Response from getAllJobPosts:', res);
+export const getAllPaginated = async (
+  params?: IPaginationRequest,
+  config: { signal?: AbortSignal } = {}
+): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/job-posts', { params, ...config });
   return res.data;
 };
 
-
-export const deleteJobPosts = async (ids: number[]): Promise<any> => {
-  const url = `${API_BASE_URL}/v1/job-posts/destroy-many`;
-  const res = await axios.delete(url, { data: { ids } });
+export const getAll = async (): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/job-posts');
+  console.log('Fetched All Job Posts:', res);
   return res.data;
 };
-// Obtener todos los job posts de un homeowner
-export const getJobPostsByHomeowner = async (homeownerId: number) => {
-  try {
-     const url = `${API_BASE_URL}/v1/job-posts/homeowner/${homeownerId}`;
-    const res = await axios.get(url);
-    console.log('Respuesta de getJobPostsByHomeowner:', res);
-    return res.data;
-  } catch (err) {
-    console.log('Error en getJobPostsByHomeowner:', err);
-    // Puedes personalizar el error si lo necesitas
-    throw err;
-  }
+
+export const getByHomeowner = async (
+  homeownerId: number,
+  params?: IPaginationRequest,
+  config: { signal?: AbortSignal } = {}
+): Promise<IApiResponse> => {
+  const res = await axios.get(`/v1/job-posts/homeowner/${homeownerId}`, { params, ...config });
+  console.log('Fetched Job Posts by Homeowner:', res);
+  return res.data;
 };
 
-export const createJobPost = async (
+export const create = async (
   data: IJobPostRequest,
   initialData?: JobPost | null
-): Promise<any> => {
+): Promise<IApiResponse> => {
   const formData = buildJobPostFormData(data, initialData);
-  console.log('FormData entries for createJobPost:', data);
-  const url = `${API_BASE_URL}/v1/job-posts`;
-  const res = await axios.post(url, formData, {
+  const res = await axios.post('/v1/job-posts', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+  console.log('Created Job Post:', res);
   return res.data;
 };
 
-export const deleteJobPostById = async (id: number): Promise<any> => {
-  const url = `${API_BASE_URL}/v1/job-posts/${id}`;
-  const res = await axios.delete(url);
-  return res.data;
-};
-
-
-export const updateJobPost = async (
+export const update = async (
+  id: number,
   data: IJobPostRequest,
   initialData: JobPost
-): Promise<any> => {
-  console.log('Data received for updateJobPost:', data);
+): Promise<IApiResponse> => {
   const formData = buildJobPostFormData(data, initialData);
-  // Loguear el contenido real de formData
-  if (formData && typeof formData.forEach === 'function') {
-    console.log('FormData to be sent (key => value):');
-    formData.forEach((value, key) => {
-      if (value instanceof File) {
-        console.log(`${key} => [File] name: ${value.name}, type: ${value.type}, size: ${value.size}`);
-      } else {
-        console.log(`${key} =>`, value);
-      }
-    });
-  }
-  // Laravel: para PUT con multipart/form-data, usar POST y _method=PUT
   formData.append('_method', 'PUT');
-  const url = `${API_BASE_URL}/v1/job-posts/${initialData.id}`;
-  const res = await axios.post(url, formData, {
+  const res = await axios.post(`/v1/job-posts/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  console.log('Response from updateJobPost:', res);
+  console.log('Updated Job Post:', res);
   return res.data;
 };
+
+export const get = async (id: number): Promise<IApiResponse> => {
+  const res = await axios.get(`/v1/job-posts/${id}`);
+  console.log('Fetched Job Post:', res);
+  return res.data;
+};
+
+export const remove = async (id: number): Promise<IApiResponse> => {
+  const res = await axios.delete(`/v1/job-posts/${id}`);
+  console.log('Removed Job Post:', res);
+  return res.data;
+};
+
+export const removeMany = async (ids: number[]): Promise<IApiResponse> => {
+  const res = await axios.delete('/v1/job-posts/destroy-many', { data: { ids } });
+  console.log('Removed Many Job Posts:', res);
+  return res.data;
+};
+
+export const changeAprobationStatus = async (
+  jobPostId: number,
+  status_aprobation: boolean
+): Promise<IApiResponse> => {
+  const res = await axios.post(`/v1/job-posts/${jobPostId}/aprobation`, { status_aprobation });
+  console.log('Changed Aprobation Status:', res);
+  return res.data;
+};
+
+export const JobPostService = {
+  getAllPaginated,
+  getAll,
+  getByHomeowner,
+  create,
+  update,
+  get,
+  remove,
+  removeMany,
+  changeAprobationStatus,
+};
+
+// --- Compatibility exports for legacy imports ---
+// Compatibility: createJobPost and updateJobPost accept two arguments for legacy usage
+export const createJobPost = (data: IJobPostRequest, initialData?: JobPost | null) => create(data, initialData);
+export const updateJobPost = (data: IJobPostRequest, initialData: JobPost) => update(initialData.id, data, initialData);
+export const getJobPostsByHomeowner = getByHomeowner;
+export const deleteJobPostById = remove;
+export const getAllJobPosts = getAll;
+export const changeJobPostAprobationStatus = changeAprobationStatus;

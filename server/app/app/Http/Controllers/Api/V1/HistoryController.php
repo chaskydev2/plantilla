@@ -70,7 +70,7 @@ class HistoryController extends Controller
         return (new HistoryResource($history))
             ->additional([
                 'success' => true,
-                'message' => 'Historia creada Satisfactoriamente',
+                'message' => 'History created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -101,7 +101,7 @@ class HistoryController extends Controller
         return (new HistoryResource($history))
             ->additional([
                 'success' => true,
-                'message' => 'Historia actualizada Satisfactoriamente'
+                'message' => 'History updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -174,7 +174,7 @@ class HistoryController extends Controller
         $history->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Historia eliminada Satisfactoriamente'
+            'message' => 'History deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

@@ -59,7 +59,7 @@ class FaqController extends Controller
         return (new FaqResource($faq))
             ->additional([
                 'success' => true,
-                'message' => 'Preguntas frecuentes Creados Satisfactoriamente',
+                'message' => 'FAQ created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class FaqController extends Controller
         return (new FaqResource($faq))
             ->additional([
                 'success' => true,
-                'message' => 'preguntas frecuentes actualizado Satisfactoriamente'
+                'message' => 'FAQ updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class FaqController extends Controller
         $faq->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Preguntas frecuentes Eliminados Satisfactoriamente'
+            'message' => 'FAQ deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

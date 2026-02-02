@@ -56,7 +56,7 @@ class WorkReferenceController extends Controller
         return (new WorkReferenceResource($result))
             ->additional([
                 'success' => true,
-                'message' => 'Experiencia Laboral Creado Satisfactoriamente',
+                'message' => 'work experience created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -73,7 +73,7 @@ class WorkReferenceController extends Controller
         return (new WorkReferenceResource($result))
             ->additional([
                 'success' => true,
-                'message' => 'Experiencia Laboral actualizado Satisfactoriamente'
+                'message' => 'work experience updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -85,7 +85,7 @@ class WorkReferenceController extends Controller
         $result->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Experiencia Laboral Eliminado Satisfactoriamente'
+            'message' => 'work experience deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 }

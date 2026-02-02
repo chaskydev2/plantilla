@@ -59,7 +59,7 @@ class EventTypeController extends Controller
         return (new EventTypeResource($eventType))
             ->additional([
                 'success' => true,
-                'message' => 'Tipo de evento Creado Satisfactoriamente',
+                'message' => 'Event type created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class EventTypeController extends Controller
         return (new EventTypeResource($eventType))
             ->additional([
                 'success' => true,
-                'message' => 'Tipo de evento actualizado Satisfactoriamente'
+                'message' => 'Event type updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class EventTypeController extends Controller
         $eventType->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Tipo de evento Eliminado Satisfactoriamente'
+            'message' => 'Event type deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 }

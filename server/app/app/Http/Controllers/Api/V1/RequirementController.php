@@ -64,7 +64,7 @@ class RequirementController extends Controller
         return (new RequirementResource($requirement))
             ->additional([
                 'success' => true,
-                'message' => 'Requisito creado Satisfactoriamente',
+                'message' => 'Requirement created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -80,7 +80,7 @@ class RequirementController extends Controller
         return (new RequirementResource($requirement))
             ->additional([
                 'success' => true,
-                'message' => 'Requisito actualizado Satisfactoriamente'
+                'message' => 'Requirement updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -94,7 +94,7 @@ class RequirementController extends Controller
         $requirement->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Requisito eliminado Satisfactoriamente'
+            'message' => 'Requirement deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

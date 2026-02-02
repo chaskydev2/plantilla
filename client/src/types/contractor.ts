@@ -41,13 +41,13 @@ export interface Tag {
 }
 
 export interface AcademicTraining {
-  id?: number;
-  title?: string;
-  institution?: string;
-  degree?: string;
-  start_date?: string | null;
-  end_date?: string | null;
-  description?: string | null;
+  id?: any;
+  professional_title?: string;
+  academic_degree?: string;
+  graduated_from?: string;
+  relevant_certifications?: string | null;
+  graduation_date?: string | null;
+  degree_date?: string | null;
 }
 
 export interface WorkExperience {
@@ -60,10 +60,11 @@ export interface WorkExperience {
 }
 
 export interface TechnicalSkill {
-  id?: number;
-  type?: string;
-  name?: string;
-  level?: string;
+  id?: any;
+  user_id?: string;
+  skill_type?: string;
+  skill_name?: string;
+  skill_level?: string;
   description?: string | null;
 }
 

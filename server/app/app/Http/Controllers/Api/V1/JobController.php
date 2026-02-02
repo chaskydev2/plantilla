@@ -317,7 +317,7 @@ class JobController extends Controller
             $job->save();
             return response()->json([
                 'success' => true,
-                'message' => 'Job actualizado correctamente',
+                'message' => 'Job updated successfully',
                 'data' => $job,
             ]);
         }

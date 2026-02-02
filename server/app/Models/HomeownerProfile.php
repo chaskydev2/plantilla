@@ -5,9 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class HomeownerProfile extends Model
 {
@@ -81,40 +78,6 @@ class HomeownerProfile extends Model
         return $query->where('state_code', $state_code);
     }
 
-    public function messageThreads(): HasMany
-    {
-        return $this->hasMany(ContractorMessageThread::class, 'participant_user_id', 'user_id')
-            ->where('participant_type', 'homeowner')
-            ->orderByDesc('last_message_at');
-    }
-
-    public function contractorMessages(): HasManyThrough
-    {
-        return $this->hasManyThrough(
-            ContractorMessage::class,
-            ContractorMessageThread::class,
-            'participant_user_id',
-            'thread_id',
-            'user_id',
-            'id'
-        )->where('contractor_message_threads.participant_type', 'homeowner')
-         ->orderBy('message_number');
-    }
-
-    public function contractors(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Contractor::class,
-            'contractor_message_threads',
-            'participant_user_id',
-            'contractor_user_id',
-            'user_id',
-            'user_id'
-        )->wherePivot('participant_type', 'homeowner')
-         ->withPivot('id as thread_id', 'status', 'last_message_at')
-         ->orderBy('contractor_message_threads.last_message_at', 'desc');
-    }
-
     public function services()
     {
         return $this->belongsToMany(
@@ -126,5 +89,39 @@ class HomeownerProfile extends Model
             'id'
         )->using(HomeownerProfileService::class)
          ->withTimestamps();
+    }
+
+    public function chatThreads()
+    {
+        return $this->hasMany(ChatThread::class, 'homeowner_profile_id', 'user_id');
+    }
+
+    public function chatMessages()
+    {
+        return $this->morphMany(ChatMessage::class, 'sender');
+    }
+
+    /**
+     * Calificaciones que ha dado este HomeownerProfile a Contractors
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'homeowner_profile_id', 'user_id');
+    }
+
+    /**
+     * Verificar si ya calificó a un contractor específico
+     */
+    public function hasReviewedContractor(int $contractorUserId): bool
+    {
+        return $this->reviews()->where('contractor_id', $contractorUserId)->exists();
+    }
+
+    /**
+     * Obtener la calificación dada a un contractor específico
+     */
+    public function getReviewForContractor(int $contractorUserId)
+    {
+        return $this->reviews()->where('contractor_id', $contractorUserId)->first();
     }
 }

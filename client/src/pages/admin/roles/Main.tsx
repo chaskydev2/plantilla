@@ -121,21 +121,21 @@ export default function RoleList() {
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => navigate(`/admin/roles/${item.id}/permisos`),
       variant: 'primary' as const,
-      show: (item: IItemResource) => item.id != null && hasPermission('rol_permiso_editar'),
+      show: (item: IItemResource) => item.id != null && hasPermission('rol_permiso_editar') && item.name.toLowerCase() !== 'admin',
     },
     {
       label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: 'primary' as const,
-      show: (item: IItemResource) => item.id != null && hasPermission('rol_editar'),
+      show: (item: IItemResource) => item.id != null && hasPermission('rol_editar') && item.name.toLowerCase() !== 'admin',
     },
     {
       label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: 'danger' as const,
-      show: (item: IItemResource) => item.id != null && hasPermission('rol_eliminar'),
+      show: (item: IItemResource) => item.id != null && hasPermission('rol_eliminar') && item.name.toLowerCase() !== 'admin',
     },
   ];
 

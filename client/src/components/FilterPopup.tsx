@@ -104,7 +104,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     loadServices();
   }, [show]);
 
-  // Eliminado el efecto que cerraba el mapa al cerrar el dropdown de ubicación
+  // Removed the effect that closed the map when closing the location dropdown
 
   useEffect(() => {
     if (!openLocation) return;
@@ -123,7 +123,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     }
     const key = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
     if (!key) {
-      setLocationError("No se pudo cargar Google Maps");
+      setLocationError("Could not load Google Maps");
       return;
     }
     if (!w.__gmapsLoadingPromise) {
@@ -144,7 +144,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
           geocoderRef.current = new w.google.maps.Geocoder();
         }
       }
-    }).catch(() => setLocationError("No se pudo cargar Google Maps"));
+    }).catch(() => setLocationError("Could not load Google Maps"));
   }, [openLocation]);
 
   // Debounced predictions fetch
@@ -179,7 +179,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
         );
       } catch {
         setLocationLoading(false);
-        setLocationError("Error en el autocompletado");
+        setLocationError("Autocomplete error");
       }
     }, 250);
     return () => window.clearTimeout(id);
@@ -249,7 +249,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     if (w.google && w.google.maps) return true;
     const key = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
     if (!key) {
-      setLocationError("No se pudo cargar Google Maps");
+      setLocationError("Could not load Google Maps");
       return false;
     }
     if (!w.__gmapsLoadingPromise) {
@@ -266,7 +266,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       await w.__gmapsLoadingPromise;
       return !!(w.google && w.google.maps);
     } catch {
-      setLocationError("No se pudo cargar Google Maps");
+      setLocationError("Could not load Google Maps");
       return false;
     }
   };
@@ -326,19 +326,19 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     const geo = geocoderRef.current;
     if (!geo) {
       setMapSearchLoading(false);
-      setMapSearchError("No pudimos buscar en el mapa");
+      setMapSearchError("We couldn't search on the map");
       return;
     }
     geo.geocode({ address: mapSearchQuery }, (results: any, status: string) => {
       setMapSearchLoading(false);
       if (status !== "OK" || !Array.isArray(results) || results.length === 0) {
-        setMapSearchError("No encontramos esa ubicación");
+        setMapSearchError("We couldn't find that location");
         return;
       }
       const first = results[0];
       const loc = first.geometry?.location;
       if (!loc) {
-        setMapSearchError("No encontramos esa ubicación");
+        setMapSearchError("We couldn't find that location");
         return;
       }
       const lat = loc.lat();
@@ -371,11 +371,11 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
         setQueryLatLng(coords);
       } else {
         setQueryLatLng(null);
-        setLocationError("No pudimos obtener coordenadas para esa ubicación");
+        setLocationError("We couldn't get coordinates for that location");
       }
       setOpenLocation(false);
     } catch {
-      setLocationError("No pudimos obtener coordenadas para esa ubicación");
+      setLocationError("We couldn't get coordinates for that location");
     } finally {
       setLocationFetching(false);
     }
@@ -384,7 +384,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
   const handleUseCurrentLocation = () => {
     setMapSearchError(null);
     if (!navigator?.geolocation) {
-      setMapSearchError("La geolocalización no está disponible en este dispositivo");
+      setMapSearchError("Geolocation is not available on this device");
       return;
     }
     setMapGeoLoading(true);
@@ -393,7 +393,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
         try {
           const ready = await ensureMapsAvailable();
           if (!ready) {
-            setMapSearchError("Google Maps API not loaded");
+            setMapSearchError("Google Maps API is not loaded");
             setMapGeoLoading(false);
             return;
           }
@@ -423,7 +423,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
           setOpenLocation(false);
           setMapSearchError(null);
         } catch {
-          setMapSearchError("No pudimos obtener tu ubicación");
+          setMapSearchError("We couldn't get your location");
         } finally {
           setMapGeoLoading(false);
         }
@@ -431,10 +431,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       (geoError) => {
         setMapGeoLoading(false);
         if (geoError?.code === 1) {
-          setMapSearchError("Debes permitir el acceso a tu ubicación");
+          setMapSearchError("You must allow location access");
           return;
         }
-        setMapSearchError("No pudimos obtener tu ubicación");
+        setMapSearchError("We couldn't get your location");
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -468,16 +468,16 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
 
   const handleApply = async () => {
     setLocalError(null);
-    // No permitir buscar si no hay ubicación ni coordenadas
+    // Don't allow searching without a location or coordinates
     if (!queryLocation && !(queryLatLng && typeof queryLatLng.lat === "number" && typeof queryLatLng.lng === "number")) {
-      setLocalError("Debes ingresar o seleccionar una ubicación en el mapa.");
+      setLocalError("You must enter a location or select one on the map.");
       return;
     }
 
     let finalLocation = queryLocation;
     let finalLatLng = queryLatLng;
 
-    // Si no hay location pero sí lat/lng, resolver dirección
+    // If there's no location string but we do have lat/lng, resolve an address
     if (!finalLocation && finalLatLng && typeof finalLatLng.lat === "number" && typeof finalLatLng.lng === "number") {
       finalLocation = await resolveAddressFromLatLng(finalLatLng.lat, finalLatLng.lng);
       setQueryLocation(finalLocation);
@@ -487,10 +487,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
     
     // Service parameters (similar to FindProPage)
     if (selectedServiceId && queryService) {
-      // Si hay service_id y service_name, usarlos (NO enviar profession_name)
+      // If there's an ID and a name, use the name (do not send a different profession_name)
       params.set("profession_name", queryService);
     } else if (queryService) {
-      // Si solo hay nombre sin ID, enviar como profession_name
+      // If we only have a name, send as profession_name
       params.set("profession_name", queryService);
     }
     
@@ -508,7 +508,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       params.set("lng", String(finalLatLng.lng));
     }
     
-    console.log("🔍 FilterPopup applying search with params:", {
+    console.log("🔍 FilterPopup applying search params:", {
       service_id: selectedServiceId,
       service_name: queryService,
       profession_name: queryService,
@@ -543,8 +543,8 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
           <div className="relative flex flex-1">
             <Plus aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
             <input
-              placeholder="¿En qué podemos ayudarte?"
-              aria-label="Selecciona un servicio"
+              placeholder="How can we help you?"
+              aria-label="Select a service"
               value={queryService}
               onFocus={() => {
                 setShowServiceModal(true);
@@ -563,8 +563,8 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <Tag className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
             <input
               type="text"
-              aria-label="Describe libremente tu necesidad"
-              placeholder="Ej. ayudante de cocina experto"
+              aria-label="Describe your need"
+              placeholder="e.g. experienced kitchen assistant"
               value={queryTags}
               onChange={(e) => setQueryTags(e.target.value)}
               className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#F5D238] placeholder-[#F5D238] bg-transparent border-none"
@@ -579,8 +579,8 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 setOpenLocation(true);
               }}
               type="text"
-              aria-label="Ingresa tu código postal o ciudad"
-              placeholder="Ciudad, calle o código postal"
+              aria-label="Enter your ZIP code or city"
+              placeholder="City, street, or ZIP code"
               value={queryLocation}
               onChange={(e) => {
                 setQueryLocation(e.target.value);
@@ -594,7 +594,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 <div className="rounded-2xl border bg-white shadow-xl p-0 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-3 bg-green-50 border-b border-green-100">
                     <MapPin className="w-6 h-6 text-green-600" />
-                    <span className="font-semibold text-green-700 text-base">Buscar ubicación</span>
+                    <span className="font-semibold text-green-700 text-base">Search location</span>
                   </div>
                   <div className="p-3">
                     <button
@@ -606,16 +606,16 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                       }}
                     >
                       <MapPin className="w-5 h-5 text-green-600" />
-                      Elegir en el mapa
+                      Choose on map
                     </button>
                     {queryLocation.trim() ? (
                       <div>
-                        {locationLoading && <div className="px-3 py-2 text-sm text-gray-500">Buscando…</div>}
+                        {locationLoading && <div className="px-3 py-2 text-sm text-gray-500">Searching…</div>}
                         {locationFetching && !locationLoading && (
-                          <div className="px-3 py-2 text-sm text-gray-500">Obteniendo coordenadas…</div>
+                          <div className="px-3 py-2 text-sm text-gray-500">Getting coordinates…</div>
                         )}
                         {!locationLoading && locationPredictions.length === 0 && !locationError && (
-                          <div className="px-3 py-2 text-sm text-gray-500">No se encontraron resultados</div>)}
+                          <div className="px-3 py-2 text-sm text-gray-500">No results found</div>)}
                         {locationError && <div className="px-3 py-2 text-sm text-red-600">{locationError}</div>}
                         {!locationLoading && locationPredictions.length > 0 && (
                           <div className="max-h-60 overflow-y-auto">
@@ -633,7 +633,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                         )}
                       </div>
                     ) : (
-                      <div className="px-3 py-2 text-sm text-gray-500">Escribe para buscar una ubicación…</div>
+                      <div className="px-3 py-2 text-sm text-gray-500">Type to search for a location…</div>
                     )}
                   </div>
                 </div>
@@ -646,13 +646,13 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             onClick={handleApply}
             className="inline-flex items-center bg-[#F5D238] hover:bg-[#e6c12e] text-[#1E1E17] font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F5D238] focus:ring-offset-[#1E1E17] ml-2 border border-[#F5D238]"
           >
-            <span>Buscar un profesional</span>
+            <span>Find a professional</span>
             <Search className="ml-2 size-4 text-[#1A1B16]" />
           </button>
           {/* Close button (optional, for modal context) */}
           <button
             type="button"
-            aria-label="Cerrar"
+            aria-label="Close"
             onClick={onClose}
             className="absolute top-3 right-3 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
           >
@@ -668,7 +668,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <button
               type="button"
               className="absolute top-2 right-2 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
-              aria-label="Cerrar selector de mapa"
+              aria-label="Close map picker"
               onClick={() => setShowMapPicker(false)}
             >
               ×
@@ -681,7 +681,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             >
               <input
                 type="text"
-                placeholder="Buscar ubicación en el mapa..."
+                placeholder="Search location on the map..."
                 value={mapSearchQuery}
                 onChange={e => setMapSearchQuery(e.target.value)}
                 className="flex-1 px-3 py-2 border border-[#F5D238] rounded-lg focus:outline-none bg-[#1E1E17] text-[#F5D238] placeholder-[#F5D238]"
@@ -691,7 +691,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 disabled={mapSearchLoading}
               >
-                Buscar
+                Search
               </button>
             </form>
             <button
@@ -701,7 +701,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
               disabled={mapGeoLoading}
             >
               <Locate className="w-5 h-5" />
-              <span>{mapGeoLoading ? "Localizando..." : "Usar mi ubicación actual"}</span>
+              <span>{mapGeoLoading ? "Locating..." : "Use my current location"}</span>
             </button>
             {mapSearchError && (
               <div className="text-red-600 text-sm mb-2 w-full text-center">{mapSearchError}</div>
@@ -718,7 +718,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 onClick={() => setShowMapPicker(false)}
               >
-                Cancelar
+                Cancel
               </button>
             </div>
           </div>
@@ -732,7 +732,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <button
               type="button"
               className="absolute top-2 right-2 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
-              aria-label="Cerrar selector de servicio"
+              aria-label="Close service picker"
               onClick={() => setShowServiceModal(false)}
             >
               ×
@@ -741,8 +741,8 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <div className="flex items-center gap-3 mb-4">
               <Plus className="w-5 h-5 text-[#F5D238]" />
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-white">Selecciona un servicio</h3>
-                <p className="text-xs text-[#F5D238]/80">Escribe para filtrar o elige de la lista</p>
+                <h3 className="text-lg font-bold text-white">Select a service</h3>
+                <p className="text-xs text-[#F5D238]/80">Type to filter or pick from the list</p>
               </div>
             </div>
 
@@ -751,7 +751,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 type="text"
                 value={queryService}
                 onChange={(e) => setQueryService(e.target.value)}
-                placeholder="Buscar servicio..."
+                placeholder="Search service..."
                 className="w-full px-3 py-2 rounded-lg border border-[#F5D238] bg-[#1E1E17] text-[#F5D238] placeholder-[#F5D238] focus:outline-none"
               />
             </div>
@@ -759,7 +759,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 max-h-[420px] overflow-y-auto pr-1">
               {filteredServices.length === 0 && (
                 <div className="col-span-full text-sm text-center text-[#F5D238]/80 border border-dashed border-[#F5D238]/40 rounded-lg p-4">
-                  No se encontraron servicios
+                  No services found
                 </div>
               )}
               {filteredServices.map((service) => (
@@ -784,7 +784,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 onClick={() => setShowServiceModal(false)}
               >
-                Cancelar
+                Cancel
               </button>
             </div>
           </div>

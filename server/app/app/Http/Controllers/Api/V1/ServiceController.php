@@ -126,7 +126,7 @@ class ServiceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Servicio eliminado correctamente',
+            'message' => 'Service deleted successfully',
         ], Response::HTTP_OK);
     }
 

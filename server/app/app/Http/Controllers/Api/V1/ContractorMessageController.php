@@ -21,7 +21,7 @@ class ContractorMessageController extends Controller
         if (!$contractor) {
             return response()->json([
                 'success' => false,
-                'message' => 'Contractor no encontrado',
+                'message' => 'Contractor not found',
                 'data' => [],
             ], 404);
         }
@@ -52,7 +52,7 @@ class ContractorMessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Conversación obtenida correctamente',
+            'message' => 'Conversation retrieved successfully',
             'data' => $messages,
         ]);
     }
@@ -68,7 +68,7 @@ class ContractorMessageController extends Controller
         if (!$contractor) {
             return response()->json([
                 'success' => false,
-                'message' => 'Contractor no encontrado',
+                'message' => 'Contractor not found',
                 'data' => null,
             ], 404);
         }
@@ -106,7 +106,7 @@ class ContractorMessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Mensaje enviado correctamente al contractor',
+            'message' => 'Message sent successfully to contractor',
             'data' => $message,
         ], 201);
     }

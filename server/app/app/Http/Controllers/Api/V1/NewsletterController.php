@@ -59,7 +59,7 @@ class NewsletterController extends Controller
         return (new NewsletterResource($newsletter))
             ->additional([
                 'success' => true,
-                'message' => 'Consulta creado Satisfactoriamente',
+                'message' => 'Inquiry created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class NewsletterController extends Controller
         return (new NewsletterResource($newsletter))
             ->additional([
                 'success' => true,
-                'message' => 'Consulta actualizado Satisfactoriamente'
+                'message' => 'Inquiry updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class NewsletterController extends Controller
         $newsletter->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Consulta eliminado Satisfactoriamente'
+            'message' => 'Inquiry deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 
@@ -100,7 +100,7 @@ class NewsletterController extends Controller
         return (new NewsletterResource($newsletter))
             ->additional([
                 'success' => true,
-                'message' => 'Consulta creado Satisfactoriamente',
+                'message' => 'Inquiry created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

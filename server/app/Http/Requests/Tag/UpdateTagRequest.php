@@ -57,13 +57,13 @@ class UpdateTagRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'El :attribute es obligatorio.',
-            'name.string' => 'El :attribute debe ser un texto.',
-            'name.max' => 'El :attribute no puede tener más de :max caracteres.',
-            'name.unique' => 'El :attribute ya existe.',
-            'slug.string' => 'El :attribute debe ser un texto.',
-            'slug.max' => 'El :attribute no puede tener más de :max caracteres.',
-            'slug.unique' => 'El :attribute ya existe.',
+            'name.required' => 'The :attribute is required.',
+            'name.string' => 'The :attribute must be a string.',
+            'name.max' => 'The :attribute may not be greater than :max characters.',
+            'name.unique' => 'The :attribute already exists.',
+            'slug.string' => 'The :attribute must be a string.',
+            'slug.max' => 'The :attribute may not be greater than :max characters.',
+            'slug.unique' => 'The :attribute already exists.',
         ];
     }
 }

@@ -25,25 +25,25 @@ class RegisterHomeownerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'first_name.required' => 'El nombre es obligatorio.',
-            'first_name.string' => 'El nombre debe ser una cadena de texto.',
-            'first_name.max' => 'El nombre no puede tener más de 255 caracteres.',
-            
-            'last_name.required' => 'El apellido es obligatorio.',
-            'last_name.string' => 'El apellido debe ser una cadena de texto.',
-            'last_name.max' => 'El apellido no puede tener más de 255 caracteres.',
-            
-            'email.required' => 'El email es obligatorio.',
-            'email.email' => 'El email debe tener un formato válido.',
-            'email.unique' => 'Este email ya está registrado.',
-            
-            'phone.required' => 'El número de teléfono es obligatorio.',
-            'phone.string' => 'El número de teléfono debe ser una cadena de texto.',
-            'phone.max' => 'El número de teléfono no puede tener más de 20 caracteres.',
-            
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.string' => 'La contraseña debe ser una cadena de texto.',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'first_name.required' => 'First name is required.',
+            'first_name.string' => 'First name must be a string.',
+            'first_name.max' => 'First name may not be greater than 255 characters.',
+
+            'last_name.required' => 'Last name is required.',
+            'last_name.string' => 'Last name must be a string.',
+            'last_name.max' => 'Last name may not be greater than 255 characters.',
+
+            'email.required' => 'Email is required.',
+            'email.email' => 'Email must be a valid email address.',
+            'email.unique' => 'This email is already registered.',
+
+            'phone.required' => 'Phone number is required.',
+            'phone.string' => 'Phone number must be a string.',
+            'phone.max' => 'Phone number may not be greater than 20 characters.',
+
+            'password.required' => 'Password is required.',
+            'password.string' => 'Password must be a string.',
+            'password.min' => 'Password must be at least 6 characters.',
         ];
     }
 }

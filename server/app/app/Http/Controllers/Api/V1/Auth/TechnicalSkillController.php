@@ -58,7 +58,7 @@ class TechnicalSkillController extends Controller
         return (new TechnicalSkillResource($result))
             ->additional([
                 'success' => true,
-                'message' => 'Habilidad Tecnica Creado Satisfactoriamente',
+                'message' => 'Technical Skill created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -76,7 +76,7 @@ class TechnicalSkillController extends Controller
         return (new TechnicalSkillResource($result))
             ->additional([
                 'success' => true,
-                'message' => 'Habilidad Tecnica actualizado Satisfactoriamente'
+                'message' => 'Technical Skill updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -88,7 +88,7 @@ class TechnicalSkillController extends Controller
         $result->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Habilidad Tecnica Eliminado Satisfactoriamente'
+            'message' => 'Technical Skill deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 }

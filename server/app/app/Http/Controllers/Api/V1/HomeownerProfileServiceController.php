@@ -42,7 +42,7 @@ class HomeownerProfileServiceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Servicio asociado al homeowner correctamente',
+            'message' => 'Service successfully associated to homeowner',
             'data' => $service,
         ], Response::HTTP_CREATED);
     }
@@ -53,7 +53,7 @@ class HomeownerProfileServiceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Servicio desvinculado correctamente',
+            'message' => 'Service successfully unlinked',
         ], Response::HTTP_OK);
     }
 
@@ -98,7 +98,7 @@ class HomeownerProfileServiceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Servicios sincronizados correctamente',
+            'message' => 'Services synchronized successfully',
             'data' => $services,
         ], Response::HTTP_OK);
     }

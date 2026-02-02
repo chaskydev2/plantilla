@@ -552,9 +552,11 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
       if (isEditing && initialData && initialData.id) {
         console.log(payload);
         result = await updateJobPost(payload, initialData);
+        console.log(result);
       } else {
             console.log(payload);
         result = await createJobPost(payload, initialData);
+        console.log(result);
       }
       console.log('API result:', result);
       if (result && result.message && result.data) {
@@ -606,7 +608,17 @@ const Form: React.FC<FormProps> = ({ isOpen, onClose, initialData, load }) => {
                 placeholder="Select a service"
               />
               <InputField name="deadline" label="Deadline" type="date" />
-              <InputField name="currency" label="Currency" />
+              <InputField
+                name="currency"
+                label="Currency"
+                maxLength={3}
+                onInput={e => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 3);
+                }}
+                placeholder="e.g. USD"
+                autoComplete="off"
+              />
               <SelectField
                 name="status"
                 label="Status"

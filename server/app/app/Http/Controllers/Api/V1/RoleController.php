@@ -53,7 +53,7 @@ class RoleController extends Controller
         $role = Role::create(['name' => $request->name, 'guard_name' => 'api']);
 
         return (new RoleResource($role))
-            ->additional(['success' => true, 'message' => 'Rol creado'])
+            ->additional(['success' => true, 'message' => 'Role created'])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -74,7 +74,7 @@ class RoleController extends Controller
         $role->update(['name' => $request->name]);
 
         return (new RoleResource($role))
-            ->additional(['success' => true, 'message' => 'Rol actualizado'])
+            ->additional(['success' => true, 'message' => 'Role updated'])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -86,7 +86,7 @@ class RoleController extends Controller
         if ($role->users()->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'El rol está asignado a usuarios'
+                'message' => 'The role is assigned to users'
             ], Response::HTTP_CONFLICT);
         }
 
@@ -94,7 +94,7 @@ class RoleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Rol eliminado'
+            'message' => 'Role deleted'
         ])->setStatusCode(Response::HTTP_OK);
     }
 }

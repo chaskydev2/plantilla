@@ -115,7 +115,7 @@ class AttributeHomeownerController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error al guardar los datos',
+                'message' => 'Error saving data',
                 'error' => $exception->getMessage(),
             ], 500);
         }
@@ -142,7 +142,7 @@ class AttributeHomeownerController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado actualizado correctamente',
+            'message' => 'Status updated successfully',
             'data' => $attributeHomeowner,
         ]);
     }
@@ -159,7 +159,7 @@ class AttributeHomeownerController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comentario actualizado correctamente',
+            'message' => 'Comment updated successfully',
             'data' => $attributeHomeowner,
         ]);
     }
@@ -240,7 +240,7 @@ class AttributeHomeownerController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar los datos',
+                'message' => 'Error updating data',
                 'error' => $exception->getMessage(),
             ], 500);
         }
@@ -266,7 +266,7 @@ class AttributeHomeownerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Registro eliminado correctamente',
+                'message' => 'Record deleted successfully',
             ]);
         } catch (\Throwable $exception) {
             DB::rollBack();
@@ -277,7 +277,7 @@ class AttributeHomeownerController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar el registro',
+                'message' => 'Error deleting record',
                 'error' => $exception->getMessage(),
             ], 500);
         }

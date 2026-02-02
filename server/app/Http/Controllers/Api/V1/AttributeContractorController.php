@@ -77,6 +77,7 @@ class AttributeContractorController extends Controller
         'attributes' => 'required|array',
         'attributes.*.attribute_id' => ['required', Rule::exists('attributes', 'id')],
         'attributes.*.value' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'attributes.*.coment' => 'nullable|string',
     ]);
 
     
@@ -115,6 +116,7 @@ class AttributeContractorController extends Controller
                     'contractor_id' => $validated['contractor_id'],
                     'attribute_id' => $attributeId,
                     'value' => $storedValue,
+                    'coment' => $attr['coment'] ?? '',
                 ]);
                 $created[] = $row;
             } else {
@@ -266,6 +268,42 @@ class AttributeContractorController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar los datos',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        $attributeContractor = AttributeContractor::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            // Eliminar archivo si existe
+            if ($attributeContractor->value && !is_null($attributeContractor->value)) {
+                $filePath = public_path($attributeContractor->value);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            // Eliminar el registro
+            $attributeContractor->delete();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Registro eliminado correctamente'
+            ], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error deleting attribute_contractor: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'attribute_contractor_id' => $id
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el registro',
                 'error' => $e->getMessage(),
             ], 500);
         }

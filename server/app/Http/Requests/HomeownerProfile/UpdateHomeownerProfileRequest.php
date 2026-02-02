@@ -39,14 +39,14 @@ class UpdateHomeownerProfileRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'preferred_zip' => 'código postal preferido',
-            'address_line1' => 'dirección línea 1',
-            'address_line2' => 'dirección línea 2',
-            'city' => 'ciudad',
-            'state_code' => 'código de estado',
-            'country_code' => 'código de país',
-            'lat' => 'latitud',
-            'lng' => 'longitud',
+            'preferred_zip' => 'preferred postal code',
+            'address_line1' => 'address line 1',
+            'address_line2' => 'address line 2',
+            'city' => 'city',
+            'state_code' => 'state code',
+            'country_code' => 'country code',
+            'lat' => 'latitude',
+            'lng' => 'longitude',
         ];
     }
 
@@ -56,9 +56,9 @@ class UpdateHomeownerProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'country_code.in' => 'El código de país debe ser válido.',
-            'lat.between' => 'La latitud debe estar entre -90 y 90.',
-            'lng.between' => 'La longitud debe estar entre -180 y 180.',
+            'country_code.in' => 'The country code must be valid.',
+            'lat.between' => 'Latitude must be between -90 and 90.',
+            'lng.between' => 'Longitude must be between -180 and 180.',
         ];
     }
 }

@@ -22,16 +22,16 @@ interface TechnicalSkillModalProps {
 }
 
 const typeSkillOptions = [
-  { value: 'equipment', label: 'Equipos topográficos' },
-  { value: 'software', label: 'Software especializado' },
-  { value: 'technical', label: 'Habilidades tecnicas' },
+  { value: 'equipment', label: 'Surveying equipment' },
+  { value: 'software', label: 'Specialized software' },
+  { value: 'technical', label: 'Technical skills' },
 ];
 
 const skillLevelOptions = [
-  { value: 'Básico', label: 'Básico' },
-  { value: 'Intermedio', label: 'Intermedio' },
-  { value: 'Avanzado', label: 'Avanzado' },
-  { value: 'Experto', label: 'Experto' },
+  { value: 'Basic', label: 'Basic' },
+  { value: 'Intermediate', label: 'Intermediate' },
+  { value: 'Advanced', label: 'Advanced' },
+  { value: 'Expert', label: 'Expert' },
 ];
 
 const TechnicalSkillModal = ({
@@ -64,7 +64,7 @@ const TechnicalSkillModal = ({
   const handleSubmit = async (data: FormValues) => {
     try {
       if (!userId) {
-        toastify.error('Se requiere un ID de usuario');
+        toastify.error('User ID is required');
         return;
       }
       if (isEditing) {
@@ -73,13 +73,13 @@ const TechnicalSkillModal = ({
           initialData!.id, 
           data
         );
-        toastify.success(response.message || 'Habilidad Tecnica actualizada');
+        toastify.success(response.message || 'Technical skill updated');
       } else {
         const response = await ItemService.create(
           userId,
           data
         );
-        toastify.success(response.message || 'Habilidad Tecnica creada');
+        toastify.success(response.message || 'Technical skill created');
       }
 
       load();
@@ -87,7 +87,7 @@ const TechnicalSkillModal = ({
     } catch (error: any) {
       toastify.error(
         error.response?.data?.message || 
-        (isEditing ? 'Error al actualizar' : 'Error al crear')
+        (isEditing ? 'Error updating' : 'Error creating')
       );
     }
   };
@@ -96,7 +96,7 @@ const TechnicalSkillModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar habilidad técnica' : 'Agregar habilidad técnica'}
+      title={isEditing ? 'Edit technical skill' : 'Add technical skill'}
       size="lg"
     >
       <FormProviderWrapper
@@ -108,7 +108,7 @@ const TechnicalSkillModal = ({
       >
         <div className="grid grid-cols-1 gap-4">
           <SelectField
-            label='Tipo de habilidad'
+            label='Skill type'
             name="skill_type"
             options={typeSkillOptions}
             valueKey="value"
@@ -117,12 +117,12 @@ const TechnicalSkillModal = ({
           
           <InputField
             name="skill_name"
-            label="Nombre de la habilidad"
-            placeholder="Ej: Manejo de estación total, Uso de AutoCAD Civil 3D, Nivelación geométrica"
+            label="Skill name"
+            placeholder="E.g.: Total station operation, AutoCAD Civil 3D, Geometric leveling"
           />
           
           <SelectField
-            label='Nivel de dominio'
+            label='Skill level'
             name="skill_level"
             options={skillLevelOptions}
             valueKey="value"
@@ -131,8 +131,8 @@ const TechnicalSkillModal = ({
 
           <TextAreaField
             name="description"
-            label="Descripción detallada"
-            placeholder="Ej: Descripción de la habilidad técnica, años de experiencia, proyectos relevantes"
+            label="Detailed description"
+            placeholder="E.g.: Description of the technical skill, years of experience, relevant projects"
             rows={4}
           />
         </div>

@@ -35,12 +35,6 @@ class ContractorMessageThread extends Model
         return $this->belongsTo(User::class, 'participant_user_id');
     }
 
-    public function homeowner(): BelongsTo
-    {
-        return $this->belongsTo(HomeownerProfile::class, 'participant_user_id', 'user_id')
-            ->where('participant_type', 'homeowner');
-    }
-
     public function messages(): HasMany
     {
         return $this->hasMany(ContractorMessage::class, 'thread_id')

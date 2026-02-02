@@ -59,7 +59,7 @@ class CourseController extends Controller
         return (new CourseResource($course))
             ->additional([
                 'success' => true,
-                'message' => 'Curso Creado Satisfactoriamente',
+                'message' => 'Course created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -75,7 +75,7 @@ class CourseController extends Controller
         return (new CourseResource($course))
             ->additional([
                 'success' => true,
-                'message' => 'Curso actualizado Satisfactoriamente'
+                'message' => 'Course updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -89,7 +89,7 @@ class CourseController extends Controller
         $course->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Curso Eliminado Satisfactoriamente'
+            'message' => 'Course deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

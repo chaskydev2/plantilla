@@ -86,7 +86,7 @@ const AttributeHomeownerList: React.FC = () => {
 
 	const actions: ITableAction<WithRelations>[] = [
 		{
-			label: "Ver",
+			label: "View",
 			icon: <Eye className="w-4 h-4" />,
 			onClick: (item: WithRelations) => {
 				if (item.value) {
@@ -112,7 +112,7 @@ const AttributeHomeownerList: React.FC = () => {
 		},
 		{
 			key: "homeowner_name",
-			header: "Nombre del Propietario",
+			header: "Homeowner Name",
 			render: (item: WithRelations) => (
 				<div className="text-gray-900 dark:text-gray-100">
 					{item.homeowner?.user?.name ?? "-"}
@@ -122,7 +122,7 @@ const AttributeHomeownerList: React.FC = () => {
 		},
 		{
 			key: "attribute_name",
-			header: "Nombre del Atributo",
+			header: "Attribute Name",
 			render: (item: WithRelations) => (
 				<div className="text-gray-900 dark:text-gray-100">{item.attribute?.name ?? "-"}</div>
 			),
@@ -130,11 +130,11 @@ const AttributeHomeownerList: React.FC = () => {
 		},
 		{
 			key: "created_at",
-			header: "Creado",
+			header: "Created",
 			render: (item: WithRelations) => (
 				<div className="text-sm text-gray-600 dark:text-gray-400">
 					{item.created_at
-						? new Date(item.created_at).toLocaleDateString("es-ES", {
+						? new Date(item.created_at).toLocaleDateString("en-US", {
 								year: "numeric",
 								month: "short",
 								day: "numeric",
@@ -146,11 +146,11 @@ const AttributeHomeownerList: React.FC = () => {
 		},
 		{
 			key: "updated_at",
-			header: "Actualizado",
+			header: "Updated",
 			render: (item: WithRelations) => (
 				<div className="text-sm text-gray-600 dark:text-gray-400">
 					{item.updated_at
-						? new Date(item.updated_at).toLocaleDateString("es-ES", {
+						? new Date(item.updated_at).toLocaleDateString("en-US", {
 								year: "numeric",
 								month: "short",
 								day: "numeric",
@@ -170,7 +170,7 @@ const AttributeHomeownerList: React.FC = () => {
 				</div>
 				<input
 					type="text"
-					placeholder="Buscar..."
+					placeholder="Search..."
 					className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600 rounded-xl"
 					value={searchInput}
 					onChange={(e) => setSearchInput(e.target.value)}
@@ -213,7 +213,7 @@ const AttributeHomeownerList: React.FC = () => {
 
 	return (
 		<div>
-			<PageBreadcrumb pageTitle="Mis Documentos" />
+			<PageBreadcrumb pageTitle="My Documents" />
 			<DataTable<WithRelations> {...tableProps} />
 
 			<AttributeHomeownerModal

@@ -11,6 +11,7 @@ import { toastify } from "@/core/utils/toastify";
 // import useAuth from "@/core/hooks/useAuth"; // TODO: Descomentar cuando se configuren los permisos
 import DataTable from "@/components/table/DataTable";
 
+// Columns are created inside the component to allow translated labels
 // columns will be created inside component to allow translated labels
 
 export default function TagList() {

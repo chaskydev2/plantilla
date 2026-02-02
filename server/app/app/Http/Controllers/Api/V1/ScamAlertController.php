@@ -103,7 +103,7 @@ class ScamAlertController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Scam alert creado correctamente',
+            'message' => 'Scam alert created successfully',
             'data' => $alert,
         ], Response::HTTP_CREATED);
     }
@@ -134,7 +134,7 @@ class ScamAlertController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Scam alert actualizado correctamente',
+            'message' => 'Scam alert updated successfully',
             'data' => $scamAlert,
         ], Response::HTTP_OK);
     }
@@ -145,7 +145,7 @@ class ScamAlertController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Scam alert eliminado correctamente',
+            'message' => 'Scam alert deleted successfully',
         ], Response::HTTP_OK);
     }
 }

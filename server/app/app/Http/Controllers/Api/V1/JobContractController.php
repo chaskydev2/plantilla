@@ -22,7 +22,7 @@ class JobContractController extends Controller
             ->limit(10)
             ->get();
         return response()->json([
-            'message' => 'Últimos 10 contratos activos',
+            'message' => 'Latest 10 active contracts',
             'data' => $contracts
         ]);
     }
@@ -63,17 +63,17 @@ class JobContractController extends Controller
         try {
             $contract = JobContract::with(['jobPost', 'contractor'])->findOrFail($id);
             return response()->json([
-                'message' => 'Contrato encontrado',
+                'message' => 'Contract found',
                 'data' => $contract
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Contrato no encontrado',
-                'error' => "No se encontró un contrato con el ID: {$id}"
+                'message' => 'Contract not found',
+                'error' => "No contract found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al obtener el contrato',
+                'message' => 'Error retrieving contract',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -95,12 +95,12 @@ class JobContractController extends Controller
             $contract = JobContract::create($data);
             $contract->load(['jobPost', 'contractor']);
             return response()->json([
-                'message' => 'Contrato creado exitosamente',
+                'message' => 'Contract created successfully',
                 'data' => $contract
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear el contrato',
+                'message' => 'Error creating contract',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -121,17 +121,17 @@ class JobContractController extends Controller
             $contract->update($data);
             $contract->load(['jobPost', 'contractor']);
             return response()->json([
-                'message' => 'Contrato actualizado exitosamente',
+                'message' => 'Contract updated successfully',
                 'data' => $contract
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Contrato no encontrado',
-                'error' => "No se encontró un contrato con el ID: {$id}"
+                'message' => 'Contract not found',
+                'error' => "No contract found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al actualizar el contrato',
+                'message' => 'Error updating contract',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -146,16 +146,16 @@ class JobContractController extends Controller
             $contract = JobContract::findOrFail($id);
             $contract->delete();
             return response()->json([
-                'message' => 'Contrato eliminado exitosamente'
+                'message' => 'Contract deleted successfully'
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Contrato no encontrado',
-                'error' => "No se encontró un contrato con el ID: {$id}"
+                'message' => 'Contract not found',
+                'error' => "No contract found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al eliminar el contrato',
+                'message' => 'Error deleting contract',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -170,17 +170,17 @@ class JobContractController extends Controller
                 $contract = JobContract::withTrashed()->findOrFail($id);
                 $contract->forceDelete();
                 return response()->json([
-                    'message' => 'Contrato eliminado permanentemente',
+                    'message' => 'Contract permanently deleted',
                     'success' => true
                 ]);
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 return response()->json([
-                    'message' => 'Contrato no encontrado',
-                    'error' => "No se encontró un contrato con el ID: {$id}"
+                    'message' => 'Contract not found',
+                    'error' => "No contract found with ID: {$id}"
                 ], 404);
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Error al eliminar permanentemente el contrato',
+                    'message' => 'Error permanently deleting contract',
                     'error' => $e->getMessage(),
                     'success' => false
                 ], 500);

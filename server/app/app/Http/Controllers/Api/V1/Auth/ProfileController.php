@@ -25,7 +25,7 @@ class ProfileController extends Controller
         if (Auth::id() != $id) {
             return response()->json([
                 'success' => false,
-                'message' => 'No autorizado para actualizar este perfil'
+                'message' => 'No authorized to update this profile'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -37,7 +37,7 @@ class ProfileController extends Controller
         return ($this->_generateProfileResponse_($result))
             ->additional([
                 'success' => true,
-                'message' => 'Perfil actualizado Satisfactoriamente'
+                'message' => 'Profile updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);

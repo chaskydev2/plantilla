@@ -44,9 +44,9 @@ const AuthFormModal = ({
       cleanData as ICreateRequest
     ).then((response) => {
       load();
-      toastify.success(response.message || 'Item actualizado');
+      toastify.success(response.message || 'User updated');
     }).catch((error) => {
-      toastify.error(error.message || 'Error al actualizar el item');
+      toastify.error(error.message || 'Error updating user');
     }).finally(() => {
       closeModal();
     });
@@ -58,7 +58,7 @@ const AuthFormModal = ({
         <Modal
           isOpen={isOpen}
           onClose={closeModal}
-          title={'Editar Usuario'}
+          title={'Edit User'}
           size="lg"
         >
           <FormProviderWrapper
@@ -72,35 +72,35 @@ const AuthFormModal = ({
               <div className="md:col-span-2">
                 <InputField
                   name="email"
-                  label="Correo electrónico"
+                  label="Email"
                   type="email"
-                  placeholder="Ej: usuario@ejemplo.com"
+                  placeholder="e.g. user@example.com"
                 />
               </div>
               
               <InputField
                 name="first_name"
-                label="Nombre"
-                placeholder="Ej: Juan"
+                label="First name"
+                placeholder="e.g. John"
               />
 
               <InputField
                 name="last_name"
-                label="Apellido"
-                placeholder="Ej: Pérez"
+                label="Last name"
+                placeholder="e.g. Smith"
               />
 
               <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <PasswordField
                   name="password"
-                  label={'Nueva contraseña (opcional)'}
-                  placeholder={'Dejar vacío para no cambiar'}
+                  label={'New password (optional)'}
+                  placeholder={'Leave blank to keep current password'}
                 />
 
                 <PasswordField
                   name="confirmPassword"
-                  label="Confirmar contraseña"
-                  placeholder="Repite la contraseña"
+                  label="Confirm password"
+                  placeholder="Re-enter your password"
                 />
               </div>
             </div>
@@ -112,7 +112,7 @@ const AuthFormModal = ({
           className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
         >
           <Edit className="w-5 h-5" />
-          Editar
+          Edit
         </button>
       )}
     </>

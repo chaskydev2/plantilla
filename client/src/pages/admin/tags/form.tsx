@@ -53,17 +53,17 @@ const TagModal = ({
     try {
       if (isEditing) {
         const response = await ItemService.update(initialData!.id, cleanData as IUpdateRequest);
-        toastify.success(response.message || 'Etiqueta actualizada');
+        toastify.success(response.message || 'Tag updated');
         onClose();
         load();
       } else {
         const response = await ItemService.create(cleanData as ICreateRequest);
-        toastify.success(response.message || 'Etiqueta creada');
+        toastify.success(response.message || 'Tag created');
         onClose();
         load();
       }
     } catch (error: any) {
-      toastify.error(error.response?.data?.message || 'Error al guardar la etiqueta');
+      toastify.error(error.response?.data?.message || 'Error saving tag');
     }
   };
 
@@ -71,7 +71,7 @@ const TagModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Etiqueta' : 'Nueva Etiqueta'}
+      title={isEditing ? 'Edit Tag' : 'New Tag'}
       size="md"
     >
       <FormProviderWrapper
@@ -85,23 +85,23 @@ const TagModal = ({
           <div>
             <InputField
               name="name"
-              label="Nombre de la etiqueta"
-              placeholder="Ej: Laravel"
+              label="Tag name"
+              placeholder="E.g.: Laravel"
               required
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              El nombre de la etiqueta debe ser único.
+              The tag name must be unique.
             </p>
           </div>
 
           <div>
             <InputField
               name="slug"
-              label="Slug (opcional)"
-              placeholder="Se genera automáticamente del nombre"
+              label="Slug (optional)"
+              placeholder="Automatically generated from name"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Si no se proporciona, se generará automáticamente del nombre. Solo letras minúsculas, números y guiones.
+              If not provided, it will be generated automatically from the name. Only lowercase letters, numbers, and hyphens are allowed.
             </p>
           </div>
         </div>

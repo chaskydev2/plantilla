@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HistoryService } from '@/core/services/history/history.service';
 import type { IHistory } from '@/core/types/IHistory';
@@ -11,6 +11,9 @@ export default function RegisterGuaraHowItWorks() {
   const [loading, setLoading] = useState(true);
   const [requirements, setRequirements] = useState<IRequirement[]>([]);
   const [reqLoading, setReqLoading] = useState(true);
+  const [selectedReqType, setSelectedReqType] = useState<'all' | 'Registration' | 'Renewal' | 'Information Update'>('all');
+
+  const REQUIREMENT_TYPES = ['Registration', 'Renewal', 'Information Update'] as const;
 
   const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
   
@@ -69,6 +72,37 @@ export default function RegisterGuaraHowItWorks() {
     );
   }
 
+  function normalizeRequirementType(type?: string | null): 'Registration' | 'Renewal' | 'Information Update' {
+    const normalized = (type ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
+    if (normalized === 'registration' || normalized === 'registratiion') return 'Registration';
+
+    if (normalized === 'renewal' || normalized === 'renewal information' || normalized === 'renewalinformation' || normalized === 'renewal-info') {
+      return 'Renewal';
+    }
+
+    if (normalized === 'information update' || normalized === 'informationupdate' || normalized === 'update' || normalized === 'updates') {
+      return 'Information Update';
+    }
+
+    // Fallback: keep UI consistent
+    return 'Information Update';
+  }
+
+  const requirementsByType = useMemo(() => {
+    const grouped: Record<'Registration' | 'Renewal' | 'Information Update', IRequirement[]> = {
+      Registration: [],
+      Renewal: [],
+      'Information Update': [],
+    };
+
+    for (const req of requirements) {
+      const type = normalizeRequirementType((req as any).type);
+      grouped[type].push(req);
+    }
+
+    return grouped;
+  }, [requirements]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section - More elegant */}
@@ -103,25 +137,75 @@ export default function RegisterGuaraHowItWorks() {
           ) : requirements.length === 0 ? (
             <div className="text-gray-500">No requirements available at this time.</div>
           ) : (
-            <div className="rounded-2xl overflow-hidden border border-[#1A1B16]/10 bg-white shadow-sm">
-              <div className="bg-primary text-[#1A1B16] px-6 py-4 font-extrabold text-2xl">GU</div>
-              <ul className="divide-y divide-primary/20">
-                {requirements.map((req) => (
-                  <li key={req.id} className="bg-[#F7FAFF]" style={{ background: 'white', color: 'var(--color-secondary)', borderColor: 'var(--color-secondary)', opacity: 1, transform: 'none' }}>
-                    <div className="flex items-center gap-4 px-6 py-4">
-                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white text-primary ring-1 ring-primary/30">
-                        <FileIcon />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-[#1A1B16] font-medium">{req.title}</div>
-                        {req.description && (
-                          <div className="text-sm text-gray-600">{req.description}</div>
-                        )}
-                      </div>
-                    </div>
-                  </li>
+            <div className="space-y-8">
+              {/* Filter */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedReqType('all')}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold ring-1 transition ${
+                    selectedReqType === 'all'
+                      ? 'bg-primary text-[#1A1B16] ring-primary'
+                      : 'bg-white text-[#1A1B16] ring-[#1A1B16]/15 hover:ring-[#1A1B16]/30'
+                  }`}
+                >
+                  All
+                </button>
+                {REQUIREMENT_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setSelectedReqType(type)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold ring-1 transition ${
+                      selectedReqType === type
+                        ? 'bg-primary text-[#1A1B16] ring-primary'
+                        : 'bg-white text-[#1A1B16] ring-[#1A1B16]/15 hover:ring-[#1A1B16]/30'
+                    }`}
+                  >
+                    {type}
+                  </button>
                 ))}
-              </ul>
+              </div>
+
+              {/* Groups */}
+              <div className="space-y-8">
+                {(selectedReqType === 'all' ? REQUIREMENT_TYPES : [selectedReqType]).map((type) => {
+                  const list = requirementsByType[type];
+                  if (!list || list.length === 0) return null;
+                  return (
+                    <div key={type} className="rounded-2xl overflow-hidden border border-[#1A1B16]/10 bg-white shadow-sm">
+                      <div className="bg-primary text-[#1A1B16] px-6 py-4 font-extrabold text-2xl">
+                        {type}
+                      </div>
+                      <ul className="divide-y divide-primary/20">
+                        {list.map((req) => (
+                          <li
+                            key={req.id}
+                            className="bg-[#F7FAFF]"
+                            style={{
+                              background: 'white',
+                              color: 'var(--color-secondary)',
+                              borderColor: 'var(--color-secondary)',
+                              opacity: 1,
+                              transform: 'none',
+                            }}
+                          >
+                            <div className="flex items-center gap-4 px-6 py-4">
+                              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white text-primary ring-1 ring-primary/30">
+                                <FileIcon />
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-[#1A1B16] font-medium">{req.title}</div>
+                                {req.description && <div className="text-sm text-gray-600">{req.description}</div>}
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

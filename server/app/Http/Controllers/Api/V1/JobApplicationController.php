@@ -49,17 +49,17 @@ class JobApplicationController extends Controller
         try {
             $application = JobApplication::with(['jobPost', 'contractor'])->findOrFail($id);
             return response()->json([
-                'message' => 'Postulación encontrada',
+                'message' => 'Job application found',
                 'data' => $application
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Postulación no encontrada',
-                'error' => "No se encontró una postulación con el ID: {$id}"
+                'message' => 'Job application not found',
+                'error' => "No job application found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al obtener la postulación',
+                'message' => 'Error retrieving job application',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -80,12 +80,12 @@ class JobApplicationController extends Controller
             $application = JobApplication::create($data);
             $application->load(['jobPost', 'contractor']);
             return response()->json([
-                'message' => 'Postulación creada exitosamente',
+                'message' => 'Job application created successfully',
                 'data' => $application
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear la postulación',
+                'message' => 'Error creating job application',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -105,17 +105,17 @@ class JobApplicationController extends Controller
             $application->update($data);
             $application->load(['jobPost', 'contractor']);
             return response()->json([
-                'message' => 'Postulación actualizada exitosamente',
+                'message' => 'Job application updated successfully',
                 'data' => $application
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Postulación no encontrada',
-                'error' => "No se encontró una postulación con el ID: {$id}"
+                'message' => 'Job application not found',
+                'error' => "No job application found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al actualizar la postulación',
+                'message' => 'Error updating job application',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -130,16 +130,16 @@ class JobApplicationController extends Controller
             $application = JobApplication::findOrFail($id);
             $application->delete();
             return response()->json([
-                'message' => 'Postulación eliminada exitosamente'
+                'message' => 'Job application deleted successfully'
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Postulación no encontrada',
-                'error' => "No se encontró una postulación con el ID: {$id}"
+                'message' => 'Job application not found',
+                'error' => "No job application found with ID: {$id}"
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al eliminar la postulación',
+                'message' => 'Error deleting job application',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -154,17 +154,17 @@ class JobApplicationController extends Controller
                 $application = JobApplication::withTrashed()->findOrFail($id);
                 $application->forceDelete();
                 return response()->json([
-                    'message' => 'Postulación eliminada permanentemente',
+                    'message' => 'Job application permanently deleted',
                     'success' => true
                 ]);
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 return response()->json([
-                    'message' => 'Postulación no encontrada',
-                    'error' => "No se encontró una postulación con el ID: {$id}"
+                    'message' => 'Job application not found',
+                    'error' => "No job application found with ID: {$id}"
                 ], 404);
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Error al eliminar permanentemente la postulación',
+                    'message' => 'Error permanently deleting job application',
                     'error' => $e->getMessage(),
                     'success' => false
                 ], 500);

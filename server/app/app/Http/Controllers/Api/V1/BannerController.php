@@ -106,7 +106,7 @@ class BannerController extends Controller
         return (new BannerResource($banner))
             ->additional([
                 'success' => true,
-                'message' => 'Banner creado Satisfactoriamente',
+                'message' => 'Banner created successfully',
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -127,7 +127,7 @@ class BannerController extends Controller
         return (new BannerResource($banner))
             ->additional([
                 'success' => true,
-                'message' => 'Banner actualizado Satisfactoriamente'
+                'message' => 'Banner updated successfully'
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -142,7 +142,7 @@ class BannerController extends Controller
         $banner->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Banner eliminado Satisfactoriamente'
+            'message' => 'Banner deleted successfully'
         ])->setStatusCode(Response::HTTP_OK);
     }
 

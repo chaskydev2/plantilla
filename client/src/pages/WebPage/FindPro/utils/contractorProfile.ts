@@ -144,6 +144,7 @@ export function createContractorProfileViewModel(contractor: ContractorFullInfo)
       ...collectUniqueNames(user?.professions),
     ]),
   );
+  console.log('Professions:', professionNames);
   const tagNames = collectUniqueNames(contractor.tags);
   const contact = contractor.contact;
 
