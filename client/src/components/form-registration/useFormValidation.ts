@@ -20,6 +20,9 @@ export const useFormValidation = () => {
     const errors = validateCommonAuth(data);
     // Más flexible: acepta números con espacios, guiones, paréntesis, y opcionalmente el +
     if (!/^[\+]?[(]?[\d\s\-\(\)]{7,}$/.test(data.phone || "")) errors.phone = "Enter a valid phone number.";
+    if (!/^\d{5}(?:-\d{4})?$/.test((data.preferredZip || "").trim())) {
+      errors.preferredZip = "Enter a valid ZIP code.";
+    }
     return errors;
   };
 

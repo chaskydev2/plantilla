@@ -91,6 +91,7 @@ export const useRegistrationForm = () => {
         first_name: "firstName",
         last_name: "lastName",
         phone: "phone",
+        preferred_zip: "preferredZip",
         email: "email",
         password: "password",
         company: "company",
@@ -222,6 +223,7 @@ export const useRegistrationForm = () => {
       last_name: homeownerData.lastName,
       email: homeownerData.email,
       phone: homeownerData.phone,
+      preferred_zip: homeownerData.preferredZip,
       password: homeownerData.password,
     };
 

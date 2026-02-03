@@ -17,7 +17,12 @@ export const borderPrimary = { borderColor: "var(--color-secondary)" } as React.
 // Initial state values
 export const initialBaseAuth = { firstName: "", lastName: "", email: "", password: "", confirmPassword: "" };
 
-export const initialHomeowner = { ...initialBaseAuth, userType: "ownerHome" as const, phone: "" };
+export const initialHomeowner = {
+  ...initialBaseAuth,
+  userType: "ownerHome" as const,
+  phone: "",
+  preferredZip: "",
+};
 
 export const initialContractor = {
   ...initialBaseAuth,

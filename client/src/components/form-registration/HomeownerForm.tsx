@@ -139,6 +139,27 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
           <label
             className={labelCls}
             style={{ color: "var(--color-secondary)" }}
+            htmlFor="preferredZip"
+          >
+            ZIP Code *
+          </label>
+          <input
+            id="preferredZip"
+            type="text"
+            name="preferredZip"
+            value={formData.preferredZip}
+            onChange={handleChange}
+            className={fieldCls}
+            style={borderPrimary}
+            placeholder="e.g. 90210"
+          />
+          <ErrorText msg={submitted ? errors.preferredZip : undefined} />
+        </div>
+
+        <div className="md:col-start-1">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
             htmlFor="password"
           >
             Password *
@@ -154,7 +175,7 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
           <ErrorText msg={submitted ? errors.password : undefined} />
         </div>
 
-        <div>
+        <div className="md:col-start-2">
           <label
             className={labelCls}
             style={{ color: "var(--color-secondary)" }}

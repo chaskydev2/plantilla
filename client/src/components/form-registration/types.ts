@@ -19,6 +19,7 @@ export type UserType = "ownerHome" | "contractor";
 
 export interface HomeownerFields {
   phone: string;
+  preferredZip: string;
 }
 
 export interface ContractorFields {
