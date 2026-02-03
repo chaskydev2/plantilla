@@ -167,7 +167,7 @@ export function ContractorChatAside({
   const isSendDisabled = !isAuthenticated || !messageDraft.trim().length || sending;
 
   return (
-    <aside className="flex flex-col rounded-3xl border border-[#F5D238]/35 bg-gradient-to-br from-[#181818] via-[#111] to-[#1f1f1f] p-5 text-white shadow-[0_18px_48px_rgba(0,0,0,0.46)] lg:mx-auto lg:max-w-md lg:w-auto lg:self-start lg:sticky lg:top-28">
+    <aside className="flex flex-col rounded-3xl border border-[#ffed00]/35 bg-gradient-to-br from-[#181818] via-[#111] to-[#1f1f1f] p-5 text-white shadow-[0_18px_48px_rgba(0,0,0,0.46)] lg:mx-auto lg:max-w-md lg:w-auto lg:self-start lg:sticky lg:top-28">
       <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
         <div className="space-y-1">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/70">
@@ -185,8 +185,8 @@ export function ContractorChatAside({
       </div>
 
       {!isAuthenticated && (
-        <div className="mt-4 rounded-2xl border border-[#F5D238]/40 bg-[#1E1E17]/70 px-4 py-4 text-sm text-white/80">
-          <p className="text-[#F5D238] font-semibold uppercase tracking-wide text-xs">
+        <div className="mt-4 rounded-2xl border border-[#ffed00]/40 bg-[#1E1E17]/70 px-4 py-4 text-sm text-white/80">
+          <p className="text-[#ffed00] font-semibold uppercase tracking-wide text-xs">
             {isContractorRole ? "Access restricted" : "Sign in required"}
           </p>
           <p className="mt-2 text-xs">
@@ -199,13 +199,13 @@ export function ContractorChatAside({
             <div className="mt-3 flex gap-2">
               <a
                 href={loginHref}
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-[#F5D238] bg-[#F5D238] px-3 py-2 text-xs font-bold text-[#1E1E17] transition hover:bg-[#f7df52]"
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-[#ffed00] bg-[#ffed00] px-3 py-2 text-xs font-bold text-[#1E1E17] transition hover:bg-[#f7df52]"
               >
                 Log in
               </a>
               <a
                 href={registerHref}
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-white/25 bg-transparent px-3 py-2 text-xs font-semibold text-white transition hover:border-[#F5D238]/60 hover:text-[#F5D238]"
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-white/25 bg-transparent px-3 py-2 text-xs font-semibold text-white transition hover:border-[#ffed00]/60 hover:text-[#ffed00]"
               >
                 Register
               </a>
@@ -219,9 +219,9 @@ export function ContractorChatAside({
           {isLoadingChat ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 text-center text-xs text-white/60">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-[#F5D238]" />
-                <div className="h-2 w-2 animate-pulse rounded-full bg-[#F5D238] animation-delay-100" />
-                <div className="h-2 w-2 animate-pulse rounded-full bg-[#F5D238] animation-delay-200" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#ffed00]" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#ffed00] animation-delay-100" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#ffed00] animation-delay-200" />
               </div>
               <p>Cargando chats...</p>
             </div>
@@ -244,8 +244,8 @@ export function ContractorChatAside({
                             isSupport
                               ? "border border-white/20 bg-white text-[#101010]"
                               : isHomeowner
-                              ? "border border-[#F5D238]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
-                              : "border border-[#F5D238]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
+                              ? "border border-[#ffed00]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
+                              : "border border-[#ffed00]/30 bg-gradient-to-br from-[#070707] to-[#23231b] text-white"
                           }`}
                         >
                           <p className="whitespace-pre-line leading-relaxed">{message.text}</p>
@@ -266,7 +266,7 @@ export function ContractorChatAside({
 
               {!messages.length && (
                 <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-6 text-center text-xs text-white/60">
-                  <Sparkles className="h-6 w-6 text-[#F5D238]" aria-hidden />
+                  <Sparkles className="h-6 w-6 text-[#ffed00]" aria-hidden />
                   <p>Start a conversation with support and we&apos;ll reply in minutes.</p>
                 </div>
               )}
@@ -282,7 +282,7 @@ export function ContractorChatAside({
               key={reply}
               type="button"
               onClick={() => handleQuickReply(reply)}
-              className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 transition hover:border-[#F5D238]/60 hover:bg-[#F5D238]/15 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 transition hover:border-[#ffed00]/60 hover:bg-[#ffed00]/15 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
               disabled={!isAuthenticated}
             >
               {reply}
@@ -304,13 +304,13 @@ export function ContractorChatAside({
             onDraftChange(event);
           }}
           placeholder={isAuthenticated ? "Type your message..." : "Sign in to send messages"}
-          className="flex-1 rounded-full border border-white/20 bg-white/10 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#F5D238]/60 focus:outline-none focus:ring-2 focus:ring-[#F5D238]/45 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 rounded-full border border-white/20 bg-white/10 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#ffed00]/60 focus:outline-none focus:ring-2 focus:ring-[#ffed00]/45 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={!isAuthenticated}
           aria-label="Escribe tu mensaje"
         />
         <button
           type="submit"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F5D238] px-4 py-2.5 text-sm font-semibold text-[#1E1E17] shadow-sm transition hover:bg-[#F5D238]/85 disabled:cursor-not-allowed disabled:bg-[#F5D238]/50"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ffed00] px-4 py-2.5 text-sm font-semibold text-[#1E1E17] shadow-sm transition hover:bg-[#ffed00]/85 disabled:cursor-not-allowed disabled:bg-[#ffed00]/50"
           disabled={isSendDisabled}
           aria-disabled={isSendDisabled}
         >

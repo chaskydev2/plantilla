@@ -13,14 +13,14 @@ export default function AuthLayout({
       {/* Back button - global position in the login layout */}
       <Link
         to="/"
-        className="fixed top-4 left-4 z-[100] p-3 rounded-full text-[#1A1B16] hover:bg-[#F5D238]/20 focus:outline-none focus:ring-2 focus:ring-[#F5D238]/40 transition active:scale-95 cursor-pointer inline-flex items-center justify-center"
+        className="fixed top-4 left-4 z-[100] p-3 rounded-full text-[#1A1B16] hover:bg-[#ffed00]/20 focus:outline-none focus:ring-2 focus:ring-[#ffed00]/40 transition active:scale-95 cursor-pointer inline-flex items-center justify-center"
         aria-label="Volver al login"
       >
         <ArrowLeft className="w-7 h-7" />
       </Link>
       <div className="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0">
         {children}
-        <div className="items-center hidden w-full h-full lg:w-1/2 bg-[#F5D238] lg:grid relative overflow-hidden">
+        <div className="items-center hidden w-full h-full lg:w-1/2 bg-[#ffed00] lg:grid relative overflow-hidden">
           {/* subtle depth gradient on the right side */}
           <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-[#eac62d] to-transparent opacity-40" aria-hidden="true"></div>
           

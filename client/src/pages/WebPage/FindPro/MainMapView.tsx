@@ -159,10 +159,10 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
   if (!isLoaded) {
     return (
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
-        <div className="p-6 border-b border-[#F5D238]/40 bg-gradient-to-r from-[#F5D238]/20 via-white to-[#1E1E17]/5">
+        <div className="p-6 border-b border-[#ffed00]/40 bg-gradient-to-r from-[#ffed00]/20 via-white to-[#1E1E17]/5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#F5D238] rounded-lg shadow-sm">
+              <div className="p-2 bg-[#ffed00] rounded-lg shadow-sm">
                 <Navigation className="h-6 w-6 text-[#1E1E17]" />
               </div>
               <div>
@@ -176,7 +176,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
         <div className="h-[500px] bg-gradient-to-br from-[#fff8d1] via-[#fffef5] to-[#f7eed2] flex items-center justify-center">
           <div className="text-center">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#F5D238]/40 border-t-[#F5D238] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#ffed00]/40 border-t-[#ffed00] mx-auto mb-4"></div>
               <Navigation className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-[#1E1E17]" />
             </div>
             <h3 className="text-lg font-semibold text-[#1E1E17] mb-2">Loading Your Location</h3>
@@ -205,12 +205,12 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
       <div className="p-0 border-b border-gray-200 bg-gradient-to-r from-[#23231b] via-[#1E1E17] to-[#23231b]">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 px-4 py-4">
           <div className="flex items-center gap-4">
-            <div className="p-2 bg-[#F5D238] rounded-xl shadow-md">
+            <div className="p-2 bg-[#ffed00] rounded-xl shadow-md">
               <Navigation className="h-5 w-5 text-[#1E1E17]" />
             </div>
             <div>
               <h2 className="text-lg font-extrabold text-white tracking-tight mb-0.5">Contractors Near You</h2>
-              <p className="text-xs text-[#F5D238] font-medium">
+              <p className="text-xs text-[#ffed00] font-medium">
                 {locationError ? locationError : `${nearbyContractors.length} contractors found within ${searchRadius} miles`}
               </p>
             </div>
@@ -222,7 +222,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
               <select
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(Number(e.target.value))}
-                className="px-3 py-1 border border-gray-400 rounded-lg text-xs bg-white text-[#1E1E17] font-semibold focus:outline-none focus:ring-2 focus:ring-[#F5D238] shadow-sm"
+                className="px-3 py-1 border border-gray-400 rounded-lg text-xs bg-white text-[#1E1E17] font-semibold focus:outline-none focus:ring-2 focus:ring-[#ffed00] shadow-sm"
               >
                 <option value={5}>5 miles</option>
                 <option value={10}>10 miles</option>
@@ -233,7 +233,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
             <button
               type="button"
               onClick={() => setShowFilter(true)}
-              className="flex items-center gap-2 px-5 py-2 bg-[#F5D238] text-[#1E1E17] rounded-full font-bold shadow-lg hover:bg-yellow-300 transition text-sm"
+              className="flex items-center gap-2 px-5 py-2 bg-[#ffed00] text-[#1E1E17] rounded-full font-bold shadow-lg hover:bg-yellow-300 transition text-sm"
             >
               <Search className="w-4 h-4" />
               Filtros
@@ -269,7 +269,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
               getPixelPositionOffset={() => ({ x: -70, y: -210 })}
             >
-              <div className="bg-gradient-to-br from-[#F5D238]/20 via-white to-[#F5D238]/30 rounded-lg border border-[#F5D238] flex flex-col items-center justify-center py-1 px-3 shadow-md min-h-[38px] min-w-[110px]">
+              <div className="bg-gradient-to-br from-[#ffed00]/20 via-white to-[#ffed00]/30 rounded-lg border border-[#ffed00] flex flex-col items-center justify-center py-1 px-3 shadow-md min-h-[38px] min-w-[110px]">
                 <div className="flex items-center gap-1 mb-0.5">
                   <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-yellow-400/20">
                     <Star className="w-2.5 h-2.5 text-yellow-600" />
@@ -291,7 +291,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
                     scale: 9,
                     fillColor: "#1E1E17",
                     fillOpacity: 1,
-                    strokeColor: "#F5D238",
+                    strokeColor: "#ffed00",
                     strokeWeight: 3,
                   },
                 }}
@@ -302,7 +302,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
                 center={userLocation}
                 radius={searchRadius * 1609.34}
                 options={{
-                  fillColor: "#F5D238",
+                  fillColor: "#ffed00",
                   fillOpacity: 0.12,
                   strokeColor: "#1E1E17",
                   strokeOpacity: 0.4,
@@ -343,18 +343,18 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
               onCloseClick={() => setSelectedContractor(null)}
               options={{ pixelOffset: new google.maps.Size(0, -10) }}
             >
-              <div className="p-4 max-w-sm bg-gradient-to-br from-[#fffce6] via-white to-[#fdf3b0] rounded-xl border border-[#F5D238]/60 shadow-lg text-[#1E1E17]">
+              <div className="p-4 max-w-sm bg-gradient-to-br from-[#fffce6] via-white to-[#fdf3b0] rounded-xl border border-[#ffed00]/60 shadow-lg text-[#1E1E17]">
                 <div className="flex items-center gap-3 mb-4">
                   <img
                     src={selectedAvatar}
                     alt={selectedContractor.name}
-                    className="h-14 w-14 rounded-full border-2 border-[#F5D238] object-cover bg-white"
+                    className="h-14 w-14 rounded-full border-2 border-[#ffed00] object-cover bg-white"
                   />
                   <div>
                     <h3 className="font-extrabold text-base leading-tight">{selectedContractor.name}</h3>
                     <p className="text-xs text-[#1E1E17]/70">{selectedContractor.locationLabel}</p>
                     {selectedContractor.elite && (
-                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#F5D238]/20 text-[#1E1E17] px-2.5 py-0.5 text-[11px] font-semibold">
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#ffed00]/20 text-[#1E1E17] px-2.5 py-0.5 text-[11px] font-semibold">
                         <ShieldCheck className="h-3.5 w-3.5" /> Elite Contractor
                       </span>
                     )}
@@ -365,7 +365,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
                     {Array.from({ length: 5 }, (_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${i < Math.round(selectedRatingValue) ? "text-[#F5D238] fill-current" : "text-gray-300"}`}
+                        className={`h-4 w-4 ${i < Math.round(selectedRatingValue) ? "text-[#ffed00] fill-current" : "text-gray-300"}`}
                       />
                     ))}
                   </div>
@@ -373,7 +373,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
                     {selectedRatingValue.toFixed(1)} ({selectedContractor.reviews} reviews)
                   </span>
                 </div>
-                <div className="rounded-lg border border-[#F5D238]/40 bg-white/80 p-3 mb-3">
+                <div className="rounded-lg border border-[#ffed00]/40 bg-white/80 p-3 mb-3">
                   <p className="text-sm font-semibold mb-1">Services destacados</p>
                   <p className="text-xs text-[#1E1E17]/80 leading-relaxed">
                     {selectedContractor.services.join(", ")}
@@ -381,11 +381,11 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-semibold mb-4">
-                  <MapPin className="h-4 w-4 text-[#F5D238]" />
+                  <MapPin className="h-4 w-4 text-[#ffed00]" />
                   <span>{selectedContractor.distanceMiles} miles away</span>
                 </div>
                 <button
-                  className="w-full bg-[#F5D238] text-[#1E1E17] text-sm font-bold py-3 px-4 rounded-lg transition-all duration-200 hover:bg-[#f7df52] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#1E1E17]/20"
+                  className="w-full bg-[#ffed00] text-[#1E1E17] text-sm font-bold py-3 px-4 rounded-lg transition-all duration-200 hover:bg-[#f7df52] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#1E1E17]/20"
                   onClick={() => console.log("Get quote for:", selectedContractor.name)}
                 >
                   Get Free Quote
@@ -396,7 +396,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
         </GoogleMap>
 
         <div className="absolute top-3 right-3 bg-white/95 border border-yellow-200 shadow-sm rounded-lg px-3 py-2 text-xs text-[#1E1E17] flex items-center gap-2">
-          <MapPin className="h-3 w-3 text-[#F5D238]" />
+          <MapPin className="h-3 w-3 text-[#ffed00]" />
           <span className="font-semibold">Lat:</span>
           <span>{mapCenter.lat.toFixed(5)}</span>
           <span className="text-gray-400">/</span>
@@ -417,7 +417,7 @@ export default function MainMapView({ contractors, initialCenter, onVisibleChang
               <span>Regular Contractors</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-[#F5D238] rounded-full"></div>
+              <div className="w-2 h-2 bg-[#ffed00] rounded-full"></div>
               <span>Elite Contractors</span>
             </div>
           </div>

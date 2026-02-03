@@ -2,10 +2,10 @@ import { ShieldCheck } from "lucide-react";
 
 export default function MatchMeCard() {
   return (
-    <div className="rounded-lg border border-[#F5D238] bg-white shadow-sm p-6">
+    <div className="rounded-lg border border-[#ffed00] bg-white shadow-sm p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="h-12 w-12 rounded-lg bg-[#F5D238]/10 border border-[#F5D238]/20 flex items-center justify-center">
-          <ShieldCheck className="h-6 w-6 text-[#F5D238]" />
+        <div className="h-12 w-12 rounded-lg bg-[#ffed00]/10 border border-[#ffed00]/20 flex items-center justify-center">
+          <ShieldCheck className="h-6 w-6 text-[#ffed00]" />
         </div>
         <div className="font-bold text-[#1A1B16] text-lg leading-tight">Want us to match you with a contractor with $250K Guarantee?</div>
       </div>

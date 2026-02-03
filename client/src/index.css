@@ -12,13 +12,13 @@
 :root,
 [data-theme] {
   /* Colores principales de la aplicación */
-  --color-primary: #F5D238;
-  --color-primary-500: #F5D238;
+  --color-primary: #ffed00;
+  --color-primary-500: #ffed00;
   --color-secondary: #1A1B16;      
   --color-secondary-500: #1A1B16;
 
   /* DaisyUI expects raw HSL values (no hsl()) */
-  /* Primary (#F5D238) convertido a HSL */
+  /* Primary (#ffed00) convertido a HSL */
   --p: 49 90% 59% !important;
   --pc: 0 0% 0% !important; /* texto negro en primario */
   --pf: 48 85% 55% !important; /* primario focus */
@@ -152,19 +152,19 @@
   --color-black: #101828;
 
   /* COLORES PRINCIPALES DE LA APLICACIÓN */
-  --color-primary: #F5D238;
-  --color-primary-25: #fefdf8;
-  --color-primary-50: #fdfbf1;
-  --color-primary-100: #faf6e1;
-  --color-primary-200: #f5ebc6;
-  --color-primary-300: #f0da96;
-  --color-primary-400: #eac564;
-  --color-primary-500: #F5D238;
-  --color-primary-600: #e6bd20;
-  --color-primary-700: #c19d1a;
-  --color-primary-800: #9e7d1a;
-  --color-primary-900: #82651b;
-  --color-primary-950: #4a360c;
+  --color-primary: ##ffed00;
+  --color-primary-25: #ffed00;
+  --color-primary-50: #ffed00;
+  --color-primary-100: #ffed00;
+  --color-primary-200: #ffed00;
+  --color-primary-300: #ffed00;
+  --color-primary-400: #ffed00;
+  --color-primary-500: #ffed00;
+  --color-primary-600: #ffed00;
+  --color-primary-700: #ffed00;
+  --color-primary-800: #ffed00;
+  --color-primary-900: #ffed00;
+  --color-primary-950: #ffed00;
 
   --color-secondary: #1A1B16;
   --color-secondary-25: #fafafa;

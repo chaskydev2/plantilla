@@ -18,13 +18,13 @@ export default function LoaderScreen() {
           </div>
 
           {/* Outer spinning ring */}
-          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F5D238] border-r-[#1A1B16] animate-spin-slow" />
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#ffed00] border-r-[#1A1B16] animate-spin-slow" />
 
           {/* Inner ring spinning in reverse */}
-          <div className="absolute inset-4 rounded-full border-2 border-transparent border-b-[#F5D238] border-l-[#1A1B16] animate-spin-slow-reverse" />
+          <div className="absolute inset-4 rounded-full border-2 border-transparent border-b-[#ffed00] border-l-[#1A1B16] animate-spin-slow-reverse" />
 
           {/* Center dot */}
-          <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F5D238] shadow-[0_0_0_6px_rgba(245,210,56,0.12)]" />
+          <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ffed00] shadow-[0_0_0_6px_rgba(245,210,56,0.12)]" />
         </div>
 
         <p className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">Loading…</p>
@@ -33,7 +33,7 @@ export default function LoaderScreen() {
         </p>
 
         <div className="mt-6 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#F5D238] animate-pulse" />
+          <span className="inline-block h-2 w-2 rounded-full bg-[#ffed00] animate-pulse" />
           <span>Preparing your experience</span>
         </div>
 

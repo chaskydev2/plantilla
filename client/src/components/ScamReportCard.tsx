@@ -42,7 +42,7 @@ const ScamReportCard: React.FC<ScamReportCardProps> = ({ report, setShowToast })
       <div className="p-6 pb-0">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-[#F5D238] mb-2">
+            <h2 className="text-xl font-bold text-[#ffed00] mb-2">
               {report.business_name}
             </h2>
             {report.legal_name && (
@@ -165,7 +165,7 @@ const CardFooter: React.FC = () => (
         <span className="text-sm">No comments yet</span>
       </div>
       <div className="text-sm text-gray-600">
-        <span className="text-[#F5D238] hover:text-[#e6c531] font-semibold transition-colors duration-200 cursor-pointer">
+        <span className="text-[#ffed00] hover:text-[#e6c531] font-semibold transition-colors duration-200 cursor-pointer">
           Log in
         </span>
         <span> to read and leave comments</span>

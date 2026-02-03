@@ -236,6 +236,8 @@
     }
   },
   "navigation": {
+    "about": "Acerca de",
+    "joinAsPro": "Únete como Pro",
     "services": "Servicios",
     "scamAlerts": "Alertas de estafas",
     "priceCheck": "Revisión de precios",

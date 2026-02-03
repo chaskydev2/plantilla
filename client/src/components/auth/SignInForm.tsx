@@ -120,14 +120,14 @@ export default function SignInForm() {
                   <div className="flex items-center gap-3">
                     <Link
                       to="/reset-password"
-                      className="text-sm text-[#F5D238] hover:text-[#e0c02f]"
+                      className="text-sm text-[#ffed00] hover:text-[#e0c02f]"
                     >
                       Forgot your password?
                     </Link>
                     <span className="text-gray-300">|</span>
                     <Link
                       to="/formulario_solicitud"
-                      className="text-sm text-[#F5D238] hover:text-[#e0c02f]"
+                      className="text-sm text-[#ffed00] hover:text-[#e0c02f]"
                     >
                       Not registered?
                     </Link>
@@ -136,7 +136,7 @@ export default function SignInForm() {
 
                 {/* Submit */}
                 <div>
-                  <Button disabled={isLoading} className="w-full bg-[#F5D238] text-[#1A1B16] hover:bg-[#e0c02f] shadow-sm hover:shadow-md" size="sm" type="submit">
+                  <Button disabled={isLoading} className="w-full bg-[#ffed00] text-[#1A1B16] hover:bg-[#e0c02f] shadow-sm hover:shadow-md" size="sm" type="submit">
                     {isLoading ? (
                       <span className="inline-flex items-center gap-2">
                         <Loader2 className="size-4 animate-spin" />

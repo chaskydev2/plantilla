@@ -51,13 +51,13 @@ export function NearbyContractorsSection({ loading, error, contractors }: Nearby
             <Link
               key={item.id}
               to={`/findpro/contractor/${item.id}`}
-              className="group flex items-center gap-4 rounded-2xl border border-white/12 bg-white p-4 text-[#1E1E17] shadow-[0_14px_32px_rgba(30,30,23,0.12)] transition hover:border-[#F5D238]/40 hover:shadow-[0_18px_40px_rgba(30,30,23,0.18)]"
+              className="group flex items-center gap-4 rounded-2xl border border-white/12 bg-white p-4 text-[#1E1E17] shadow-[0_14px_32px_rgba(30,30,23,0.12)] transition hover:border-[#ffed00]/40 hover:shadow-[0_18px_40px_rgba(30,30,23,0.18)]"
               state={sharedState}
             >
-              <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-[#F5D238] bg-[#1E1E17] text-sm font-bold uppercase text-white shadow-[0_8px_18px_rgba(30,30,23,0.24)]">
+              <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-[#ffed00] bg-[#1E1E17] text-sm font-bold uppercase text-white shadow-[0_8px_18px_rgba(30,30,23,0.24)]">
                 {getAvatarInitials(item.name)}
                 {item.rating && (
-                  <span className="absolute -right-1 -bottom-1 flex items-center justify-center rounded-full border border-white/70 bg-[#F5D238] px-1 text-[9px] font-semibold text-[#1E1E17]">
+                  <span className="absolute -right-1 -bottom-1 flex items-center justify-center rounded-full border border-white/70 bg-[#ffed00] px-1 text-[9px] font-semibold text-[#1E1E17]">
                     {item.rating.toFixed(1)}
                   </span>
                 )}
@@ -75,7 +75,7 @@ export function NearbyContractorsSection({ loading, error, contractors }: Nearby
                 )}
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-semibold text-[#1E1E17]/70">
                   {item.rating && (
-                    <span className="inline-flex items-center gap-1 text-[#F5D238]">
+                    <span className="inline-flex items-center gap-1 text-[#ffed00]">
                       <Star className="h-3 w-3" /> {item.rating.toFixed(1)}
                     </span>
                   )}

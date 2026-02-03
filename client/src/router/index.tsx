@@ -90,6 +90,7 @@ import PostJobAdmin from "@/pages/admin/PostJob/Main";
 import JobAdmin from "@/pages/admin/jobs/Main";
 
 import Services from "@/pages/WebPage/Services";
+import JoinAsPro from "@/pages/WebPage/JoinAsPro";
 
 import LoaderScreen from "@/components/common/LoaderScreen";
 import { ToastContainer } from "react-toastify";
@@ -151,6 +152,7 @@ export default function App() {
             <Route path="/register-guara" element={<RegisterGuara />} />
             <Route path="/register-guara/how-it-works" element={<RegisterGuaraHowItWorks />} />
             <Route path="/register-guara/what-cover" element={<RegisterGuaraWhatCover />} />
+            <Route path="/join-as-pro" element={<JoinAsPro />} />
             <Route path="/services" element={<Services />} />
             <Route path="/loader" element={<LoaderScreen />} />
 

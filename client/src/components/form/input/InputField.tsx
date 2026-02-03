@@ -49,7 +49,7 @@ const Input: FC<InputProps> = ({
   } else if (success) {
     inputClasses += `  border-success-500 focus:border-success-300 focus:ring-success-500/20 dark:text-success-400 dark:border-success-500 dark:focus:border-success-800`;
   } else {
-    inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-[#F5D238] focus:ring-[rgba(245,210,56,0.35)] dark:border-gray-700 dark:text-white/90  dark:focus:border-[#C9A92F]`;
+    inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-[#ffed00] focus:ring-[rgba(245,210,56,0.35)] dark:border-gray-700 dark:text-white/90  dark:focus:border-[#C9A92F]`;
   }
 
   return (

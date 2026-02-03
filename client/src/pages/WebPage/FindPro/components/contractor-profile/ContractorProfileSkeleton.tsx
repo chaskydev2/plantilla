@@ -2,7 +2,7 @@ import { NearbyContractorsSkeleton } from "./NearbyContractorsSkeleton";
 
 export function ContractorProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-[#F5D238] overflow-x-hidden">
+    <div className="min-h-screen bg-[#ffed00] overflow-x-hidden">
       <div className="mx-auto w-full max-w-screen-xl px-3 py-10 sm:px-4 lg:px-8">
         <div className="h-4 w-56 rounded-full bg-[#FFE48A]" />
         <div className="mt-6 overflow-hidden rounded-3xl border border-[#1E1E17]/10 bg-white/90 shadow-[0_24px_80px_rgba(30,30,23,0.25)] backdrop-blur">
@@ -24,7 +24,7 @@ export function ContractorProfileSkeleton() {
           <div className="grid gap-8 border-b border-[#1E1E17]/5 bg-white px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:px-10">
             <div className="space-y-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                <div className="h-24 w-24 rounded-full border-4 border-[#F5D238] bg-[#FFF3B0]" />
+                <div className="h-24 w-24 rounded-full border-4 border-[#ffed00] bg-[#FFF3B0]" />
                 <div className="flex-1 space-y-3">
                   <div className="h-8 w-52 rounded bg-[#FFF3B0]" />
                   <div className="h-4 w-40 rounded bg-[#FFF3B0]" />

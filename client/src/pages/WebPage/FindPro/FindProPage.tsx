@@ -176,11 +176,11 @@ export default function FindProPage() {
   ]);
 
   return (
-    <div className="min-h-screen pb-8 bg-[#F5D238]">
+    <div className="min-h-screen pb-8 bg-[#ffed00]">
       <div className="mx-auto px-3 sm:px-6 lg:px-10 xl:px-16">
         <Breadcrumb />
 
-        <div className="mx-auto max-w-none rounded-3xl shadow-2xl bg-white/90 border border-[#F5D238]/30 p-6 md:p-10 mt-4">
+        <div className="mx-auto max-w-none rounded-3xl shadow-2xl bg-white/90 border border-[#ffed00]/30 p-6 md:p-10 mt-4">
           {contractorsError && (
             <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm">
               {contractorsError}
@@ -188,8 +188,8 @@ export default function FindProPage() {
           )}
 
           {mapCenter && (
-            <div className="flex items-center gap-2 text-xs font-bold text-[#1E1E17] mb-4 bg-white border border-[#F5D238] rounded-lg px-4 py-2 shadow-lg drop-shadow-sm transition-all">
-              <MapPin className="h-4 w-4 text-[#F5D238] mr-1" />
+            <div className="flex items-center gap-2 text-xs font-bold text-[#1E1E17] mb-4 bg-white border border-[#ffed00] rounded-lg px-4 py-2 shadow-lg drop-shadow-sm transition-all">
+              <MapPin className="h-4 w-4 text-[#ffed00] mr-1" />
               <span className="text-[#1E1E17] tracking-wide">
                 {queryLocation ? queryLocation : 'Ubicación desconocida'}
               </span>
@@ -202,17 +202,17 @@ export default function FindProPage() {
             onVisibleChange={setVisibleContractors}
           />
 
-          <hr className="my-6 border-[#F5D238]/30" />
+          <hr className="my-6 border-[#ffed00]/30" />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-4">
-              <div className="flex items-center justify-between bg-[#1E1E17] text-white rounded-2xl px-6 py-4 shadow-lg border border-[#F5D238]">
+              <div className="flex items-center justify-between bg-[#1E1E17] text-white rounded-2xl px-6 py-4 shadow-lg border border-[#ffed00]">
                 <div>
-                  <p className="text-xs tracking-[0.2em] uppercase text-[#F5D238]/80">Professionals Nearby</p>
+                  <p className="text-xs tracking-[0.2em] uppercase text-[#ffed00]/80">Professionals Nearby</p>
                   <h3 className="text-2xl font-extrabold mt-1">{visibleContractors.length} contractors ready to help</h3>
                 </div>
                 <div className="hidden sm:flex flex-col text-right">
-                  <span className="text-xs uppercase tracking-wide text-[#F5D238]/70">Filters applied</span>
+                  <span className="text-xs uppercase tracking-wide text-[#ffed00]/70">Filters applied</span>
                   <span className="text-sm font-semibold">{queryLocation || "All areas"}</span>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default function FindProPage() {
               {loadingContractors && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={idx} className="h-48 rounded-2xl border border-[#F5D238]/20 bg-white/70 animate-pulse" />
+                    <div key={idx} className="h-48 rounded-2xl border border-[#ffed00]/20 bg-white/70 animate-pulse" />
                   ))}
                 </div>
               )}
@@ -228,11 +228,11 @@ export default function FindProPage() {
               {!loadingContractors && visibleContractors.length > 0 && (
                 <div className="grid gap-4 md:grid-cols-2">
                   {visibleContractors.map((contractor) => (
-                    <div key={contractor.id} className="relative overflow-hidden rounded-2xl border border-[#F5D238]/30 bg-white shadow-xl transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
-                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#F5D238] via-[#F5D238]/60 to-transparent" />
+                    <div key={contractor.id} className="relative overflow-hidden rounded-2xl border border-[#ffed00]/30 bg-white shadow-xl transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#ffed00] via-[#ffed00]/60 to-transparent" />
                       <div className="p-5">
                         <div className="flex items-start gap-4">
-                          <div className="h-14 w-14 rounded-xl border border-[#F5D238]/40 bg-[#FFF7C2] flex items-center justify-center text-sm font-bold text-[#1E1E17]">
+                          <div className="h-14 w-14 rounded-xl border border-[#ffed00]/40 bg-[#FFF7C2] flex items-center justify-center text-sm font-bold text-[#1E1E17]">
                             {contractor.name
                               .split(" ")
                               .slice(0, 2)
@@ -242,8 +242,8 @@ export default function FindProPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
                               <h4 className="text-lg font-bold text-[#1E1E17] truncate">{contractor.name}</h4>
-                              <span className="inline-flex items-center gap-1 rounded-full bg-[#F5D238]/20 px-3 py-1 text-xs font-semibold text-[#1E1E17]">
-                                <Star className="h-3.5 w-3.5 text-[#F5D238]" />
+                              <span className="inline-flex items-center gap-1 rounded-full bg-[#ffed00]/20 px-3 py-1 text-xs font-semibold text-[#1E1E17]">
+                                <Star className="h-3.5 w-3.5 text-[#ffed00]" />
                                 {contractor.rating.toFixed(1)}
                                 <span className="text-[#1E1E17]/60">({contractor.reviews})</span>
                               </span>
@@ -270,7 +270,7 @@ export default function FindProPage() {
                         </div>
 
                         {contractor.quote && (
-                          <div className="mt-4 rounded-xl border border-[#F5D238]/30 bg-[#FFF7C2]/50 p-3 text-xs text-[#1E1E17]/80">
+                          <div className="mt-4 rounded-xl border border-[#ffed00]/30 bg-[#FFF7C2]/50 p-3 text-xs text-[#1E1E17]/80">
                             <p className="font-semibold text-[#1E1E17]">Client feedback</p>
                             <p className="mt-1 line-clamp-2 italic">“{contractor.quote.text}”</p>
                             <p className="mt-1 text-[10px] uppercase tracking-wide text-[#1E1E17]/60">— {contractor.quote.author}</p>
@@ -279,7 +279,7 @@ export default function FindProPage() {
 
                         <div className="mt-5 flex items-center justify-between">
                           {contractor.elite ? (
-                            <span className="inline-flex items-center gap-1 rounded-lg bg-[#F5D238]/25 px-3 py-1 text-xs font-semibold text-[#1E1E17]">
+                            <span className="inline-flex items-center gap-1 rounded-lg bg-[#ffed00]/25 px-3 py-1 text-xs font-semibold text-[#1E1E17]">
                               Elite Contractor
                             </span>
                           ) : (
@@ -287,7 +287,7 @@ export default function FindProPage() {
                           )}
                           <button
                             type="button"
-                            className="inline-flex items-center gap-2 rounded-full bg-[#F5D238] px-4 py-2 text-sm font-bold text-[#1E1E17] transition-transform hover:-translate-y-0.5"
+                            className="inline-flex items-center gap-2 rounded-full bg-[#ffed00] px-4 py-2 text-sm font-bold text-[#1E1E17] transition-transform hover:-translate-y-0.5"
                             onClick={() =>
                               navigate(`/findpro/contractor/${contractor.id}`, {
                                 state: {
@@ -309,7 +309,7 @@ export default function FindProPage() {
               )}
 
               {!loadingContractors && !visibleContractors.length && (
-                <div className="rounded-2xl border border-dashed border-[#F5D238]/50 bg-white/80 p-10 text-center text-sm text-[#1E1E17]/60">
+                <div className="rounded-2xl border border-dashed border-[#ffed00]/50 bg-white/80 p-10 text-center text-sm text-[#1E1E17]/60">
                   No contractors match the current filters.
                 </div>
               )}
@@ -319,7 +319,7 @@ export default function FindProPage() {
               <MatchMeCard />
               <OffersCarousel items={OFFERS} />
 
-              <div className="bg-white/95 rounded-2xl shadow-lg border border-[#F5D238]/20 p-6">
+              <div className="bg-white/95 rounded-2xl shadow-lg border border-[#ffed00]/20 p-6">
                 <h3 className="font-bold text-[#1A1B16] mb-2 text-lg tracking-wide">Top Rated Nearby</h3>
                 <p className="text-xs text-[#1E1E17]/70 mb-4">Handpicked from the current map view based on rating and activity.</p>
                 <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
@@ -330,16 +330,16 @@ export default function FindProPage() {
                     .map((contractor) => (
                       <div
                         key={contractor.id}
-                        className="flex items-start gap-3 rounded-xl border border-[#F5D238]/20 bg-white/90 p-3 hover:border-[#F5D238]/60 hover:shadow-md transition-all"
+                        className="flex items-start gap-3 rounded-xl border border-[#ffed00]/20 bg-white/90 p-3 hover:border-[#ffed00]/60 hover:shadow-md transition-all"
                       >
-                        <div className="h-8 w-8 rounded-full bg-[#F5D238]/20 flex items-center justify-center text-[11px] font-bold text-[#1E1E17]">
+                        <div className="h-8 w-8 rounded-full bg-[#ffed00]/20 flex items-center justify-center text-[11px] font-bold text-[#1E1E17]">
                           {contractor.name.charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-sm font-semibold text-[#1E1E17] truncate">{contractor.name}</p>
-                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#F5D238]">
-                              <Star className="h-3 w-3 text-[#F5D238] fill-current" />
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#ffed00]">
+                              <Star className="h-3 w-3 text-[#ffed00] fill-current" />
                               {contractor.rating.toFixed(1)}
                             </span>
                           </div>
@@ -352,7 +352,7 @@ export default function FindProPage() {
                       </div>
                     ))}
                   {!visibleContractors.length && (
-                    <div className="rounded-xl border border-dashed border-[#F5D238]/40 p-6 text-center text-sm text-[#1E1E17]/60">
+                    <div className="rounded-xl border border-dashed border-[#ffed00]/40 p-6 text-center text-sm text-[#1E1E17]/60">
                       No featured contractors available with the current filters.
                     </div>
                   )}

@@ -60,7 +60,7 @@ const ContractorProfileStatus: React.FC = () => {
             <input type="file" className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-200 dark:bg-gray-800 dark:border-gray-600" name={attr.slug || attr.name} />
           </div>
         ))}
-        <button  className="mt-4 px-6 py-2 bg-[#F5D238] text-[#1A1B16] font-bold rounded-lg shadow hover:bg-yellow-400 transition">Enviar documentos</button>
+        <button  className="mt-4 px-6 py-2 bg-[#ffed00] text-[#1A1B16] font-bold rounded-lg shadow hover:bg-yellow-400 transition">Enviar documentos</button>
       </form>
       <div className="mt-6">
         <h3 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2">Opciones adicionales</h3>

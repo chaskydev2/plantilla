@@ -32,12 +32,12 @@ const ContractorTeam: React.FC<ContractorTeamProps> = ({ teamMembers }) => {
             >
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <div className="w-14 h-14 bg-[#F5D238] rounded-2xl flex items-center justify-center text-[#1A1B16] font-bold text-lg shadow-lg group-hover:scale-105 transition-transform duration-200">
+                  <div className="w-14 h-14 bg-[#ffed00] rounded-2xl flex items-center justify-center text-[#1A1B16] font-bold text-lg shadow-lg group-hover:scale-105 transition-transform duration-200">
                     {member.avatar}
                   </div>
                   <div
                     className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ring-3 ring-white dark:ring-gray-800 ${
-                      member.status === 'online' ? 'bg-[#F5D238]' : 'bg-gray-400'
+                      member.status === 'online' ? 'bg-[#ffed00]' : 'bg-gray-400'
                     } flex items-center justify-center`}
                   >
                     <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -53,9 +53,9 @@ const ContractorTeam: React.FC<ContractorTeamProps> = ({ teamMembers }) => {
               </div>
             </div>
           ))}
-          <button className="group bg-gray-50 dark:bg-gray-700/30 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-5 text-gray-600 dark:text-gray-400 font-bold hover:border-[#F5D238] dark:hover:border-[#F5D238] hover:bg-[#F5D238]/10 dark:hover:bg-[#F5D238]/20 transition-all duration-300 flex items-center justify-center min-h-[100px]">
+          <button className="group bg-gray-50 dark:bg-gray-700/30 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-5 text-gray-600 dark:text-gray-400 font-bold hover:border-[#ffed00] dark:hover:border-[#ffed00] hover:bg-[#ffed00]/10 dark:hover:bg-[#ffed00]/20 transition-all duration-300 flex items-center justify-center min-h-[100px]">
             <div className="text-center">
-              <div className="w-8 h-8 bg-[#F5D238] rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-200">
+              <div className="w-8 h-8 bg-[#ffed00] rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-200">
                 <span className="text-[#1A1B16] font-bold">+</span>
               </div>
               <span className="text-sm">Agregar miembro</span>

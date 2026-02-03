@@ -48,9 +48,9 @@ const ShareButton: React.FC<ShareButtonProps> = ({ setShowToast }) => {
         onClick={handleShareClick}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="group relative flex items-center justify-center w-12 h-12 rounded-full border-2 border-white bg-white hover:border-[#F5D238] hover:bg-[#F5D238] transition-all duration-300"
+        className="group relative flex items-center justify-center w-12 h-12 rounded-full border-2 border-white bg-white hover:border-[#ffed00] hover:bg-[#ffed00] transition-all duration-300"
       >
-        <ShareIcon className="h-6 w-6 text-[#F5D238] group-hover:text-white transition-colors duration-300" />
+        <ShareIcon className="h-6 w-6 text-[#ffed00] group-hover:text-white transition-colors duration-300" />
       </button>
 
       {tooltip.visible && (

@@ -17,7 +17,7 @@ const ShareToast: React.FC<ShareToastProps> = ({ showToast, setShowToast }) => (
         className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
       >
         <div className="bg-[#1A1B16] text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]">
-          <CheckCircle className="h-5 w-5 text-[#F5D238]" />
+          <CheckCircle className="h-5 w-5 text-[#ffed00]" />
           <span className="flex-1">Share link copied to clipboard</span>
           <button 
             onClick={() => setShowToast(false)}

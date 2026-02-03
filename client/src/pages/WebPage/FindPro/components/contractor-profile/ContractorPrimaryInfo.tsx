@@ -73,15 +73,15 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
         style={{ borderColor: "rgba(245, 210, 56, 0.3)", color: "var(--color-secondary)", ...borderPrimary }}
       >
         <div className="relative isolate overflow-hidden px-6 py-10 sm:px-12 md:px-16 lg:px-20">
-          <div className="absolute -left-20 top-0 hidden h-40 w-40 rounded-full border-2 border-[#F5D238]/20 bg-gradient-to-br from-[#F5D238]/15 to-[#F5D238]/5 blur-2xl lg:block" aria-hidden />
-          <div className="absolute -right-24 -bottom-12 hidden h-48 w-48 rounded-full border-2 border-[#F5D238]/15 bg-gradient-to-tl from-[#F5D238]/8 to-transparent opacity-50 blur-2xl lg:block" aria-hidden />
-          <div className="absolute left-1/2 -top-20 hidden h-80 w-80 -translate-x-1/2 rounded-full bg-gradient-to-b from-[#F5D238]/4 to-transparent blur-3xl lg:block" aria-hidden />
+          <div className="absolute -left-20 top-0 hidden h-40 w-40 rounded-full border-2 border-[#ffed00]/20 bg-gradient-to-br from-[#ffed00]/15 to-[#ffed00]/5 blur-2xl lg:block" aria-hidden />
+          <div className="absolute -right-24 -bottom-12 hidden h-48 w-48 rounded-full border-2 border-[#ffed00]/15 bg-gradient-to-tl from-[#ffed00]/8 to-transparent opacity-50 blur-2xl lg:block" aria-hidden />
+          <div className="absolute left-1/2 -top-20 hidden h-80 w-80 -translate-x-1/2 rounded-full bg-gradient-to-b from-[#ffed00]/4 to-transparent blur-3xl lg:block" aria-hidden />
           <div className="relative flex flex-col gap-4 lg:gap-8 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex flex-row items-start gap-4 sm:gap-6 flex-1 min-w-0 z-10">
-              <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 flex-shrink-0 items-center justify-center rounded-full border-[4px] border-[#F5D238] bg-gradient-to-br from-white via-gray-50 to-white shadow-[0_18px_40px_rgba(245,210,56,0.24),0_8px_18px_rgba(0,0,0,0.14)] ring-3 ring-[#F5D238]/12 z-20">
-                <span className="pointer-events-none absolute inset-[-6px] rounded-full border border-[#F5D238]/25 blur-[1px]" aria-hidden />
+              <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 flex-shrink-0 items-center justify-center rounded-full border-[4px] border-[#ffed00] bg-gradient-to-br from-white via-gray-50 to-white shadow-[0_18px_40px_rgba(245,210,56,0.24),0_8px_18px_rgba(0,0,0,0.14)] ring-3 ring-[#ffed00]/12 z-20">
+                <span className="pointer-events-none absolute inset-[-6px] rounded-full border border-[#ffed00]/25 blur-[1px]" aria-hidden />
                 <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/70 via-transparent to-transparent" aria-hidden />
-                <span className="pointer-events-none absolute -bottom-6 left-1/2 h-10 w-10 -translate-x-1/2 rounded-full bg-gradient-to-t from-[#F5D238]/25 via-transparent to-transparent blur-xl opacity-60" aria-hidden />
+                <span className="pointer-events-none absolute -bottom-6 left-1/2 h-10 w-10 -translate-x-1/2 rounded-full bg-gradient-to-t from-[#ffed00]/25 via-transparent to-transparent blur-xl opacity-60" aria-hidden />
                 {hasAvatarImage ? (
                   <img
                     src={getAvatar(contractor)}
@@ -97,7 +97,7 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
               <div className="flex-1 space-y-2 sm:space-y-3 min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                   {contractor.elite && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-[#F5D238] bg-gradient-to-r from-[#F5D238]/25 via-[#F5D238]/15 to-[#F5D238]/25 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-xs font-black text-[#1E1E17] shadow-md">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[#ffed00] bg-gradient-to-r from-[#ffed00]/25 via-[#ffed00]/15 to-[#ffed00]/25 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-xs font-black text-[#1E1E17] shadow-md">
                       <ShieldCheck className="h-3 w-3" /> Elite
                     </span>
                   )}
@@ -108,13 +108,13 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 rounded-lg bg-gradient-to-r from-[#F5D238]/10 to-[#FFD700]/10 px-3 py-2 w-fit">
+                <div className="flex items-center gap-3 rounded-lg bg-gradient-to-r from-[#ffed00]/10 to-[#FFD700]/10 px-3 py-2 w-fit">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }, (_, index) => (
                       <Star
                         key={index}
                         className={`h-4 w-4 sm:h-5 sm:w-5 ${index + 1 <= Math.round(ratingValue)
-                          ? "fill-[#F5D238] text-[#F5D238]"
+                          ? "fill-[#ffed00] text-[#ffed00]"
                           : "text-black/20"}`}
                       />
                     ))}
@@ -135,13 +135,13 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
                     {professionNames.slice(0, 3).map((name) => (
                       <span
                         key={name}
-                        className="rounded-full border border-black/20 bg-gradient-to-r from-black/10 to-black/5 px-2 py-0.5 text-[#1E1E17] shadow-sm transition-transform hover:scale-105 hover:border-[#F5D238] hover:from-[#F5D238]/20 hover:to-[#F5D238]/10"
+                        className="rounded-full border border-black/20 bg-gradient-to-r from-black/10 to-black/5 px-2 py-0.5 text-[#1E1E17] shadow-sm transition-transform hover:scale-105 hover:border-[#ffed00] hover:from-[#ffed00]/20 hover:to-[#ffed00]/10"
                       >
                         {name}
                       </span>
                     ))}
                     {professionNames.length > 3 && (
-                      <span className="rounded-full border border-[#F5D238] bg-gradient-to-r from-[#F5D238]/20 to-[#F5D238]/10 px-2 py-0.5 font-black text-[#1E1E17] shadow-sm text-[8px] sm:text-xs">
+                      <span className="rounded-full border border-[#ffed00] bg-gradient-to-r from-[#ffed00]/20 to-[#ffed00]/10 px-2 py-0.5 font-black text-[#1E1E17] shadow-sm text-[8px] sm:text-xs">
                         +{professionNames.length - 3}
                       </span>
                     )}
@@ -163,9 +163,9 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
       </motion.div>
 
       {contractor.company_info && (
-        <div className="rounded-[2rem] border-2 border-[#F5D238]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
+        <div className="rounded-[2rem] border-2 border-[#ffed00]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
           <div className="flex items-center gap-3 text-lg font-black mb-1">
-            <Building2 className="h-6 w-6 text-[#F5D238]" /> Company details
+            <Building2 className="h-6 w-6 text-[#ffed00]" /> Company details
           </div>
           <div className="mt-6 grid gap-5 text-base text-white/80 sm:grid-cols-2">
             <span>
@@ -185,14 +185,14 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
       )}
 
       {contractor?.team_members && contractor.team_members.length > 0 && (
-        <div className="rounded-[2rem] border-2 border-[#F5D238]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
+        <div className="rounded-[2rem] border-2 border-[#ffed00]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
           <div className="flex items-center gap-3 text-lg font-black mb-1">
-            <Building2 className="h-6 w-6 text-[#F5D238]" /> Team Members
+            <Building2 className="h-6 w-6 text-[#ffed00]" /> Team Members
           </div>
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {contractor.team_members.map((member: any) => (
-              <div key={member.id} className="flex items-center gap-3 rounded-lg bg-gradient-to-r from-white/5 to-white/[0.02] p-4 border border-white/10 hover:border-[#F5D238]/30 transition-colors">
-                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#F5D238]/20 to-[#F5D238]/5 border border-[#F5D238]/30 flex items-center justify-center">
+              <div key={member.id} className="flex items-center gap-3 rounded-lg bg-gradient-to-r from-white/5 to-white/[0.02] p-4 border border-white/10 hover:border-[#ffed00]/30 transition-colors">
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#ffed00]/20 to-[#ffed00]/5 border border-[#ffed00]/30 flex items-center justify-center">
                   {member.user?.profile_photo_url || member.photo_url ? (
                     <img 
                       src={member.user?.profile_photo_url || member.photo_url} 
@@ -200,7 +200,7 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
                       className="h-full w-full object-cover" 
                     />
                   ) : (
-                    <span className="text-xs font-black text-[#F5D238]">
+                    <span className="text-xs font-black text-[#ffed00]">
                       {member.name?.substring(0, 2).toUpperCase()}
                     </span>
                   )}
@@ -233,18 +233,18 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
           </div>
           <div className="mt-5 space-y-3.5 text-sm text-black/75">
             {profile.mobileNumber && (
-              <a href={`tel:${profile.mobileNumber}`} className="flex items-center gap-2 rounded-2xl border border-[#F5D238]/15 bg-[#F5D238]/10 px-3 py-2 font-semibold text-[#1E1E17] transition hover:border-[#F5D238]/45">
-                <Phone className="h-4 w-4 text-[#F5D238]" /> {profile.mobileNumber}
+              <a href={`tel:${profile.mobileNumber}`} className="flex items-center gap-2 rounded-2xl border border-[#ffed00]/15 bg-[#ffed00]/10 px-3 py-2 font-semibold text-[#1E1E17] transition hover:border-[#ffed00]/45">
+                <Phone className="h-4 w-4 text-[#ffed00]" /> {profile.mobileNumber}
               </a>
             )}
             {profile.phoneNumber && (
-              <a href={`tel:${profile.phoneNumber}`} className="flex items-center gap-2 rounded-2xl border border-[#1E1E17]/10 bg-[#F5D238]/5 px-3 py-2 font-semibold text-[#1E1E17] transition hover:border-[#F5D238]/45">
-                <Phone className="h-4 w-4 text-[#F5D238]" /> {profile.phoneNumber}
+              <a href={`tel:${profile.phoneNumber}`} className="flex items-center gap-2 rounded-2xl border border-[#1E1E17]/10 bg-[#ffed00]/5 px-3 py-2 font-semibold text-[#1E1E17] transition hover:border-[#ffed00]/45">
+                <Phone className="h-4 w-4 text-[#ffed00]" /> {profile.phoneNumber}
               </a>
             )}
             {user?.email && (
-              <a href={`mailto:${user.email}`} className="flex items-center gap-2 rounded-2xl border border-[#1E1E17]/10 bg-[#0B0B0B] px-3 py-2 font-semibold text-white transition hover:border-[#F5D238]/45">
-                <Mail className="h-4 w-4 text-[#F5D238]" /> {user.email}
+              <a href={`mailto:${user.email}`} className="flex items-center gap-2 rounded-2xl border border-[#1E1E17]/10 bg-[#0B0B0B] px-3 py-2 font-semibold text-white transition hover:border-[#ffed00]/45">
+                <Mail className="h-4 w-4 text-[#ffed00]" /> {user.email}
               </a>
             )}
             {profile.linkedinUrl && (
@@ -252,7 +252,7 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
                 href={profile.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-2xl border border-[#1E1E17]/15 bg-white px-3 py-2 font-semibold text-[#1E1E17] underline-offset-4 transition hover:border-[#F5D238]/45 hover:underline"
+                className="inline-flex items-center gap-2 rounded-2xl border border-[#1E1E17]/15 bg-white px-3 py-2 font-semibold text-[#1E1E17] underline-offset-4 transition hover:border-[#ffed00]/45 hover:underline"
               >
                 <Globe className="h-4 w-4 text-[#1E1E17]" /> LinkedIn
               </a>
@@ -262,7 +262,7 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
                 href={profile.portfolioUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-2xl border border-[#1E1E17]/15 bg-white px-3 py-2 font-semibold text-[#1E1E17] underline-offset-4 transition hover:border-[#F5D238]/45 hover:underline"
+                className="inline-flex items-center gap-2 rounded-2xl border border-[#1E1E17]/15 bg-white px-3 py-2 font-semibold text-[#1E1E17] underline-offset-4 transition hover:border-[#ffed00]/45 hover:underline"
               >
                 <Globe className="h-4 w-4 text-[#1E1E17]" /> Portfolio
               </a>
@@ -286,13 +286,13 @@ export function ContractorPrimaryInfo({ contractor, profile }: ContractorPrimary
             <Compass className="h-5 w-5 text-[#1E1E17]" /> Location & Coverage
           </h3>
           <div className="mt-5 space-y-3.5 text-sm text-black/75">
-            <div className="flex items-center gap-2 rounded-2xl border border-[#F5D238]/15 bg-[#F5D238]/10 px-3 py-2">
-              <MapPin className="h-4 w-4 text-[#F5D238]" />
+            <div className="flex items-center gap-2 rounded-2xl border border-[#ffed00]/15 bg-[#ffed00]/10 px-3 py-2">
+              <MapPin className="h-4 w-4 text-[#ffed00]" />
               <span>{profile.fullAddress}</span>
             </div>
             {contractor.location?.distance_km && (
               <div className="flex items-center gap-2 rounded-2xl border border-[#1E1E17]/10 bg-[#0B0B0B] px-3 py-2 text-white">
-                <Compass className="h-4 w-4 text-[#F5D238]" />
+                <Compass className="h-4 w-4 text-[#ffed00]" />
                 <span>{Number(contractor.location.distance_km).toFixed(2)} km reference</span>
               </div>
             )}

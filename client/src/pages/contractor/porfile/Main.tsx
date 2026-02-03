@@ -96,7 +96,7 @@ const ContractorProfile = () => {
                     type="text"
                     value={profileData.firstName}
                     onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5D238] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ffed00] focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -107,7 +107,7 @@ const ContractorProfile = () => {
                     type="text"
                     value={profileData.lastName}
                     onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5D238] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ffed00] focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -118,7 +118,7 @@ const ContractorProfile = () => {
                     type="email"
                     value={profileData.email}
                     onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5D238] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ffed00] focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -129,7 +129,7 @@ const ContractorProfile = () => {
                     type="tel"
                     value={profileData.phone}
                     onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5D238] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ffed00] focus:border-transparent"
                   />
                 </div>
               </div>
@@ -153,7 +153,7 @@ const ContractorProfile = () => {
                     type="checkbox"
                     checked={notifications.statusChange.text}
                     onChange={() => handleNotificationChange('statusChange', 'text')}
-                    className="w-4 h-4 text-[#F5D238] bg-gray-100 border-gray-300 rounded focus:ring-[#F5D238] focus:ring-2"
+                    className="w-4 h-4 text-[#ffed00] bg-gray-100 border-gray-300 rounded focus:ring-[#ffed00] focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-gray-700">Texto</span>
                 </label>
@@ -162,7 +162,7 @@ const ContractorProfile = () => {
                     type="checkbox"
                     checked={notifications.statusChange.push}
                     onChange={() => handleNotificationChange('statusChange', 'push')}
-                    className="w-4 h-4 text-[#F5D238] bg-gray-100 border-gray-300 rounded focus:ring-[#F5D238] focus:ring-2"
+                    className="w-4 h-4 text-[#ffed00] bg-gray-100 border-gray-300 rounded focus:ring-[#ffed00] focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-gray-700">Empujar</span>
                 </label>
@@ -171,7 +171,7 @@ const ContractorProfile = () => {
                     type="checkbox"
                     checked={notifications.statusChange.email}
                     onChange={() => handleNotificationChange('statusChange', 'email')}
-                    className="w-4 h-4 text-[#F5D238] bg-gray-100 border-gray-300 rounded focus:ring-[#F5D238] focus:ring-2"
+                    className="w-4 h-4 text-[#ffed00] bg-gray-100 border-gray-300 rounded focus:ring-[#ffed00] focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-gray-700">Correo electrónico</span>
                 </label>
@@ -189,7 +189,7 @@ const ContractorProfile = () => {
                     type="checkbox"
                     checked={notifications.newMessages.text}
                     onChange={() => handleNotificationChange('newMessages', 'text')}
-                    className="w-4 h-4 text-[#F5D238] bg-gray-100 border-gray-300 rounded focus:ring-[#F5D238] focus:ring-2"
+                    className="w-4 h-4 text-[#ffed00] bg-gray-100 border-gray-300 rounded focus:ring-[#ffed00] focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-gray-700">Texto</span>
                 </label>
@@ -198,7 +198,7 @@ const ContractorProfile = () => {
                     type="checkbox"
                     checked={notifications.newMessages.push}
                     onChange={() => handleNotificationChange('newMessages', 'push')}
-                    className="w-4 h-4 text-[#F5D238] bg-gray-100 border-gray-300 rounded focus:ring-[#F5D238] focus:ring-2"
+                    className="w-4 h-4 text-[#ffed00] bg-gray-100 border-gray-300 rounded focus:ring-[#ffed00] focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-gray-700">Empujar</span>
                 </label>
@@ -207,7 +207,7 @@ const ContractorProfile = () => {
                     type="checkbox"
                     checked={notifications.newMessages.email}
                     onChange={() => handleNotificationChange('newMessages', 'email')}
-                    className="w-4 h-4 text-[#F5D238] bg-gray-100 border-gray-300 rounded focus:ring-[#F5D238] focus:ring-2"
+                    className="w-4 h-4 text-[#ffed00] bg-gray-100 border-gray-300 rounded focus:ring-[#ffed00] focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-gray-700">Correo electrónico</span>
                 </label>
@@ -218,7 +218,7 @@ const ContractorProfile = () => {
 
         {/* Save Button */}
         <div className="mt-6 flex justify-end">
-          <button className="px-6 py-2 bg-[#F5D238] hover:bg-[#E5C228] text-[#1A1B16] font-medium rounded-md transition-colors duration-200">
+          <button className="px-6 py-2 bg-[#ffed00] hover:bg-[#E5C228] text-[#1A1B16] font-medium rounded-md transition-colors duration-200">
             Guardar cambios
           </button>
         </div>

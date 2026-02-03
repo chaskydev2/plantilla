@@ -19,7 +19,7 @@ type ThemeContextType = {
 };
 
 const defaultColors: ThemeColors = {
-  primary: '#F5D238',
+  primary: '#ffed00',
   secondary: '#1A1B16'
 };
 

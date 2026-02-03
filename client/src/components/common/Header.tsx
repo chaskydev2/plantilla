@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
-import { Menu, X, ChevronDown, LogIn, UserPlus, Home } from "lucide-react";
+import { Menu, X, LogIn, UserPlus, Home } from "lucide-react";
 import NewLogoUrl from "@/assets/images/LOGO GUD.svg?url";
+import NewLogoHoverUrl from "@/assets/images/LOGOGUD.svg?url";
 import UserDropdown from "../header/UserDropdown";
 import NotificationDropdown from "../header/NotificationDropdown";
 import useAuth from "@/core/hooks/useAuth";
@@ -12,27 +13,11 @@ const Header = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
-  // Menu item interfaces
-  interface SubMenuItem {
-    name: string;
-    path: string;
-  }
-  type MenuItem =
-    | { name: string; path: string }
-    | { name: string; submenu: SubMenuItem[] };
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    setOpenSubmenu(null);
-  };
-
-  const toggleSubmenu = (menu: string) => {
-    setOpenSubmenu(openSubmenu === menu ? null : menu);
   };
 
   useEffect(() => {
@@ -44,18 +29,12 @@ const Header = () => {
   const isHomePage = location.pathname === "/";
   const shouldBeTransparent = isHomePage && !scrolled && !isMenuOpen;
 
-  const menuItems: MenuItem[] = [
+  const menuItems = [
+    { name: t("navigation.about"), path: "/register-guara/how-it-works" },
+    { name: t("navigation.joinAsPro"), path: "/join-as-pro" },
     { name: t("navigation.services"), path: "/services" },
     { name: t("navigation.scamAlerts"), path: "/scam-alerts" },
     { name: t("navigation.priceCheck"), path: "/fair-price-check" },
-    { name: t("navigation.guarantee"), path: "/gu-guarantee" },
-    {
-      name: t("navigation.registerGuara"),
-      submenu: [
-        { name: t("navigation.howItWorks"), path: "/register-guara/how-it-works" },
-        { name: t("navigation.whatCover"), path: "/register-guara/what-cover" },
-      ],
-    },
   ];
 
   return (
@@ -71,32 +50,37 @@ const Header = () => {
           <div className="flex items-center justify-between py-4">
             
             {/* Logo Section */}
-            <div className="flex items-center flex-shrink-0">
+            <div className="flex items-center flex-shrink-0 mr-6">
               <Link to="/" className="flex items-center space-x-2 group">
-                <img
-                  src={NewLogoUrl}
-                  alt="GU Logo"
-                  className="h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
-                  onError={(e) => { 
-                    (e.currentTarget as HTMLImageElement).onerror = null; 
-                    e.currentTarget.src = "/vite.svg"; 
-                  }}
-                />
-  
+                <span className="relative h-12 w-auto">
+                  <img
+                    src={NewLogoHoverUrl}
+                    alt="GU Logo"
+                    className="h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105 group-hover:opacity-0"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).onerror = null;
+                      e.currentTarget.src = "/vite.svg";
+                    }}
+                  />
+                  <img
+                    src={NewLogoUrl}
+                    alt="GU Logo"
+                    className="absolute inset-0 h-12 w-auto object-contain opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:scale-105"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).onerror = null;
+                      e.currentTarget.src = "/vite.svg";
+                    }}
+                  />
+                </span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8 flex-grow justify-center">
               {menuItems.map((item) => (
-                <div
-                  key={item.name}
-                  className="relative group"
-                  onMouseEnter={() => setHoveredItem(item.name)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                >
+                <div key={item.name} className="relative group">
                   <Link
-                    to={'submenu' in item ? "#" : item.path}
+                    to={item.path}
                     className={`
                       px-4 py-2 transition-all duration-300 relative flex items-center font-medium
                       ${shouldBeTransparent 
@@ -105,56 +89,13 @@ const Header = () => {
                       }
                       after:content-[''] after:absolute after:bottom-0 after:left-0
                       after:w-full after:h-0.5 after:transition-all after:duration-300 after:transform
-                      ${('submenu' in item
-                        ? item.submenu.some(sub => location.pathname === sub.path)
-                        : location.pathname === item.path)
+                      ${location.pathname === item.path
                         ? `${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} after:scale-x-100`
                         : `${shouldBeTransparent ? "after:bg-white" : "after:bg-[#1A1B16]"} after:scale-x-0 hover:after:scale-x-100`}
                     `}
                   >
                     {item.name}
-                    {'submenu' in item && (
-                      <ChevronDown
-                        size={16}
-                        className={`ml-2 transition-transform duration-300 ${
-                          hoveredItem === item.name ? "rotate-180" : ""
-                        }`}
-                      />
-                    )}
                   </Link>
-
-                  {/* Desktop Submenu */}
-                  {'submenu' in item && (
-                    <div
-                      className={`
-                        absolute left-0 mt-3 w-64 origin-top
-                        rounded-xl shadow-2xl bg-white ring-1 ring-gray-200
-                        transition-all duration-300 transform
-                        ${hoveredItem === item.name
-                          ? "opacity-100 translate-y-0 visible scale-100"
-                          : "opacity-0 -translate-y-3 invisible scale-95"
-                        }
-                      `}
-                    >
-                      <div className="py-3">
-                        {item.submenu.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            to={subItem.path}
-                            className={`
-                              block px-6 py-3 text-sm font-medium transition-all duration-200
-                              ${location.pathname === subItem.path
-                                ? "bg-[#F5D238] text-[#1A1B16] font-semibold"
-                                : "text-gray-700 hover:bg-gray-50 hover:text-[#1A1B16] hover:pl-8"
-                              }
-                            `}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))}
             </nav>
@@ -264,55 +205,18 @@ const Header = () => {
                   <div key={item.name}>
                     <div className="flex items-center justify-between">
                       <Link
-                        to={'submenu' in item ? "#" : item.path}
-                        onClick={() => { if (!('submenu' in item)) toggleMenu(); }}
+                        to={item.path}
+                        onClick={toggleMenu}
                         className={`
                           flex-1 px-4 py-3 text-left font-medium transition-colors rounded-lg
-                          ${('submenu' in item
-                            ? item.submenu.some((sub: SubMenuItem) => location.pathname === sub.path)
-                            : location.pathname === item.path)
+                          ${location.pathname === item.path
                             ? "bg-[#F5D238] text-[#1A1B16]"
                             : "text-gray-700 hover:bg-gray-100"}
                         `}
                       >
                         {item.name}
                       </Link>
-                      {'submenu' in item && (
-                        <button
-                          onClick={() => toggleSubmenu(item.name)}
-                          className="p-2 text-gray-500 hover:text-gray-700"
-                        >
-                          <ChevronDown
-                            size={20}
-                            className={`transition-transform duration-200 ${
-                              openSubmenu === item.name ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
-                      )}
                     </div>
-
-                    {/* Mobile Submenu */}
-                    {'submenu' in item && openSubmenu === item.name && (
-                      <div className="mt-2 ml-4 space-y-2">
-                        {item.submenu.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            to={subItem.path}
-                            onClick={toggleMenu}
-                            className={`
-                              block px-4 py-2 text-sm rounded-lg transition-colors
-                              ${location.pathname === subItem.path
-                                ? "bg-[#F5D238] text-[#1A1B16] font-medium"
-                                : "text-gray-600 hover:bg-gray-100"
-                              }
-                            `}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))}
               </nav>

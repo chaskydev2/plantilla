@@ -338,11 +338,11 @@ export default function ContractorProfilePage() {
   // --- RENDER ---
 
   if (loading) return <ContractorProfileSkeleton />;
-  if (error) return <div className="p-8 text-center text-[#F5D238]">{error}</div>;
-  if (!contractor || !profile) return <div className="p-8 text-center text-[#F5D238]">Contractor not found.</div>;
+  if (error) return <div className="p-8 text-center text-[#ffed00]">{error}</div>;
+  if (!contractor || !profile) return <div className="p-8 text-center text-[#ffed00]">Contractor not found.</div>;
 
   return (
-    <div className="min-h-screen bg-[#F5D238] pb-12 overflow-x-hidden">
+    <div className="min-h-screen bg-[#ffed00] pb-12 overflow-x-hidden">
       <div className="mx-auto w-full max-w-screen-xl px-3 pt-10 sm:px-4 lg:px-8">
         
         {/* Contenedor Principal estilo Tarjeta */}
@@ -482,12 +482,12 @@ export default function ContractorProfilePage() {
 
               {/* 4. DESCARGAR CV (Debajo de trabajos) */}
              
-              <div className="rounded-[2rem] border-2 border-[#F5D238]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
+              <div className="rounded-[2rem] border-2 border-[#ffed00]/25 bg-gradient-to-br from-[#090909] via-[#111] to-[#080808] p-10 shadow-2xl text-white">
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-lg bg-gradient-to-r from-[#F5D238]/20 to-[#F5D238]/10 border border-[#F5D238]/30">
-                        <Download className="h-5 w-5 text-[#F5D238]" />
+                      <div className="p-3 rounded-lg bg-gradient-to-r from-[#ffed00]/20 to-[#ffed00]/10 border border-[#ffed00]/30">
+                        <Download className="h-5 w-5 text-[#ffed00]" />
                       </div>
                       <div>
                         <h3 className="text-lg font-black text-white">Download CV</h3>
@@ -498,7 +498,7 @@ export default function ContractorProfilePage() {
                       type="button"
                       onClick={handleExportCv}
                       disabled={exportingCv}
-                      className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F5D238] to-[#E5C228] px-5 py-2.5 text-sm font-bold text-[#1E1E17] shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-60 border border-[#F5D238] flex-shrink-0"
+                      className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#ffed00] to-[#E5C228] px-5 py-2.5 text-sm font-bold text-[#1E1E17] shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-60 border border-[#ffed00] flex-shrink-0"
                     >
                       <Download className="h-4 w-4" />
                       {exportingCv ? "Generating..." : "Download CV (PDF)"}
@@ -525,7 +525,7 @@ export default function ContractorProfilePage() {
                                 <Star
                                   className={`h-6 w-6 ${
                                     star <= cvRating
-                                      ? "fill-[#F5D238] text-[#F5D238]"
+                                      ? "fill-[#ffed00] text-[#ffed00]"
                                       : "text-white/30"
                                   }`}
                                 />

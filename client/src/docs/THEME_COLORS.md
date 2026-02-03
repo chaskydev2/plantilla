@@ -8,8 +8,8 @@ Este documento explica cómo usar el sistema de colores personalizable en toda l
 
 ```css
 /* Colores principales */
---color-primary: #F5D238
---color-primary-500: #F5D238
+--color-primary: #ffed00
+--color-primary-500: #ffed00
 --color-secondary: #1A1B16
 --color-secondary-500: #1A1B16
 
@@ -212,7 +212,7 @@ Los colores se guardan automáticamente en `localStorage` y se mantienen entre s
 
 ```tsx
 // Tema por defecto (Amarillo)
-{ primary: '#F5D238', secondary: '#1A1B16' }
+{ primary: '#ffed00', secondary: '#1A1B16' }
 
 // Tema azul
 { primary: '#3B82F6', secondary: '#1E293B' }

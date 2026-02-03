@@ -536,7 +536,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
         {/* Popup content */}
         <div
           ref={containerRef}
-          className="relative flex w-full max-w-4xl items-center rounded-full p-1 pr-2 shadow-2xl border border-[#F5D238] bg-[#1E1E17] backdrop-blur-md"
+          className="relative flex w-full max-w-4xl items-center rounded-full p-1 pr-2 shadow-2xl border border-[#ffed00] bg-[#1E1E17] backdrop-blur-md"
           style={{ minWidth: 320 }}
         >
           {/* Service select */}
@@ -554,7 +554,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 setQueryService(e.target.value);
                 setShowServiceModal(true);
               }}
-              className="placeholder:text-[#F5D238] w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-[#F5D238] bg-transparent appearance-none cursor-text border-none"
+              className="placeholder:text-[#ffed00] w-full py-3 pl-10 pr-8 rounded-l-full focus:outline-none text-[#ffed00] bg-transparent appearance-none cursor-text border-none"
             />
           </div>
           {/* Tags input */}
@@ -567,7 +567,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
               placeholder="e.g. experienced kitchen assistant"
               value={queryTags}
               onChange={(e) => setQueryTags(e.target.value)}
-              className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#F5D238] placeholder-[#F5D238] bg-transparent border-none"
+              className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#ffed00] placeholder-[#ffed00] bg-transparent border-none"
             />
           </div>
           {/* Location input */}
@@ -587,7 +587,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 setQueryLatLng(null);
                 if (!openLocation) setOpenLocation(true);
               }}
-              className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#F5D238] placeholder-[#F5D238] bg-transparent border-none"
+              className="w-full py-3 pl-10 pr-3 focus:outline-none text-[#ffed00] placeholder-[#ffed00] bg-transparent border-none"
             />
             {openLocation && (
               <div ref={locationPopupRef} className="absolute left-0 top-full mt-2 w-full z-50">
@@ -644,7 +644,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
           <button
             type="button"
             onClick={handleApply}
-            className="inline-flex items-center bg-[#F5D238] hover:bg-[#e6c12e] text-[#1E1E17] font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F5D238] focus:ring-offset-[#1E1E17] ml-2 border border-[#F5D238]"
+            className="inline-flex items-center bg-[#ffed00] hover:bg-[#e6c12e] text-[#1E1E17] font-bold py-3 px-6 md:px-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffed00] focus:ring-offset-[#1E1E17] ml-2 border border-[#ffed00]"
           >
             <span>Find a professional</span>
             <Search className="ml-2 size-4 text-[#1A1B16]" />
@@ -654,7 +654,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="absolute top-3 right-3 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
+            className="absolute top-3 right-3 text-[#ffed00] hover:text-[#e6c12e] text-2xl font-bold"
           >
             ×
           </button>
@@ -664,10 +664,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       {/* Map Picker Modal */}
       {showMapPicker && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#1E1E17]/80 backdrop-blur-sm">
-          <div className="relative bg-[#1E1E17] rounded-2xl shadow-2xl p-4 w-full max-w-2xl flex flex-col items-center border border-[#F5D238]">
+          <div className="relative bg-[#1E1E17] rounded-2xl shadow-2xl p-4 w-full max-w-2xl flex flex-col items-center border border-[#ffed00]">
             <button
               type="button"
-              className="absolute top-2 right-2 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
+              className="absolute top-2 right-2 text-[#ffed00] hover:text-[#e6c12e] text-2xl font-bold"
               aria-label="Close map picker"
               onClick={() => setShowMapPicker(false)}
             >
@@ -684,11 +684,11 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 placeholder="Search location on the map..."
                 value={mapSearchQuery}
                 onChange={e => setMapSearchQuery(e.target.value)}
-                className="flex-1 px-3 py-2 border border-[#F5D238] rounded-lg focus:outline-none bg-[#1E1E17] text-[#F5D238] placeholder-[#F5D238]"
+                className="flex-1 px-3 py-2 border border-[#ffed00] rounded-lg focus:outline-none bg-[#1E1E17] text-[#ffed00] placeholder-[#ffed00]"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
+                className="px-4 py-2 bg-[#ffed00] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 disabled={mapSearchLoading}
               >
                 Search
@@ -697,7 +697,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <button
               type="button"
               onClick={handleUseCurrentLocation}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 mb-3 rounded-lg border border-[#F5D238] text-[#F5D238] hover:bg-[#F5D238]/10 transition font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 mb-3 rounded-lg border border-[#ffed00] text-[#ffed00] hover:bg-[#ffed00]/10 transition font-bold disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={mapGeoLoading}
             >
               <Locate className="w-5 h-5" />
@@ -707,7 +707,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
               <div className="text-red-600 text-sm mb-2 w-full text-center">{mapSearchError}</div>
             )}
             <div
-              className="w-full h-96 rounded-lg overflow-hidden border border-[#F5D238]"
+              className="w-full h-96 rounded-lg overflow-hidden border border-[#ffed00]"
               ref={mapContainerRef}
               id="map-modal-container"
               style={{ minHeight: 384, minWidth: 320, height: 384, width: '100%' }}
@@ -715,7 +715,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <div className="mt-4 w-full flex justify-end">
               <button
                 type="button"
-                className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
+                className="px-4 py-2 bg-[#ffed00] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 onClick={() => setShowMapPicker(false)}
               >
                 Cancel
@@ -728,10 +728,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
       {/* Service Picker Modal */}
       {showServiceModal && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#1E1E17]/80 backdrop-blur-sm">
-          <div className="relative bg-[#1E1E17] rounded-2xl shadow-2xl p-4 w-full max-w-3xl flex flex-col border border-[#F5D238]">
+          <div className="relative bg-[#1E1E17] rounded-2xl shadow-2xl p-4 w-full max-w-3xl flex flex-col border border-[#ffed00]">
             <button
               type="button"
-              className="absolute top-2 right-2 text-[#F5D238] hover:text-[#e6c12e] text-2xl font-bold"
+              className="absolute top-2 right-2 text-[#ffed00] hover:text-[#e6c12e] text-2xl font-bold"
               aria-label="Close service picker"
               onClick={() => setShowServiceModal(false)}
             >
@@ -739,10 +739,10 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <Plus className="w-5 h-5 text-[#F5D238]" />
+              <Plus className="w-5 h-5 text-[#ffed00]" />
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-white">Select a service</h3>
-                <p className="text-xs text-[#F5D238]/80">Type to filter or pick from the list</p>
+                <p className="text-xs text-[#ffed00]/80">Type to filter or pick from the list</p>
               </div>
             </div>
 
@@ -752,13 +752,13 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 value={queryService}
                 onChange={(e) => setQueryService(e.target.value)}
                 placeholder="Search service..."
-                className="w-full px-3 py-2 rounded-lg border border-[#F5D238] bg-[#1E1E17] text-[#F5D238] placeholder-[#F5D238] focus:outline-none"
+                className="w-full px-3 py-2 rounded-lg border border-[#ffed00] bg-[#1E1E17] text-[#ffed00] placeholder-[#ffed00] focus:outline-none"
               />
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 max-h-[420px] overflow-y-auto pr-1">
               {filteredServices.length === 0 && (
-                <div className="col-span-full text-sm text-center text-[#F5D238]/80 border border-dashed border-[#F5D238]/40 rounded-lg p-4">
+                <div className="col-span-full text-sm text-center text-[#ffed00]/80 border border-dashed border-[#ffed00]/40 rounded-lg p-4">
                   No services found
                 </div>
               )}
@@ -766,11 +766,11 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
                 <button
                   key={service.id}
                   onClick={() => handleSelectService(service.name, service.id)}
-                  className="flex items-center gap-3 p-3 rounded-xl border border-[#F5D238]/40 bg-[#1E1E17] hover:bg-[#F5D238]/10 transition text-left"
+                  className="flex items-center gap-3 p-3 rounded-xl border border-[#ffed00]/40 bg-[#1E1E17] hover:bg-[#ffed00]/10 transition text-left"
                 >
-                  <span className="w-10 h-10 bg-[#F5D238]/15 rounded-full flex items-center justify-center">
-                    {(service.icon && <service.icon className="w-5 h-5 text-[#F5D238]" />) || (
-                      <Briefcase className="w-5 h-5 text-[#F5D238]" />
+                  <span className="w-10 h-10 bg-[#ffed00]/15 rounded-full flex items-center justify-center">
+                    {(service.icon && <service.icon className="w-5 h-5 text-[#ffed00]" />) || (
+                      <Briefcase className="w-5 h-5 text-[#ffed00]" />
                     )}
                   </span>
                   <span className="text-sm font-semibold text-white">{service.name}</span>
@@ -781,7 +781,7 @@ export function FilterPopup({ show, onClose, onApply, error }: FilterPopupProps)
             <div className="mt-4 w-full flex justify-end">
               <button
                 type="button"
-                className="px-4 py-2 bg-[#F5D238] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
+                className="px-4 py-2 bg-[#ffed00] text-[#1E1E17] rounded-lg hover:bg-[#e6c12e] transition font-bold"
                 onClick={() => setShowServiceModal(false)}
               >
                 Cancel
