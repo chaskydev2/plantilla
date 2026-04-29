@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import type { SubmitHandler, FieldValues, DefaultValues } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,6 +11,7 @@ interface FormProviderWrapperProps<T extends FieldValues> {
   defaultValues?: DefaultValues<T>;
   className?: string;
   mode?: 'create' | 'edit';
+  renderActions?: boolean;
 }
 
 export const FormProviderWrapper = <T extends FieldValues>({
@@ -20,11 +21,19 @@ export const FormProviderWrapper = <T extends FieldValues>({
   defaultValues,
   className = '',
   mode = 'create',
+  renderActions = true,
 }: FormProviderWrapperProps<T>) => {
   const methods = useForm<T>({
     resolver: yupResolver(validationSchema),
     defaultValues,
   });
+
+  // Reset form values when a different record is loaded (e.g., open edit modal)
+  useEffect(() => {
+    if (defaultValues) {
+      methods.reset(defaultValues);
+    }
+  }, [defaultValues, methods]);
 
   const handleError = (error: any) => {
     console.log("error ", error);
@@ -38,31 +47,33 @@ export const FormProviderWrapper = <T extends FieldValues>({
       >
         <div className="card-body">
           {children}
-          <div className="card-actions justify-end mt-4">
-            <button 
-              type="submit" 
-              className={`
-                bg-gray-600 text-white font-bold 
-                flex items-center justify-center gap-2 
-                rounded-xl py-3 px-10 
-                hover:bg-gray-700 
-                hover:shadow-2xl 
-                transform hover:scale-105 
-                transition-all duration-300
-                w-full sm:w-auto
-                border-none
-                focus:outline-none
-              `}
-              disabled={methods.formState.isSubmitting}
-            >
-              {methods.formState.isSubmitting ? (
-                <>
-                  <span className="loading loading-spinner"></span>
-                  Procesando...
-                </>
-              ) : mode === 'create' ? 'Crear' : 'Actualizar'}
-            </button>
-          </div>
+          {renderActions && (
+            <div className="card-actions justify-end mt-4">
+              <button 
+                type="submit" 
+                className={`
+                  bg-gray-600 text-white font-bold 
+                  flex items-center justify-center gap-2 
+                  rounded-xl py-3 px-10 
+                  hover:bg-gray-700 
+                  hover:shadow-2xl 
+                  transform hover:scale-105 
+                  transition-all duration-300
+                  w-full sm:w-auto
+                  border-none
+                  focus:outline-none
+                `}
+                disabled={methods.formState.isSubmitting}
+              >
+                {methods.formState.isSubmitting ? (
+                  <>
+                    <span className="loading loading-spinner"></span>
+                    Procesando...
+                  </>
+                ) : mode === 'create' ? 'Crear' : 'Actualizar'}
+              </button>
+            </div>
+          )}
         </div>
       </form>
     </FormProvider>

@@ -61,7 +61,10 @@ const RequirementModal = ({
           onClose();
           load();
         })
-        .catch((error) => toastify.error(error.response.data.message));
+        .catch((error) => 
+           
+          toastify.error(
+          error.response.data.message));
 
     } else {
       await ItemService.create(cleanData as ICreateRequest)

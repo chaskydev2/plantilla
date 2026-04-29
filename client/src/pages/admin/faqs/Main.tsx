@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import { useTranslation } from 'react-i18next';
 import { FaqService as ItemService } from "@/core/services/faq/faq.service.ts";
 import type { IFaq as IItemResource } from "@/core/types/IFaq";
 import { Search, Plus, Trash2, Edit } from "lucide-react";
@@ -11,44 +12,47 @@ import WithPermission from "@/components/common/WithPermission";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "question",
-    header: "Preguntas",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.question}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "answer",
-    header: "Respuesta",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.answer}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "order",
-    header: "Orden",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.order}</div>
-    ),
-    sortable: true,
-  },
-];
+// columns will be defined inside the component to allow using translations
 
 export default function FaqList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "question",
+      header: t("admin.faqs.question"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.question}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "answer",
+      header: t("admin.faqs.answer"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.answer}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "order",
+      header: t("admin.faqs.order"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.order}</div>
+      ),
+      sortable: true,
+    },
+  ];
   const {
     items,
     loading,
@@ -106,8 +110,8 @@ export default function FaqList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar la pregunta frecuente ${item.question}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.faqs.confirmDeleteMessage", { name: item.question }),
       () => handleDelete(item),
       "danger"
     );
@@ -115,8 +119,8 @@ export default function FaqList() {
 
   const handleDelete = async (item: IItemResource) => {
     try {
-      const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+  const response = await ItemService.remove(item.id);
+  toastify.success(response?.message || t("admin.faqs.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar la pregunta frecuente:", error);
@@ -128,7 +132,7 @@ export default function FaqList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -136,7 +140,7 @@ export default function FaqList() {
         item.id && hasPermission("pregunta_frecuente_editar"),
     },
     {
-      label: "Eliminar",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -157,7 +161,7 @@ export default function FaqList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         </WithPermission>
       </div>
@@ -167,7 +171,7 @@ export default function FaqList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -178,7 +182,7 @@ export default function FaqList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Preguntas Frecuentes" />
+  <PageBreadcrumb pageTitle={t("admin.sidebar.faq")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -213,7 +217,7 @@ export default function FaqList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")
           }
         />
       )}

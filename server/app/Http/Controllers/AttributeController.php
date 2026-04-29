@@ -124,18 +124,30 @@ class AttributeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAttributeRequest $request, AttributeModel $attribute): AttributeResource
+    public function update(UpdateAttributeRequest $request, $attribute): AttributeResource|JsonResponse
     {
+        // Buscar por slug o id manualmente para evitar errores de binding
+        $attributeModel = AttributeModel::where('slug', $attribute)
+            ->orWhere('id', $attribute)
+            ->first();
+
+        if (!$attributeModel) {
+            return response()->json([
+                'message' => 'Atributo no encontrado',
+                'error' => "No se encontró el atributo: {$attribute}"
+            ], 404);
+        }
+
         $validatedData = $request->validated();
 
         // Si se actualiza el nombre, regenerar el slug
-        if (isset($validatedData['name']) && $validatedData['name'] !== $attribute->name) {
+        if (isset($validatedData['name']) && $validatedData['name'] !== $attributeModel->name) {
             $newSlug = Str::slug($validatedData['name']);
             
             // Asegurar que el slug sea único
             $originalSlug = $newSlug;
             $counter = 1;
-            while (AttributeModel::where('slug', $newSlug)->where('id', '!=', $attribute->id)->exists()) {
+            while (AttributeModel::where('slug', $newSlug)->where('id', '!=', $attributeModel->id)->exists()) {
                 $newSlug = $originalSlug . '-' . $counter;
                 $counter++;
             }
@@ -143,9 +155,9 @@ class AttributeController extends Controller
             $validatedData['slug'] = $newSlug;
         }
 
-        $attribute->update($validatedData);
+        $attributeModel->update($validatedData);
 
-        return new AttributeResource($attribute->fresh());
+        return new AttributeResource($attributeModel->fresh());
     }
 
     /**

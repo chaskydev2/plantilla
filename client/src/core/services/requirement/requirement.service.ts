@@ -27,10 +27,16 @@ export const remove = async (id: any): Promise<IApiResponse> => {
   return response.data;
 }
 
+export const getAll = async (config: { signal?: AbortSignal } = {}): Promise<IApiResponse> => {
+  const res = await axios.get('/v1/requirements/all', { ...config });
+  return res.data;
+}
+
 export const RequirementService = {
   getAllPaginated,
   create,
   update,
   get,
   remove,
+  getAll,
 }

@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { FormData, FormValidationErrors } from "./types";
-import { fieldCls, labelCls, borderPrimary, helpMuted, rolesData } from "./utils";
+import { fieldCls, labelCls, borderPrimary, helpMuted } from "./utils";
 import ErrorText from "./ErrorText";
 import PasswordInput from "./PasswordInput";
 import MultiSelectField from "./MultiSelectField";
+import { ProfessionService } from "@/core/services/profession/profession.service";
+import type { IProfession } from "@/core/types/IProfession";
+import { ServiceService } from "@/core/services/service/service.service";
+import type { IService } from "@/core/types/IService";
 
 interface ContractorFormProps {
   formData: Extract<FormData, { userType: "contractor" }>;
@@ -29,8 +33,54 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
   handleMultiSelectChange,
   handleNext,
   handlePrev,
-  handleSubmit,
 }) => {
+  const [professionsData, setProfessionsData] = useState<IProfession[]>([]);
+  const [loadingProfessions, setLoadingProfessions] = useState(true);
+  const [servicesData, setServicesData] = useState<IService[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  // Cargar profesiones cuando el componente se monta
+  useEffect(() => {
+    const loadProfessions = async () => {
+      try {
+        const response = await ProfessionService.getAll();
+        if (response.success && response.data) {
+          setProfessionsData(response.data);
+        }
+      } catch (error) {
+        console.error('Error loading professions:', error);
+      } finally {
+        setLoadingProfessions(false);
+      }
+    };
+
+    loadProfessions();
+  }, []);
+
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const response = await ServiceService.getAllServices();
+        if (response.success && Array.isArray(response.data)) {
+          setServicesData(response.data);
+        }
+      } catch (error) {
+        console.error("Error loading services:", error);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    loadServices();
+  }, []);
+
+  // Transformar las profesiones al formato esperado por MultiSelectField
+  const professionsOptions = professionsData.map(profession => ({
+    id: profession.id,
+    name: profession.name,
+    value: profession.id,
+    label: profession.name
+  }));
   return (
     <div>
       {step === 0 && (
@@ -136,19 +186,31 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
 
           <div className="md:col-span-2">
             <label className={labelCls} style={{ color: "var(--color-secondary)" }}>
-              Professional Roles *
+              Professional Roless *
             </label>
             <MultiSelectField
               name="role_ids"
               value={formData.role_ids || []}
               onChange={handleMultiSelectChange}
-              options={rolesData?.data?.roles || []}
-              placeholder="Choose your roles"
+              options={professionsOptions}
+              placeholder={loadingProfessions ? "Loading professions..." : "Choose your roles"}
               maxSelections={2}
               className={fieldCls}
               style={{ borderColor: "var(--color-primary)" }}
               ariaLabel="Professional roles"
+              disabled={loadingProfessions}
             />
+            {loadingProfessions && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2 mt-2"
+                style={{ color: "var(--color-primary)", opacity: 0.7 }}
+              >
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+                <span className="text-sm">Loading professions...</span>
+              </motion.div>
+            )}
             <ErrorText msg={submitted ? errors.role_ids : undefined} />
           </div>
 
@@ -204,20 +266,32 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
           </div>
 
           <div className="md:col-span-2">
-            <label className={labelCls} style={{ color: "var(--color-secondary)" }}>
+            <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="services">
               Services <span className="font-normal" style={helpMuted}>
                 (optional)
               </span>
             </label>
-            <input
-              type="text"
+            <select
+              id="services"
               name="services"
               value={formData.services}
               onChange={handleChange}
               className={fieldCls}
               style={borderPrimary}
-              placeholder="e.g., Plumbing, Electrical, HVAC"
-            />
+              disabled={loadingServices}
+            >
+              <option value="">{loadingServices ? "Loading services..." : "Select a service"}</option>
+              {servicesData.map((service) => (
+                <option key={service.id} value={service.name}>
+                  {service.name}
+                </option>
+              ))}
+            </select>
+            {!loadingServices && !servicesData.length && (
+              <p className="mt-2 text-xs" style={helpMuted}>
+                No services available yet. Please contact support to add new services.
+              </p>
+            )}
           </div>
 
           <div>
@@ -274,7 +348,6 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              onClick={handleSubmit}
               className="px-7 py-3 rounded-xl border font-bold shadow-sm"
               style={{ background: "var(--color-secondary)", color: "var(--color-primary)", ...borderPrimary }}
             >
@@ -287,4 +360,4 @@ const ContractorForm: React.FC<ContractorFormProps> = ({
   );
 };
 
-export default ContractorForm;
+export default ContractorForm

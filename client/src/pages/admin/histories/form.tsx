@@ -35,36 +35,28 @@ const HistoryModal = ({
       title: initialData?.title || '',
       description: initialData?.description || '',
       content: initialData?.content || '',
-      banner1: initialData?.banner1 || '',
-      banner2: initialData?.banner2 || '',
-      banner3: initialData?.banner3 || '',
     }
     : {
       title: '',
       description: '',
       content: '',
-      banner1: '',
-      banner2: '',
-      banner3: '',
     };
 
   const handleSubmit = async (data: FormValues) => {
-    const cleanData = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value != null)
-    );
+    // Don't filter - send all data including Files
     if (isEditing) {
-      await ItemService.update(initialData!.id, cleanData as IUpdateRequest)
+      await ItemService.update(initialData!.id, data as IUpdateRequest)
         .then((response) => {
-          toastify.success(response.message || 'Item actualizado');
+          toastify.success(response.message || 'Item updated');
           onClose();
           load();
         })
         .catch((error) => toastify.error(error.response.data.message));
 
     } else {
-      await ItemService.create(cleanData as ICreateRequest)
+      await ItemService.create(data as ICreateRequest)
         .then((response) => {
-          toastify.success(response.message || 'Item creado');
+          toastify.success(response.message || 'Item created');
           onClose();
           load();
         })
@@ -76,7 +68,7 @@ const HistoryModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Historia' : 'Nuevo Historia'}
+      title={isEditing ? 'Edit History' : 'New History'}
       size="lg"
     >
       <FormProviderWrapper
@@ -90,16 +82,16 @@ const HistoryModal = ({
           <div className="col-span-1">
             <InputField
               name="title"
-              label="Título"
-              placeholder="Ej: Nombre de la historia..."
+              label="Title"
+              placeholder="e.g., Story title..."
             />
           </div>
 
           <div className="col-span-1">
             <TextAreaField
               name="description"
-              label="Descripción"
-              placeholder="Breve descripción de la historia..."
+              label="Description"
+              placeholder="Brief description of the story..."
               rows={4}
             />
           </div>
@@ -107,8 +99,8 @@ const HistoryModal = ({
           <div className="col-span-1">
             <TextAreaField
               name="content"
-              label="Contenido"
-              placeholder="Contenido detallado de la historia..."
+              label="Content"
+              placeholder="Detailed story content..."
               rows={6}
             />
           </div>
@@ -118,21 +110,21 @@ const HistoryModal = ({
               <InputFileField
                 name="banner1"
                 label="Banner 1"
-                helperText="Formatos: JPG, PNG (Max. 4MB)"
+                helperText="Formats: JPG, PNG (Max 4MB)"
               />
             </div>
             <div>
               <InputFileField
                 name="banner2"
                 label="Banner 2"
-                helperText="Formatos: JPG, PNG (Max. 4MB)"
+                helperText="Formats: JPG, PNG (Max 4MB)"
               />
             </div>
             <div>
               <InputFileField
                 name="banner3"
                 label="Banner 3"
-                helperText="Formatos: JPG, PNG (Max. 4MB)"
+                helperText="Formats: JPG, PNG (Max 4MB)"
               />
             </div>
           </div>

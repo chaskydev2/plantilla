@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 
 class HomeownerProfile extends Model
 {
+    use HasFactory;
     protected $guard_name = 'api';
     
     protected $primaryKey = 'user_id';
@@ -33,6 +35,11 @@ class HomeownerProfile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'user_id';
     }
     
     public function scopeSearch(Builder $query, ?string $search): Builder
@@ -69,5 +76,52 @@ class HomeownerProfile extends Model
         }
 
         return $query->where('state_code', $state_code);
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'homeowner_profile_service',
+            'homeowner_profile_id',
+            'service_id',
+            'user_id',
+            'id'
+        )->using(HomeownerProfileService::class)
+         ->withTimestamps();
+    }
+
+    public function chatThreads()
+    {
+        return $this->hasMany(ChatThread::class, 'homeowner_profile_id', 'user_id');
+    }
+
+    public function chatMessages()
+    {
+        return $this->morphMany(ChatMessage::class, 'sender');
+    }
+
+    /**
+     * Calificaciones que ha dado este HomeownerProfile a Contractors
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'homeowner_profile_id', 'user_id');
+    }
+
+    /**
+     * Verificar si ya calificó a un contractor específico
+     */
+    public function hasReviewedContractor(int $contractorUserId): bool
+    {
+        return $this->reviews()->where('contractor_id', $contractorUserId)->exists();
+    }
+
+    /**
+     * Obtener la calificación dada a un contractor específico
+     */
+    public function getReviewForContractor(int $contractorUserId)
+    {
+        return $this->reviews()->where('contractor_id', $contractorUserId)->first();
     }
 }

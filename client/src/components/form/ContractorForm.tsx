@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Lock, KeyRound, Building, FileText, Wrench, Calendar, Star } from "lucide-react";
 import { FormInput } from "./FormInput";
 import { MultiSelectField } from "./MultiSelectField";
 import type { FormData } from "./types";
-import { rolesData } from "./types";
+import { ProfessionService } from "@/core/services/profession/profession.service";
+import type { IProfession } from "@/core/types/IProfession";
 
 interface ContractorFormProps {
   formData: FormData;
@@ -17,6 +18,7 @@ interface ContractorFormProps {
   onPrev: () => void;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
+  professions?: IProfession[];
 }
 
 const fieldCls = "w-full border-2 rounded-xl px-5 py-4 text-gray-900 shadow-lg outline-none bg-white/90 backdrop-blur-sm transition-all duration-300 hover:shadow-xl focus:shadow-2xl focus:scale-[1.01] hover:bg-white/95";
@@ -32,8 +34,40 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
   onNext,
   onPrev,
   onSubmit,
-  loading
+  loading,
+  professions = []
 }) => {
+  const [professionsData, setProfessionsData] = useState<IProfession[]>(professions);
+  const [loadingProfessions, setLoadingProfessions] = useState(false);
+
+  // Cargar profesiones cuando el componente se monta
+  useEffect(() => {
+    const loadProfessions = async () => {
+      if (professions.length === 0) {
+        setLoadingProfessions(true);
+        try {
+          const response = await ProfessionService.getAll();
+          if (response.success && response.data) {
+            setProfessionsData(response.data);
+          }
+        } catch (error) {
+          console.error('Error loading professions:', error);
+        } finally {
+          setLoadingProfessions(false);
+        }
+      }
+    };
+
+    loadProfessions();
+  }, [professions]);
+
+  // Transformar las profesiones al formato esperado por MultiSelectField
+  const professionsOptions = professionsData.map(profession => ({
+    id: profession.id,
+    name: profession.name,
+    value: profession.id,
+    label: profession.name
+  }));
   return (
     <div className="relative z-10">
       {step === 0 && (
@@ -119,7 +153,7 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
           <div className="md:col-span-2 group">
             <label className={labelCls} style={{ color: "var(--color-secondary)" }}>
               <span className="flex items-center gap-2">
-                💼 Professional Roles <span style={{ color: "var(--color-secondary)" }} className="text-lg">*</span>
+                 Professional Roles <span style={{ color: "var(--color-secondary)" }} className="text-lg">*</span>
                 <span className="text-sm font-normal" style={{ color: "var(--color-primary)", opacity: 0.75 }}>(1-2 roles)</span>
               </span>
             </label>
@@ -127,12 +161,22 @@ export const ContractorForm: React.FC<ContractorFormProps> = ({
               name="role_ids"
               value={(formData as any).role_ids || []}
               onChange={onMultiSelectChange}
-              options={rolesData?.data?.roles || []}
-              placeholder="Choose your professional services..."
+              options={professionsOptions}
+              placeholder={loadingProfessions ? "Loading professions..." : "Choose your professional services..."}
               maxSelections={2}
               className={fieldCls}
               style={{ borderColor: "var(--color-primary)" }}
             />
+            {loadingProfessions && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-gray-500 mt-2 flex items-center gap-2"
+              >
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+                Loading professions...
+              </motion.div>
+            )}
             {submitted && errors.role_ids && (
               <motion.p 
                 initial={{ opacity: 0, x: -10 }}

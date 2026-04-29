@@ -33,7 +33,7 @@ export default function UserInfoCard({
         {label}
       </p>
       <p className="text-base font-medium text-gray-900 dark:text-gray-100">
-        {value || "No especificado"}
+        {value || "Not specified"}
       </p>
     </div>
   );
@@ -43,32 +43,32 @@ export default function UserInfoCard({
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex-1">
           <h4 className="mb-6 text-lg font-semibold text-gray-800 dark:text-gray-100">
-            Información Personal
+            Personal Information
           </h4>
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:gap-x-32">
-            <InfoItem label="Carnet de identidad" value={user?.ci} />
+            <InfoItem label="National ID" value={user?.ci} />
             <InfoItem
-              label="Fecha de afiliación"
+              label="Affiliation date"
               value={user?.college_affiliation_date}
             />
-            <InfoItem label="Número de teléfono" value={user?.phone_number} />
-            <InfoItem label="Número de celular" value={user?.mobile_number} />
+            <InfoItem label="Phone number" value={user?.phone_number} />
+            <InfoItem label="Mobile number" value={user?.mobile_number} />
             <InfoItem label="LinkedIn" value={user?.linkedin_url} />
             <InfoItem
-              label="Disponibilidad de viajar"
-              value={user?.travel_availability ? "Sí" : "No especificado"}
+              label="Willing to travel"
+              value={user?.travel_availability ? "Yes" : "Not specified"}
             />
             <InfoItem
-              label="Licencia de conducir"
+              label="Driver's license"
               value={
                 user?.has_driving_license
-                  ? user?.driving_license_category || "No especificado"
+                  ? user?.driving_license_category || "Not specified"
                   : "No"
               }
             />
             <InfoItem
-              label="Resumen profesional"
+              label="Professional summary"
               value={user?.professional_summary}
             />
           </div>

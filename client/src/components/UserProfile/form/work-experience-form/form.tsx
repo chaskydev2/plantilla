@@ -55,7 +55,7 @@ const WorkExperienceModal = ({
   const handleSubmit = async (data: FormValues) => {
     try {
       if (!userId) {
-        toastify.error('Se requiere un ID de usuario');
+        toastify.error('User ID is required');
         return;
       }
       if (isEditing) {
@@ -64,13 +64,13 @@ const WorkExperienceModal = ({
           initialData!.id, 
           data
         );
-        toastify.success(response.message || 'Formación académica actualizada');
+        toastify.success(response.message || 'Work experience updated');
       } else {
         const response = await ItemService.create(
           userId,
           data
         );
-        toastify.success(response.message || 'Formación académica creada');
+        toastify.success(response.message || 'Work experience created');
       }
 
       load();
@@ -78,7 +78,7 @@ const WorkExperienceModal = ({
     } catch (error: any) {
       toastify.error(
         error.response?.data?.message || 
-        (isEditing ? 'Error al actualizar' : 'Error al crear')
+        (isEditing ? 'Error updating' : 'Error creating')
       );
     }
   };
@@ -87,7 +87,7 @@ const WorkExperienceModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar experiencia profesional' : 'Agregar experiencia profesional'}
+      title={isEditing ? 'Edit work experience' : 'Add work experience'}
       size="lg"
     >
       <FormProviderWrapper
@@ -100,42 +100,42 @@ const WorkExperienceModal = ({
         <div className="grid grid-cols-1 gap-4">
           <InputField
             name="company_name"
-            label="Empresa/Institución"
-            placeholder="Ej: GEOBOL, Empresa Topográfica Boliviana, Consultoría Independiente"
+            label="Company/Institution"
+            placeholder="E.g.: GEOBOL, Bolivian Topographic Company, Independent Consulting"
           />
           
           <InputField
             name="company_location"
-            label="Ubicación (Ciudad/Departamento)"
-            placeholder="Ej: La Paz, Santa Cruz, Cochabamba"
+            label="Location (City/Department)"
+            placeholder="E.g.: La Paz, Santa Cruz, Cochabamba"
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               name="start_date"
-              label="Fecha de inicio"
+              label="Start date"
               type="date"
-              placeholder="Inicio de labores"
+              placeholder="Start of work"
             />
 
             <InputField
               name="end_date"
-              label="Fecha de conclusión"
+              label="End date"
               type="date"
-              placeholder="Fin de labores (dejar vacío si actual)"
+              placeholder="End of work (leave empty if current)"
             />
           </div>
 
           <InputField
             name="position"
-            label="Cargo/Función"
-            placeholder="Ej: Topógrafo de campo, Jefe de levantamiento, Responsable de catastro"
+            label="Position/Role"
+            placeholder="E.g.: Field surveyor, Survey chief, Cadastre manager"
           />
 
           <TextAreaField
             name="responsibilities"
-            label="Tareas realizadas (especialización)"
-            placeholder="Ej: Levantamientos topográficos con estación total, delimitación catastral rural, replanteo de obras civiles, uso de drones para fotogrametría"
+            label="Main responsibilities (specialization)"
+            placeholder="E.g.: Topographic surveys with total station, rural cadastral delimitation, civil works staking, drone use for photogrammetry"
             rows={4}
           />
         </div>

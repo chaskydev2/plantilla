@@ -1,0 +1,222 @@
+{
+  "contractorDashboard": {
+    "companyName": "Contractor Services Inc.",
+    "specialists": "Specialists in electricity and plumbing • 4.8/5 rating",
+    "verified": "Verified",
+    "availableInArea": "Available in your area",
+    "completedPercent": "{{percent}}% Completed",
+    "verificationProgress": "Verification progress",
+    "nextStep": "Next step",
+    "verificationInProgress": "Our team is performing the final verification of your documentation.",
+    "estimatedTime": "Estimated time",
+    "hours": "hours",
+    "notifyByEmail": "We will notify you by email",
+    "important": "Important!",
+    "attachFiles": "Attach your files to complete registration",
+    "attachFilesDescription": "To continue, attach the required documents for your profile verification. This helps us validate your identity and professional experience.",
+    "loadingRequirements": "Loading requirements...",
+    "requirement": "Requirement",
+    "sendDocuments": "Send documents",
+    "selectedFiles": "Selected files",
+    "sending": "Sending...",
+    "sendSuccess": "Documents sent successfully!",
+    "sendError": "Error sending documents."
+
+    },
+    "searchBar": {
+      "servicePlaceholder": "How can we help you?",
+      "tagsPlaceholder": "E.g. expert kitchen helper",
+      "locationPlaceholder": "City, street or ZIP code",
+      "searchButton": "Find a professional",
+      "locationRequired": "Select your location",
+      "gettingLocation": "Getting location…",
+      "gettingLocationShort": "Getting…",
+      "pleaseWait": "Please wait.",
+      "allowLocationTitle": "Allow access to your location?",
+      "allowLocationDesc": "We use your location to find nearby pros faster. You can also type a city or ZIP instead.",
+      "useMyLocation": "Use my location",
+      "chooseOnMap": "Choose on map",
+      "quickLocations": "Quick locations",
+      "searching": "Searching…",
+      "noResults": "No results",
+      "autocompleteFailed": "Autocomplete failed",
+      "googleMapsNotLoaded": "Could not load Google Maps",
+      "failedToLoadGoogleMaps": "Failed to load Google Maps",
+      "mapSearchFailed": "Could not search on the map",
+      "locationNotFound": "We couldn't find that location",
+      "notFound": "We couldn't find that location",
+      "currentLocation": "Current location",
+      "couldNotGetLocation": "We couldn't get your location. Try typing your city or ZIP."
+    }
+    ,
+    "videos": {
+      "title": "What is GU",
+      "roofingWarranty": "Roofing warranty: what happens when contractors fail",
+      "avoidScams": "How to avoid being scammed by a contractor again"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step": "Step {{number}}",
+      "search": {
+        "title": "Search",
+        "description": "Enter your location and project type"
+      },
+      "quotes": {
+        "title": "Get quotes",
+        "description": "Receive quotes from pre-screened contractors"
+      },
+      "select": {
+        "title": "Select",
+        "description": "Choose the best contractor for your project"
+      },
+      "guarantee": {
+        "title": "Get guarantee",
+        "description": "Your project is protected up to $250,000"
+      }
+    },
+    "realStories": {
+      "title": "Real stories, real payouts",
+      "subtitle": "See the real claims we've paid to protect homeowners like you.",
+      "story1": {
+        "quote": "$4,000 was charged after my contractor closed. GU took care of it",
+        "name": "Ben and Susan Smith",
+        "location": "Oklahoma, OK",
+        "service": "Roofing",
+        "date": "Jan 2023"
+      },
+      "story2": {
+        "quote": "A contractor destroyed my siding, but GU paid $15,000 to fix it",
+        "name": "Brandy Oberg",
+        "location": "Minnesota, MN",
+        "service": "Roofing",
+        "date": "Apr 2022"
+      },
+      "story3": {
+        "quote": "A contractor damaged my roof. GU paid $8,000 to replace it",
+        "name": "Lisa Brown",
+        "location": "New York, NY",
+        "service": "Roofing",
+        "date": "Jun 2024"
+      }
+    },
+    "contact": {
+      "title": "Contact",
+      "subtitle": "We're here to help you. Contact us for any questions.",
+      "address": "Address",
+      "phone": "Phone - Mobile",
+      "email": "Email",
+      "sendMessage": "Send us a message",
+      "businessHours": "Business hours",
+      "errorLoading": "Error loading contact data",
+      "sentSuccess": "Message sent successfully",
+      "sentError": "There was an error sending your message",
+      "form": {
+        "name": "Name",
+        "email": "Email",
+        "subject": "Subject",
+        "content": "Content",
+        "namePlaceholder": "Your name",
+        "emailPlaceholder": "Your email",
+        "subjectPlaceholder": "Subject of your message",
+        "contentPlaceholder": "Your message",
+        "submit": "Send message"
+      }
+    },
+    "stats": {
+      "claimsPaid": "Claims paid",
+      "averageResolution": "Average resolution",
+      "averageClaim": "Average claim",
+      "percent100": "100%",
+      "days15to30": "15–30 days",
+      "amount8000": "$8,000"
+    },
+    "whyGU": {
+      "title": "Why GU?",
+      "gu": {
+        "verifiedOnly": "Only verified contractors",
+        "guarantee": "Guarantee backed up to $250,000",
+        "dataRankings": "Data-based rankings",
+        "payHomeowners": "We pay homeowners",
+        "realSupport": "Real support",
+        "highRatings": "Only 4.5-star reviews or higher"
+      },
+      "bbb": {
+        "payToPlay": "Pay to appear",
+        "noGuarantee": "No financial guarantee",
+        "noAlgorithm": "No algorithm, manual and outdated ranking",
+        "noPayouts": "No payouts",
+        "submitWait": "Submit a complaint and wait",
+        "moneyBuys": "Money buys better rating"
+      }
+    },
+    "popularServices": {
+      "title": "Popular services near you",
+      "subtitle": "We work in the US and Canada with 100% verified contractors.",
+      "showMore": "Show more"
+    },
+    "testimonials": {
+      "title": "What our clients say",
+      "readMore": "Read more",
+      "testimonial1": {
+        "name": "Adam B.",
+        "date": "Apr 2024",
+        "text": "The whole process was smooth. Most importantly, I was always informed of what and when to expect the next step. When questions arose, I got immediate answers from my salesperson."
+      },
+      "testimonial2": {
+        "name": "Ryan Quarless",
+        "date": "May 2025",
+        "text": "I highly recommend Richard and Camel City Roofing if you are looking for roofing work. Richard was very knowledgeable and responded quickly to all my questions/concerns."
+      },
+      "testimonial3": {
+        "name": "Chris Munson",
+        "date": "Mar 2025",
+        "text": "GU is the best! They vet contractors to ensure only the best are allowed. They back the work and are improving the roofing space."
+      },
+      "testimonial4": {
+        "name": "Joseph Wisnaskas",
+        "date": "Feb 2025",
+        "text": "Brehm Roofing recently completed a new roof on our house and we are very happy with the new roof and the installation process. Quick response to questions and professional team."
+      }
+    },
+    "guaranteeBanner": {
+      "title": "Join the homeowners who have chosen the security of our $250,000 guarantee",
+      "subtitle": "We understand the trust you place in contractors when you invite them into your space. That's why we've created the most comprehensive protection program in the industry.",
+      "button": "Find your guaranteed contractor"
+    },
+    "faq": {
+      "title": "Questions about GU",
+      "questions": {
+        "howToUse": {
+          "question": "How do I use GU?",
+          "answer": "Search for your project type and location, compare verified contractors, and hire with confidence under our protection program."
+        },
+        "howDifferent": {
+          "question": "How are GU contractors different?",
+          "answer": "All contractors on GU are verified, financially evaluated, and backed by our guarantee to protect homeowners."
+        },
+        "noContractors": {
+          "question": "What if there are no contractors in my area?",
+          "answer": "We are expanding rapidly. If none are listed, leave your information and we will notify you as soon as verified contractors are available."
+        },
+        "cost": {
+          "question": "How much does it cost?",
+          "answer": "Using GU is free for homeowners. Contractors may have membership fees, but your protection is always included."
+        },
+        "guaranteeCover": {
+          "question": "What does the $250,000 guarantee cover?",
+          "answer": "It covers eligible losses such as contractor abandonment, poor workmanship, or damages caused during the project, up to the specified limit."
+        }
+      }
+    },
+    "navigation": {
+      "services": "Services",
+      "scamAlerts": "Scam alerts",
+      "priceCheck": "Price check",
+      "guarantee": "GU Guarantee",
+      "registerGuara": "Register Gu",
+      "howItWorks": "How it works",
+      "whatCover": "What it covers",
+      "register": "Register",
+      "login": "Login"
+    }
+  }

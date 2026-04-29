@@ -58,11 +58,10 @@ class StoreProfessionRequest extends FormRequest
                 'max:255',
                 Rule::unique('professions', 'slug'),
             ],
-            'description' => [
-                'nullable',
-                'string',
-                'max:1000',
-            ],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'description' => ['nullable', 'string', 'max:1000'],
+             'service_id' => ['required', 'string', 'exists:services,id'],
         ];
     }
 
@@ -77,6 +76,7 @@ class StoreProfessionRequest extends FormRequest
             'name' => 'nombre',
             'slug' => 'slug',
             'description' => 'descripción',
+            'service_id' => 'servicio',
         ];
     }
 
@@ -88,12 +88,13 @@ class StoreProfessionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'El nombre de la profesión es obligatorio.',
-            'name.unique' => 'Ya existe una profesión con este nombre.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'slug.unique' => 'Ya existe una profesión con este slug.',
-            'slug.max' => 'El slug no puede exceder los 255 caracteres.',
-            'description.max' => 'La descripción no puede exceder los 1000 caracteres.',
+            'name.required' => 'The profession name is required.',
+            'name.unique' => 'A profession with this name already exists.',
+            'name.max' => 'The name may not exceed 255 characters.',
+            'slug.unique' => 'A profession with this slug already exists.',
+            'slug.max' => 'The slug may not exceed 255 characters.',
+            'description.max' => 'The description may not exceed 1000 characters.',
+            'service_id.exists' => 'The selected service is not valid.',
         ];
     }
 }

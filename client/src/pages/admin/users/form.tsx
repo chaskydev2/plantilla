@@ -1,6 +1,9 @@
 import { InputField, PasswordField, SwitchField, MultiSelectField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { 
   IUserCreateRequest as ICreateRequest, 
   IUserUpdateRequest as IUpdateRequest, 
@@ -29,6 +32,7 @@ const UserModal = ({
   load,
   roles = []
 }: UserModalProps) => {
+  const { t } = useTranslation();
   const isEditing = !!initialData;
 
   type FormValues = ICreateRequest | IUpdateRequest;
@@ -41,6 +45,7 @@ const UserModal = ({
         password: '',
         role_ids: (initialData as any)?.roles?.map((role: any) => role.id) || [],
         edit_profile: initialData.edit_profile || false,
+        is_active: initialData.is_active ?? true,
       }
     : {
         first_name: '',
@@ -50,7 +55,49 @@ const UserModal = ({
         confirmPassword: '',
         role_ids: [],
         edit_profile: false,
+        is_active: true,
       };
+
+
+  const defaultIsActive = isEditing ? (initialData.is_active ?? true) : true;
+
+  // Componente interno para escuchar cambios del switch y sincronizar con backend
+  const IsActiveField: React.FC = () => {
+    const { watch, setValue } = useFormContext<FormValues>();
+    const [updatingStatus, setUpdatingStatus] = useState(false);
+    const prevStatusRef = useRef<boolean | undefined>(defaultIsActive);
+
+    useEffect(() => {
+      if (!isEditing || !initialData?.id) return;
+
+      const subscription = watch(async (value, { name, type }) => {
+        if (name !== 'is_active' || type !== 'change') return;
+        const next = (value as any)?.is_active;
+        if (next === undefined) return;
+        try {
+          setUpdatingStatus(true);
+          const res = await ItemService.updateStatus(initialData.id, next);
+          toastify.success(res?.message || t('admin.users.statusUpdated', { defaultValue: 'Estado actualizado' }));
+          prevStatusRef.current = next;
+        } catch (err: any) {
+          toastify.error(err?.response?.data?.message || t('admin.users.statusUpdateError', { defaultValue: 'Error al actualizar estado' }));
+          setValue('is_active' as any, prevStatusRef.current, { shouldDirty: false, shouldValidate: false });
+        } finally {
+          setUpdatingStatus(false);
+        }
+      });
+
+      return () => subscription.unsubscribe();
+    }, [isEditing, initialData?.id, watch, setValue]);
+
+    return (
+      <SwitchField
+        name="is_active"
+        label={t("admin.users.active", { defaultValue: "Activo" })}
+        disabled={updatingStatus}
+      />
+    );
+  };
 
   const validationSchema = isEditing ? updateSchema : storeSchema;
 
@@ -91,7 +138,7 @@ const UserModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}
+      title={isEditing ? t("admin.users.editUser") : t("admin.users.addUser")}
       size="lg"
     >
       <FormProviderWrapper
@@ -105,25 +152,25 @@ const UserModal = ({
           <div className="md:col-span-1">
             <InputField
               name="first_name"
-              label="Nombre completo"
-              placeholder="Ej: Juan Pérez"
+              label={t("admin.users.firstName")}
+              placeholder={t("admin.users.firstNamePlaceholder")}
             />
           </div>
           
           <div className="md:col-span-1">
             <InputField
               name="last_name"
-              label="Apellido completo"
-              placeholder="Ej: Salazar Gómez"
+              label={t("admin.users.lastName")}
+              placeholder={t("admin.users.lastNamePlaceholder")}
             />
           </div>
 
           <div className="md:col-span-2">
             <InputField
               name="email"
-              label="Correo electrónico"
+              label={t("admin.users.email")}
               type="email"
-              placeholder="Ej: usuario@ejemplo.com"
+              placeholder={t("admin.users.emailPlaceholder")}
               disabled={isEditing}
             />
           </div>
@@ -131,8 +178,8 @@ const UserModal = ({
           <div className="md:col-span-1">
             <PasswordField
               name="password"
-              label={isEditing ? 'Nueva contraseña (opcional)' : 'Contraseña'}
-              placeholder={isEditing ? 'Dejar vacío para no cambiar' : 'Mínimo 5 caracteres'}
+              label={isEditing ? t("admin.users.newPassword") : t("admin.users.password")}
+              placeholder={isEditing ? t("admin.users.newPasswordPlaceholder") : t("admin.users.passwordPlaceholder")}
             />
           </div>
 
@@ -140,20 +187,20 @@ const UserModal = ({
             <div className="md:col-span-1">
               <PasswordField
                 name="confirmPassword"
-                label="Confirmar contraseña"
-                placeholder="Repite la contraseña"
+                label={t("admin.users.confirmPassword")}
+                placeholder={t("admin.users.confirmPasswordPlaceholder")}
               />
             </div>
           )}
 
           <div className="md:col-span-2">
             <MultiSelectField
-              label='Seleccionar roles'
+              label={t("admin.users.selectRoles")}
               name="role_ids"
               options={roles}
               valueKey="id"
               labelKey="name"
-              placeholder="Selecciona roles para el usuario"
+              placeholder={t("admin.users.selectRoles")}
               helperText="Puedes seleccionar múltiples roles"
             />
           </div>
@@ -161,8 +208,12 @@ const UserModal = ({
           <div className="md:col-span-2">
             <SwitchField
               name="edit_profile"
-              label="Aprobar edición de perfil"
+              label={t("admin.users.editProfile")}
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <IsActiveField />
           </div>
         </div>
       </FormProviderWrapper>

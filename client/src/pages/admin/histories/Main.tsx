@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { HistoryService as ItemService } from '@/core/services/history/history.service';
 import type { IHistory as IItemResource } from "@/core/types/IHistory";
@@ -10,78 +11,88 @@ import { toastify } from "@/core/utils/toastify";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "title",
-    header: "Titulo",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.title}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "content",
-    header: "Contenido",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.content}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "banner1",
-    header: "Banner 1",
-    render: (item: IItemResource) =>
-      item.banner1 ? (
-        <img
-          src={item.banner1}
-          alt={item.title}
-          className="w-10 h-10 object-cover rounded-md"
-        />
-      ) : (
-        <span className="text-gray-400">Sin imagen</span>
-      ),
-  },
-  {
-    key: "banner2",
-    header: "Banner 2",
-    render: (item: IItemResource) =>
-      item.banner2 ? (
-        <img
-          src={item.banner2}
-          alt={item.title}
-          className="w-10 h-10 object-cover rounded-md"
-        />
-      ) : (
-        <span className="text-gray-400">Sin imagen</span>
-      ),
-  },
-  {
-    key: "banner3",
-    header: "Banner 3",
-    render: (item: IItemResource) =>
-      item.banner3 ? (
-        <img
-          src={item.banner3}
-          alt={item.title}
-          className="w-10 h-10 object-cover rounded-md"
-        />
-      ) : (
-        <span className="text-gray-400">Sin imagen</span>
-      ),
-  },
-];
+// columns moved inside component so they can use translations
 
 export default function HistoryList() {
+  const { t } = useTranslation();
+
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+  function getBannerImageUrl(image?: string | null): string {
+    if (!image) return 'https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2000&auto=format&fit=crop';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "title",
+      header: t("admin.histories.title"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.title}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "content",
+      header: t("admin.histories.content"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.content}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "banner1",
+      header: t("admin.histories.banner1"),
+      render: (item: IItemResource) =>
+        item.banner1 ? (
+          <img
+            src={getBannerImageUrl(item.banner1)}
+            alt={item.title}
+            className="w-10 h-10 object-cover rounded-md"
+          />
+        ) : (
+          <span className="text-gray-400">{t("admin.common.noData")}</span>
+        ),
+    },
+    {
+      key: "banner2",
+      header: t("admin.histories.banner2"),
+      render: (item: IItemResource) =>
+        item.banner2 ? (
+          <img
+            src={getBannerImageUrl(item.banner2)}
+            alt={item.title}
+            className="w-10 h-10 object-cover rounded-md"
+          />
+        ) : (
+          <span className="text-gray-400">{t("admin.common.noData")}</span>
+        ),
+    },
+    {
+      key: "banner3",
+      header: t("admin.histories.banner3"),
+      render: (item: IItemResource) =>
+        item.banner3 ? (
+          <img
+            src={getBannerImageUrl(item.banner3)}
+            alt={item.title}
+            className="w-10 h-10 object-cover rounded-md"
+          />
+        ) : (
+          <span className="text-gray-400">{t("admin.common.noData")}</span>
+        ),
+    },
+  ];
   const {
     items,
     loading,
@@ -139,8 +150,8 @@ export default function HistoryList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar la historia ${item.title}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.histories.confirmDeleteMessage", { title: item.title }),
       () => handleDelete(item),
       "danger"
     );
@@ -149,7 +160,7 @@ export default function HistoryList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t("admin.histories.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar la historia:", error);
@@ -161,7 +172,7 @@ export default function HistoryList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -169,7 +180,7 @@ export default function HistoryList() {
         item.id && hasPermission("historia_editar"),
     },
     {
-      label: "Eliminar",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -191,7 +202,7 @@ export default function HistoryList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+              {t("admin.common.add")}
           </button>
         }
       </div>
@@ -201,7 +212,7 @@ export default function HistoryList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -212,7 +223,7 @@ export default function HistoryList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Historia" />
+  <PageBreadcrumb pageTitle={t("admin.sidebar.history")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -247,7 +258,7 @@ export default function HistoryList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")
           }
         />
       )}

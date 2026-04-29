@@ -1,0 +1,26 @@
+meta {
+  name: chatpost
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://127.0.0.1:8000/api/v1/chat/contractor/16/thread/2/reply
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMTliYzlhOS01Nzg5LTczODAtOTIyZi0wZDE4MmVlNTdmZjEiLCJqdGkiOiJiMDUzMzBlMzQ3MmE4YjMzOTA5ODI2NDA3MmViMzNlNjJlMTcxYjA3MDc2NmVkYjczOTdkZjY0NmRhYTc1MTAzMGEyNmYzOTM2ZjM4OWFkOSIsImlhdCI6MTc2OTIwNzA1MS43OTU2MjMsIm5iZiI6MTc2OTIwNzA1MS43OTU2NTEsImV4cCI6MTgwMDc0MzA1MS42NTgxMDcsInN1YiI6IjE2Iiwic2NvcGVzIjpbXX0.UFGi0Js9j--VUUCF2uSpdrbyIruenK3A4fjSCpoUbJm3F7K-IwPAnws3wve9ilsAYzipjTjEz8AGrIMXO7PfU-HX-EZrlDRq_heSHvoKL2pS9UuoncPlUSX-6o5Ly6uocmuVAq_1HjP2IgYkYwKV5DG864NgliC9PZVoEbYj05C0t4f8Sr3XgTKIK84Ug15E8OFf60_gb_Pek8QxX4kpxum-21lHB6d8L-jhlGIlHSHiJ7lKJ1DFpidMEF-GOsAT1WtQcSu-vk9qp6UceXP26wieSaMmgenbbNV-dBaDz_Ij820rP9tnDvrf9LqjO372vDHmR2eEMxW9Y4QWRzmwTb5XK1bKW4ACxTXFMndTNwhMn1p37aM_-K6qViGmgDgT2LGQ-CH85RD1zvtIhGjRoJubuoi-Z40wTG82f-LLH2zXqbFWOjEsnDl5YwIZBdik5ZFwDc77D2yWufy9U-UyVkIIGLX2tuGKQITcw2l-eRhzBErTk3kGJ_x3VxWE-CTKe9jsM1fyGXqTQgmzzoJQvhxyiq2gfYUxoiXai_y2ZmybJ_RivNmFJUyIPz21dOUDZjKlXqNhy2e5z9mC9rzWm7UyMlYq0B9lQTtTThJRLlA5FYjKm4DsCW764nv4nPueRLSJKUwkfTijx3aT2SzWJ72-QE3HqhWniBFh4n6L6mY
+}
+
+body:json {
+  {
+    "message": "The message field is required."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -55,7 +55,7 @@ const AcademicModal = ({
   const handleSubmit = async (data: FormValues) => {
     try {
       if (!userId) {
-        toastify.error('Se requiere un ID de usuario');
+        toastify.error('User ID is required');
         return;
       }
       if (isEditing) {
@@ -64,13 +64,13 @@ const AcademicModal = ({
           initialData!.id, 
           data
         );
-        toastify.success(response.message || 'Formación académica actualizada');
+        toastify.success(response.message || 'Academic training updated');
       } else {
         const response = await ItemService.create(
           userId,
           data
         );
-        toastify.success(response.message || 'Formación académica creada');
+        toastify.success(response.message || 'Academic training created');
       }
 
       load();
@@ -78,7 +78,7 @@ const AcademicModal = ({
     } catch (error: any) {
       toastify.error(
         error.response?.data?.message || 
-        (isEditing ? 'Error al actualizar' : 'Error al crear')
+        (isEditing ? 'Error updating' : 'Error creating')
       );
     }
   };
@@ -87,7 +87,7 @@ const AcademicModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar formación académica' : 'Agregar formación académica'}
+      title={isEditing ? 'Edit academic training' : 'Add academic training'}
       size="lg"
     >
       <FormProviderWrapper
@@ -100,39 +100,39 @@ const AcademicModal = ({
         <div className="space-y-4">
           <InputField
             name="professional_title"
-            label="Título profesional"
-            placeholder="Ej: Ingeniero en Geodesia y Topografia"
+            label="Professional title"
+            placeholder="E.g.: Geodesy and Topography Engineer"
           />
 
           <InputField
             name="academic_degree"
-            label="Grado académico"
-            placeholder="Ej: Licenciatura, Técnico Medio"
+            label="Academic degree"
+            placeholder="E.g.: Bachelor, Associate Degree"
           />
 
           <InputField
             name="graduated_from"
-            label="Titulado de la institución"
-            placeholder="Ej: Universidad Latinoamericana"
+            label="Graduated from"
+            placeholder="E.g.: Latin American University"
           />
 
           <TextAreaField
             name="relevant_certifications"
-            label="Certificaciones relevantes"
-            placeholder="Ej: Certificación en ... (nombre de la certificación)"
+            label="Relevant certifications"
+            placeholder="E.g.: Certification in ... (name of the certification)"
             rows={3}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               name="graduation_date"
-              label="Fecha de egreso"
+              label="Graduation date"
               type="date"
             />
 
             <InputField
               name="degree_date"
-              label="Fecha de obtención del título"
+              label="Degree date"
               type="date"
             />
           </div>

@@ -1,4 +1,5 @@
 import type{ ReactNode } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -16,13 +17,17 @@ export const ConfirmDialog = ({
   isOpen,
   title,
   message,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
   isProcessing = false,
   variant = 'primary'
 }: ConfirmDialogProps) => {
+  const { t } = useTranslation();
+
+  const confirmLabel = confirmText ?? t('admin.common.confirmDelete');
+  const cancelLabel = cancelText ?? t('admin.common.cancel');
   if (!isOpen) return null;
 
   const variantClasses = {
@@ -43,7 +48,7 @@ export const ConfirmDialog = ({
             onClick={onCancel}
             disabled={isProcessing}
           >
-            {cancelText}
+            {cancelLabel}
           </button>
           <button 
             className={`btn ${variantClasses[variant]}`}
@@ -52,7 +57,7 @@ export const ConfirmDialog = ({
           >
             {isProcessing ? (
               <span className="loading loading-spinner"></span>
-            ) : confirmText}
+            ) : confirmLabel}
           </button>
         </div>
       </div>

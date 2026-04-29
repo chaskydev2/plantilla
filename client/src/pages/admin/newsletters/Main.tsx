@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { NewsletterService as ItemService } from '@/core/services/newsletter/newsletter.service';
 import type { INewsletter as IItemResource } from "@/core/types/INewsletter";
@@ -10,53 +11,55 @@ import { toastify } from "@/core/utils/toastify";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Nombre",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.name}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "email",
-    header: "correo electronico",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.email}</div>
-    ),
-    sortable: true,
-  },
-    {
-    key: "subject",
-    header: "Asunto",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.subject}</div>
-    ),
-    sortable: true,
-  },
-    {
-    key: "content",
-    header: "contenido",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.content}</div>
-    ),
-    sortable: true,
-  },
-
-];
+// columns moved into component to allow translations
 
 export default function NewsletterList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t("admin.common.name"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.name}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "email",
+      header: t("admin.consultations.email"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.email}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "subject",
+      header: t("admin.consultations.subject"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.subject}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "content",
+      header: t("admin.consultations.content"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.content}</div>
+      ),
+      sortable: true,
+    },
+  ];
   const {
     items,
     loading,
@@ -114,8 +117,8 @@ export default function NewsletterList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar la consulta ${item.name}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.consultations.confirmDeleteMessage", { name: item.name }),
       () => handleDelete(item),
       "danger"
     );
@@ -124,7 +127,7 @@ export default function NewsletterList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t("admin.consultations.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar la consulta:", error);
@@ -136,7 +139,7 @@ export default function NewsletterList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -144,7 +147,7 @@ export default function NewsletterList() {
         item.id && hasPermission("consulta_editar"),
     },
     {
-      label: "Eliminar",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -166,7 +169,7 @@ export default function NewsletterList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         }
       </div>
@@ -176,7 +179,7 @@ export default function NewsletterList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -187,7 +190,7 @@ export default function NewsletterList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Consultas" />
+  <PageBreadcrumb pageTitle={t("admin.sidebar.consultations")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -222,7 +225,7 @@ export default function NewsletterList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")
           }
         />
       )}

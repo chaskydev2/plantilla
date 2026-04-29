@@ -46,7 +46,7 @@ class StoreContractorRequest extends FormRequest
             'portfolio_url' => ['nullable', 'url', 'max:500'],
             'affiliation_date' => ['nullable', 'date', 'before_or_equal:today'],
             'approval_date' => ['nullable', 'date', 'before_or_equal:today', 'after_or_equal:affiliation_date'],
-            'contract_status' => ['required', Rule::in([
+            'contract_status' => ['nullable', Rule::in([
                 Contractor::STATUS_PENDING,
                 Contractor::STATUS_APPROVED,
                 Contractor::STATUS_REJECTED,
@@ -61,29 +61,29 @@ class StoreContractorRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'user_id' => 'usuario',
-            'preferred_zip' => 'código postal',
-            'address_line1' => 'dirección línea 1',
-            'address_line2' => 'dirección línea 2',
-            'city' => 'ciudad',
-            'company_name' => 'nombre de la empresa',
-            'license_number' => 'número de licencia',
-            'is_insured' => 'está asegurado',
-            'service_area' => 'área de servicio',
-            'average_rating' => 'calificación promedio',
-            'state_code' => 'código de estado',
-            'country_code' => 'código de país',
-            'lat' => 'latitud',
-            'lng' => 'longitud',
-            'mobile_number' => 'número de celular',
-            'phone_number' => 'número de teléfono',
-            'has_driving_license' => 'tiene licencia de conducir',
-            'driving_license_category' => 'categoría de licencia de conducir',
-            'linkedin_url' => 'URL de LinkedIn',
-            'portfolio_url' => 'URL de portafolio',
-            'affiliation_date' => 'fecha de afiliación',
-            'approval_date' => 'fecha de aprobación',
-            'contract_status' => 'estado del contrato',
+            'user_id' => 'user',
+            'preferred_zip' => 'postal code',
+            'address_line1' => 'address line 1',
+            'address_line2' => 'address line 2',
+            'city' => 'city',
+            'company_name' => 'company name',
+            'license_number' => 'license number',
+            'is_insured' => 'is insured',
+            'service_area' => 'service area',
+            'average_rating' => 'average rating',
+            'state_code' => 'state code',
+            'country_code' => 'country code',
+            'lat' => 'latitude',
+            'lng' => 'longitude',
+            'mobile_number' => 'mobile number',
+            'phone_number' => 'phone number',
+            'has_driving_license' => 'has driving license',
+            'driving_license_category' => 'driving license category',
+            'linkedin_url' => 'LinkedIn URL',
+            'portfolio_url' => 'portfolio URL',
+            'affiliation_date' => 'affiliation date',
+            'approval_date' => 'approval date',
+            'contract_status' => 'contract status',
         ];
     }
 
@@ -93,12 +93,12 @@ class StoreContractorRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.unique' => 'Este usuario ya tiene un contrato registrado.',
-            'license_number.unique' => 'Este número de licencia ya está registrado.',
-            'approval_date.after_or_equal' => 'La fecha de aprobación debe ser posterior o igual a la fecha de afiliación.',
-            'lat.between' => 'La latitud debe estar entre -90 y 90 grados.',
-            'lng.between' => 'La longitud debe estar entre -180 y 180 grados.',
-            'average_rating.between' => 'La calificación debe estar entre 0 y 5.',
+            'user_id.unique' => 'This user already has a registered contract.',
+            'license_number.unique' => 'This license number is already registered.',
+            'approval_date.after_or_equal' => 'The approval date must be after or equal to the affiliation date.',
+            'lat.between' => 'Latitude must be between -90 and 90 degrees.',
+            'lng.between' => 'Longitude must be between -180 and 180 degrees.',
+            'average_rating.between' => 'The rating must be between 0 and 5.',
         ];
     }
 }

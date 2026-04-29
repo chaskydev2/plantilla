@@ -60,3 +60,6 @@ php artisan serve
 ```bash
 cd client
 npm run dev
+
+
+php artisan  install api

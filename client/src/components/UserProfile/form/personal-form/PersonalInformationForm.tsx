@@ -40,10 +40,10 @@ const PersonalInformationFormModal = ({ initialData = null, load }: ModalProps) 
         data
       );
       load();
-      toastify.success(response.message || 'Información personal actualizada');
+      toastify.success(response.message || 'Personal information updated');
       closeModal();
     } catch (error: any) {
-      toastify.error(error.message || 'Error al actualizar la información personal');
+      toastify.error(error.message || 'Error updating personal information');
     }
   };
 
@@ -52,8 +52,8 @@ const PersonalInformationFormModal = ({ initialData = null, load }: ModalProps) 
     return hasLicense ? (
       <InputField
         name="driving_license_category"
-        label="Categoría de licencia"
-        placeholder="Ej: A, B, C, etc."
+        label="License category"
+        placeholder="E.g., A, B, C, etc."
         required
       />
     ) : null;
@@ -65,7 +65,7 @@ const PersonalInformationFormModal = ({ initialData = null, load }: ModalProps) 
         <Modal
           isOpen={isOpen}
           onClose={closeModal}
-          title="Editar Información Personal"
+          title="Edit Personal Information"
           size="lg"
         >
           <FormProviderWrapper
@@ -78,57 +78,57 @@ const PersonalInformationFormModal = ({ initialData = null, load }: ModalProps) 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InputField
                 name="ci"
-                label="Carnet de Identidad"
-                placeholder="Ej: 1234567"
+                label="National ID"
+                placeholder="E.g., 1234567"
               />
               
               <InputField
                 name="address"
-                label="Dirección"
-                placeholder="Ej: Av. Siempre Viva 123"
+                label="Address"
+                placeholder="E.g., 742 Evergreen Terrace"
               />
               
               <InputField
                 name="mobile_number"
-                label="Teléfono Móvil"
-                placeholder="Ej: 70012345"
+                label="Mobile phone"
+                placeholder="E.g., 70012345"
               />
               
               <InputField
                 name="phone_number"
-                label="Teléfono Fijo (Opcional)"
-                placeholder="Ej: 2212345"
+                label="Landline (optional)"
+                placeholder="E.g., 2212345"
               />
               
               <InputField
                 name="linkedin_url"
-                label="Perfil de LinkedIn (Opcional)"
-                placeholder="Ej: https://linkedin.com/in/tu-perfil"
+                label="LinkedIn profile (optional)"
+                placeholder="E.g., https://linkedin.com/in/your-profile"
               />
               
               <InputField
                 name="portfolio_url"
-                label="Portafolio (Opcional)"
-                placeholder="Ej: https://tusitio.com"
+                label="Portfolio (optional)"
+                placeholder="E.g., https://your-site.com"
               />
             </div>
             
             <TextAreaField
               name="professional_summary"
-              label="Resumen Profesional (Opcional)"
-              placeholder="Describe tu experiencia profesional"
+              label="Professional summary (optional)"
+              placeholder="Describe your professional experience"
               rows={4}
-              helperText="Máximo 500 caracteres"
+              helperText="Maximum 500 characters"
             />
             
             <SwitchField
               name="travel_availability"
-              label="Disponibilidad para viajar"
+              label="Available to travel"
             />
               
             <SwitchField
               name="has_driving_license"
-              label="Posee licencia de conducir"
+              label="Has driver's license"
             />
               
             <LicenseCategoryField />
@@ -140,7 +140,7 @@ const PersonalInformationFormModal = ({ initialData = null, load }: ModalProps) 
           className="bg-gray-600 text-white font-bold flex items-center gap-2 rounded-xl py-3 px-10 hover:bg-gray-700 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
         >
           <Edit className="w-5 h-5" />
-          Editar
+          Edit
         </button>
       )}
     </>

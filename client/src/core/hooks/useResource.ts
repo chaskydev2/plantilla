@@ -37,6 +37,7 @@ type ServiceType<T> = ServiceWithId<T> | ServiceWithoutId<T>;
 interface UseResourceOptions<T> {
   service: ServiceType<T>;
   resourceId?: any;
+  methodName?: string;
   initialFilters?: Record<string, string>;
   defaultSort?: { key: string; direction: 'asc' | 'desc' };
   defaultPerPage?: number;
@@ -45,6 +46,7 @@ interface UseResourceOptions<T> {
 export const useResource = <T>({
   service,
   resourceId,
+  methodName = 'getAllPaginated',
   initialFilters = {},
   defaultSort = { key: 'id', direction: 'asc' },
   defaultPerPage = 10,
@@ -84,13 +86,13 @@ export const useResource = <T>({
 
       let response;
       if (resourceId !== undefined) {
-        response = await (service as ServiceWithId<T>).getAllPaginated(
+        response = await (service as any)[methodName](
           resourceId, 
           params, 
           { signal: abortController.signal }
         );
       } else {
-        response = await (service as ServiceWithoutId<T>).getAllPaginated(
+        response = await (service as any)[methodName](
           params, 
           { signal: abortController.signal }
         );

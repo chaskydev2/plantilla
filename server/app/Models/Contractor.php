@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contractor extends Model
 {
@@ -23,7 +24,7 @@ class Contractor extends Model
         'license_number',
         'is_insured',
         'service_area',
-        'average_rating',
+        'average_rating', // Importante: Este campo almacenará el promedio
         'state_code',
         'country_code',
         'lat',
@@ -131,6 +132,57 @@ class Contractor extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'contractor_categories', 'contractor_user_id', 'category_id', 'user_id');
+    }
+
+    public function professions()
+    {
+        return $this->belongsToMany(Profession::class, 'contractor_professions', 'contractor_user_id', 'profession_id', 'user_id');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'contractor_tag', 'contractor_user_id', 'tag_id', 'user_id');
+    }
+
+    public function messageThreads(): HasMany
+    {
+        return $this->hasMany(ContractorMessageThread::class, 'contractor_user_id', 'user_id')
+            ->orderByDesc('last_message_at');
+    }
+
+    // Team relationships (self-referential)
+    public function teamMembers()
+    {
+        return $this->belongsToMany(
+            Contractor::class,
+            'contractor_team_members',
+            'leader_user_id',
+            'member_user_id',
+            'user_id',
+            'user_id'
+        )->withPivot('status', 'compania');
+    }
+
+    public function teamLeaders()
+    {
+        return $this->belongsToMany(
+            Contractor::class,
+            'contractor_team_members',
+            'member_user_id',
+            'leader_user_id',
+            'user_id',
+            'user_id'
+        )->withPivot('status', 'compania');
+    }
+
+    public function jobs()
+    {
+        return $this->hasMany(JobContractor::class, 'id_creator', 'user_id');
     }
 
     // Scopes
@@ -274,5 +326,41 @@ class Contractor extends Model
     public function getStatusLabelAttribute(): string
     {
         return self::getStatuses()[$this->contract_status] ?? 'Desconocido';
+    }
+
+    public function attributeContractors()
+    {
+        return $this->hasMany(AttributeContractor::class, 'contractor_id', 'user_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(ContractorMessageThread::class, 'contractor_user_id', 'user_id');
+    }
+
+    public function reviews()
+    {
+    
+        return $this->hasMany(Review::class, 'contractor_id', 'user_id');
+    }
+
+    public function updateAverageRating()
+    {
+        
+        $avg = $this->reviews()->avg('rating');
+        
+      
+        $this->average_rating = round($avg, 2);
+        $this->save();
+    }
+
+    public function chatThreads()
+    {
+        return $this->hasMany(ChatThread::class, 'contractor_id', 'user_id');
+    }
+
+    public function chatMessages()
+    {
+        return $this->morphMany(ChatMessage::class, 'sender');
     }
 }

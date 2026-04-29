@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import UserDetailModal from "./UserDetailModal";
+import { useTranslation } from "react-i18next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { UserService as ItemService } from "@/core/services/user/user.service";
 import type { IUserResponse as IItemResource } from "@/core/types/IUser";
-import { Search, Plus, Trash2, RotateCw, Edit, EyeIcon } from "lucide-react";
+import { Search, Plus, Trash2, RotateCw, Edit, EyeIcon, FileText } from "lucide-react";
 import Form from "./form";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -13,76 +15,6 @@ import WithPermission from "@/components/common/WithPermission";
 import useAuth from "@/core/hooks/useAuth";
 import { useNavigate } from "react-router";
 import DataTable from "@/components/table/DataTable";
-
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div>
-          <div className="font-bold">{item.id}</div>
-        </div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Nombre",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.name}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "email",
-    header: "Email",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.email}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "role",
-    header: "Roles",
-    render: (item: IItemResource) => {
-      // Manejar múltiples roles
-      const roles = (item as any).roles || [];
-      if (roles.length === 0) {
-        return <span className="badge badge-secondary">Sin rol</span>;
-      }
-      return (
-        <div className="flex flex-wrap gap-1">
-          {roles.map((role: any, index: number) => (
-            <span key={index} className="badge badge-primary text-xs">
-              {role.name}
-            </span>
-          ))}
-        </div>
-      );
-    },
-  },
-  {
-    key: "status",
-    header: "Estado",
-    render: (item: IItemResource) => (
-      <span className="badge badge-success">
-        {item.deleted_id == null ? "Activo" : "Inactivo"}
-      </span>
-    ),
-  },
-  {
-    key: "edit_profile",
-    header: "Perfil actualizado",
-    render: (item: IItemResource) =>
-      item.edit_profile ? (
-        <span className="badge badge-success">Actualizado</span>
-      ) : (
-        <span className="badge badge-warning">Pendiente</span>
-      ),
-  },
-];
 
 type FilterOption = {
   value: string;
@@ -97,11 +29,127 @@ type FilterConfig = {
 };
 
 export default function UserList() {
+  const { t } = useTranslation();
+
+  const [userDetailModal, setUserDetailModal] = useState<{ open: boolean; user: IItemResource | null }>({ open: false, user: null });
+
+  const handleOpenUserDetail = (user: IItemResource) => {
+    setUserDetailModal({ open: true, user });
+  };
+
+  const isContractor = (item: IItemResource) => {
+    const roles = (item as any).roles || [];
+    return roles.some((role: any) => {
+      const name = (role.slug || role.name || "").toString().toLowerCase();
+      return name.includes("contractor") || name.includes("contratista");
+    });
+  };
+
+  const isHomeowner = (item: IItemResource) => {
+    const roles = (item as any).roles || [];
+    return roles.some((role: any) => {
+      const name = (role.slug || role.name || "").toString().toLowerCase();
+      return name.includes("homeowner") || name.includes("propietario");
+    });
+  };
+
+  const handleStatusChange = async (id: number, status: boolean) => {
+    // Aquí deberías llamar a tu servicio para actualizar el estado del usuario
+    await ItemService.updateStatus(id, status ? 1 : 0);
+    fetchItems();
+  };
+
+  const columns = [
+    {
+      key: "id",
+      header: "ID",
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="font-bold">{item.id}</div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t("admin.users.firstName"),
+      render: (item: IItemResource) => (
+        <button className="font-bold text-blue-600 underline hover:text-blue-800" onClick={() => handleOpenUserDetail(item)}>
+          {item.name}
+        </button>
+      ),
+      sortable: true,
+    },
+    {
+      key: "email",
+      header: t("admin.users.email"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.email}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "role",
+      header: t("admin.users.roles"),
+      render: (item: IItemResource) => {
+        // Manejar múltiples roles
+        const roles = (item as any).roles || [];
+        if (roles.length === 0) {
+          return <span className="badge badge-secondary">Sin rol</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1">
+            {roles.map((role: any, index: number) => (
+              <span key={index} className="badge badge-primary text-xs">
+                {role.name}
+              </span>
+            ))}
+          </div>
+        );
+      },
+    },
+    { 
+      key: "status",
+      header: "Estado",
+      render: (item: IItemResource) => {
+        let badgeClass = "badge ";
+        let label = "Desconocido";
+        if (item.verification !== undefined && item.verification !== null) {
+          if (item.verification === true) {
+            badgeClass += "badge-success";
+            label = "Activo";
+          } else if (item.verification === false) {
+            badgeClass += "badge-danger";
+            label = "Inactivo";
+          } else {
+            badgeClass += "badge-secondary";
+            label = String(item.verification);
+          }
+        } else {
+          badgeClass += "badge-secondary";
+        }
+        return <span className={badgeClass}>{label}</span>;
+      },
+    },
+    {
+      key: "edit_profile",
+      header: t("admin.users.editProfile"),
+      render: (item: IItemResource) =>
+        item.edit_profile ? (
+          <span className="badge badge-success">Actualizado</span>
+        ) : (
+          <span className="badge badge-warning">Pendiente</span>
+        ),
+    },
+  ];
   const {
     items,
     loading,
     pagination,
     sort,
+    filters: activeFilters,
     searchInput,
     handlePageChange,
     handleSortChange,
@@ -130,8 +178,18 @@ export default function UserList() {
   const [filters, setFilters] = useState<FilterConfig[]>([
     {
       key: "role",
-      label: "Filtrar por rol",
-      options: [{ value: "", label: "Todos" }],
+      label: "Filter by role",
+      options: [{ value: "", label: "All" }],
+      currentValue: "",
+    },
+    {
+      key: "verification",
+      label: "Estado",
+      options: [
+        { value: "", label: "Todos" },
+        { value: "1", label: "Activo" },
+        { value: "0", label: "Inactivo" },
+      ],
       currentValue: "",
     },
   ]);
@@ -145,19 +203,20 @@ export default function UserList() {
     getAllPermissions();
   }, []);
 
-  // Imprimir usuarios por consola cuando cambien
+  // Print users to console when they change
   useEffect(() => {
+
     if (items && items.length > 0) {
-      console.log("===== TODOS LOS USUARIOS =====");
+      console.log("===== ALL USERS =====");
       console.log(items);
-      console.log("===== DETALLE DE CADA USUARIO =====");
+      console.log("===== USER DETAILS =====");
       items.forEach((user, index) => {
         const typedUser = user as IItemResource;
-        console.log(`Usuario ${index + 1}:`, typedUser);
+        console.log(`User ${index + 1}:`, typedUser);
         console.log(`- ID: ${typedUser.id}`);
-        console.log(`- Nombre: ${typedUser.name}`);
+        console.log(`- Name: ${typedUser.name}`);
         console.log(`- Email: ${typedUser.email}`);
-        console.log(`- Roles:`, (typedUser as any).roles || 'Sin roles');
+        console.log(`- Roles:`, (typedUser as any).roles || 'No roles');
         console.log("----------------------------");
       });
     }
@@ -170,12 +229,21 @@ export default function UserList() {
       label: item.name,
     }));
     setFilters((prev) => [
-      {
-        ...prev[0],
-        options: [{ value: "", label: "Todos" }, ...rolOptions],
-      },
+      ...prev.map((filter) =>
+        filter.key === "role"
+          ? { ...filter, options: [{ value: "", label: "All" }, ...rolOptions] }
+          : filter
+      ),
     ]);
     setRoles(res.data);
+  };
+
+  const handleFiltersChange = (newFilter: Record<string, string>) => {
+    const next = { ...activeFilters, ...newFilter } as Record<string, string | undefined>;
+    if ('verification' in newFilter && newFilter.verification === "") {
+      delete next.verification; // no filter when selecting "Todos"
+    }
+    handleFilterChange(next as Record<string, string>);
   };
 
   const openDialog = (
@@ -204,8 +272,8 @@ export default function UserList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar al usuario ${item.name}?`,
+      "Confirm Deletion",
+      `Are you sure you want to delete user ${item.name}?`,
       () => handleDelete(item),
       "danger"
     );
@@ -213,8 +281,8 @@ export default function UserList() {
 
   const confirmRestore = (item: IItemResource) => {
     openDialog(
-      "Confirmar restauración",
-      `¿Estás seguro que deseas restaurar al usuario ${item.name}?`,
+      "Confirm Restoration",
+      `Are you sure you want to restore user ${item.name}?`,
       () => handleRestore(item)
     );
   };
@@ -222,10 +290,10 @@ export default function UserList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || "User deleted");
       fetchItems();
     } catch (error) {
-      console.error("Error al eliminar usuario:", error);
+      console.error("Error deleting user:", error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -236,10 +304,26 @@ export default function UserList() {
     setIsProcessing(true);
     try {
       const response = await ItemService.restore(item.id);
-      toastify.success(response?.message || "Item restaurado");
+      toastify.success(response?.message || "User restored");
       fetchItems();
     } catch (error) {
-      console.error("Error al restaurar usuario:", error);
+      console.error("Error restoring user:", error);
+    } finally {
+      setIsProcessing(false);
+      closeDialog();
+    }
+  };
+
+  const handlePermanentDelete = async (item: IItemResource) => {
+    setIsProcessing(true);
+    try {
+      const response = await ItemService.forceRemove(item.id);
+      // Log the full response so we can inspect what the service returns
+      console.log('Debug - forceRemove response for user', item.id, response);
+      toastify.success(response?.message || "User permanently deleted");
+      fetchItems();
+    } catch (error) {
+      console.error("Error permanently deleting user:", error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -248,7 +332,7 @@ export default function UserList() {
 
   const actions = [
     {
-      label: "Ver perfil",
+      label: t("admin.users.viewProfile"),
       icon: <EyeIcon className="w-4 h-4" />,
       onClick: (item: IItemResource) => navigate(`/admin/usuarios/${item.id}`),
       variant: "primary" as const,
@@ -256,7 +340,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_ver"),
     },
     {
-      label: "Editar",
+      label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -264,7 +348,7 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_editar"),
     },
     {
-      label: "Eliminar",
+      label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -272,12 +356,34 @@ export default function UserList() {
         item.deleted_id == null && hasPermission("usuario_eliminar"),
     },
     {
-      label: "Restaurar",
+      label: "Documentos",
+      icon: <FileText className="w-4 h-4" />,
+      onClick: (item: IItemResource) => handleOpenUserDetail(item),
+      variant: "secondary" as const,
+      show: (item: IItemResource) =>
+        (isContractor(item) || isHomeowner(item)) && hasPermission("usuario_ver"),
+    },
+    {
+      label: t("admin.common.restore"),
       icon: <RotateCw className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmRestore(item),
       variant: "primary" as const,
       show: (item: IItemResource) =>
         item.deleted_id != null && hasPermission("usuario_restaurar"),
+    },
+    {
+      label: "Delete Permanently",
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (item: IItemResource) => {
+        openDialog(
+          "Confirm Permanent Deletion",
+          `This will permanently delete user ${item.name}. This action cannot be undone. Continue?`,
+          () => handlePermanentDelete(item),
+          "danger"
+        );
+      },
+      variant: "danger" as const,
+      show: (item: IItemResource) => item.deleted_id != null && hasPermission("usuario_eliminar" as any),
     },
   ];
 
@@ -293,7 +399,7 @@ export default function UserList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         </WithPermission>
         
@@ -304,7 +410,7 @@ export default function UserList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar usuarios..."
+          placeholder={t("admin.users.searchPlaceholder")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -315,7 +421,7 @@ export default function UserList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Usuarios" />
+      <PageBreadcrumb pageTitle={t("admin.users.title")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -323,7 +429,7 @@ export default function UserList() {
         filters={filters}
         sort={sort}
         onSortChange={handleSortChange}
-        onFilterChange={handleFilterChange}
+        onFilterChange={handleFiltersChange}
         onSearch={handleSearch}
         pagination={pagination}
         onPageChange={handlePageChange}
@@ -342,6 +448,12 @@ export default function UserList() {
         load={fetchItems}
         roles={roles}
       />
+      <UserDetailModal
+        user={userDetailModal.user}
+        isOpen={userDetailModal.open}
+        onClose={() => setUserDetailModal({ open: false, user: null })}
+        onStatusChange={handleStatusChange}
+      />
       {dialogConfig && (
         <ConfirmDialog
           isOpen={dialogConfig.isOpen}
@@ -351,7 +463,7 @@ export default function UserList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"}
+          confirmText={dialogConfig.variant === "danger" ? "Delete" : "Restore"}
         />
       )}
     </div>

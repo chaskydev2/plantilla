@@ -33,8 +33,15 @@ class UpdateCategoryRequest extends FormRequest
             ]);
         }
 
-        // Si se proporciona parent_id como 0 o string vacío, convertir a null
-        if ($this->has('parent_id') && ($this->parent_id === '0' || $this->parent_id === '' || $this->parent_id === 0)) {
+        // Si se proporciona parent_id como 0, string vacío o texto indicando sin padre, convertir a null
+        if ($this->has('parent_id') && (
+            $this->parent_id === '0' || 
+            $this->parent_id === '' || 
+            $this->parent_id === 0 ||
+            $this->parent_id === 'No Parent Category (Root)' ||
+            $this->parent_id === 'null' ||
+            $this->parent_id === 'undefined'
+        )) {
             $this->merge(['parent_id' => null]);
         }
     }
@@ -142,15 +149,15 @@ class UpdateCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'El nombre de la categoría es obligatorio.',
-            'name.unique' => 'Ya existe una categoría con este nombre.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'slug.unique' => 'Ya existe una categoría con este slug.',
-            'slug.max' => 'El slug no puede exceder los 255 caracteres.',
-            'parent_id.exists' => 'La categoría padre seleccionada no existe.',
-            'parent_id.integer' => 'El ID de la categoría padre debe ser un número.',
-            'description.max' => 'La descripción no puede exceder los 1000 caracteres.',
-            'icon.max' => 'El icono no puede exceder los 255 caracteres.',
+            'name.required' => 'The category name is required.',
+            'name.unique' => 'A category with this name already exists.',
+            'name.max' => 'The name may not exceed 255 characters.',
+            'slug.unique' => 'A category with this slug already exists.',
+            'slug.max' => 'The slug may not exceed 255 characters.',
+            'parent_id.exists' => 'The selected parent category does not exist.',
+            'parent_id.integer' => 'The parent category ID must be a number.',
+            'description.max' => 'The description may not exceed 1000 characters.',
+            'icon.max' => 'The icon may not exceed 255 characters.',
         ];
     }
 }

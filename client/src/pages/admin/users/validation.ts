@@ -23,6 +23,7 @@ export const userStoreSchema = yup.object().shape({
     .of(yup.number())
     .min(1, 'Debe seleccionar al menos un rol')
     .max(5, 'Máximo 2 roles permitidos'),
+  is_active: yup.boolean().optional(),
 });
 
 export const userUpdateSchema = yup.object().shape({
@@ -47,4 +48,5 @@ export const userUpdateSchema = yup.object().shape({
     .of(yup.number())
     .min(1, 'Debe seleccionar al menos un rol')
     .max(5, 'Máximo 5 roles permitidos'),
+  is_active: yup.boolean().optional(),
 });

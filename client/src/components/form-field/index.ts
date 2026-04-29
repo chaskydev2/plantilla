@@ -4,8 +4,9 @@ import SelectField from "./SelectField";
 import TextAreaField from "./TextAreaField";
 import SwitchField from "./SwitchField";
 import InputFileField from "./InputFileField";
-
 import MultiSelectField from "./MultiSelectField";
+import UserSearchField from "./UserSearchField";
+import CheckboxField from "./CheckboxField";
 
 export {
     InputField,
@@ -15,4 +16,6 @@ export {
     SwitchField,
     InputFileField,
     MultiSelectField,
+    UserSearchField,
+    CheckboxField,
 }

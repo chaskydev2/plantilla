@@ -55,7 +55,7 @@ const WorkReferenceModal = ({
   const handleSubmit = async (data: FormValues) => {
     try {
       if (!userId) {
-        toastify.error('Se requiere un ID de usuario');
+        toastify.error('User ID is required');
         return;
       }
       if (isEditing) {
@@ -64,13 +64,13 @@ const WorkReferenceModal = ({
           initialData!.id, 
           data
         );
-        toastify.success(response.message || 'Formación académica actualizada');
+        toastify.success(response.message || 'Work reference updated');
       } else {
         const response = await ItemService.create(
           userId,
           data
         );
-        toastify.success(response.message || 'Formación académica creada');
+        toastify.success(response.message || 'Work reference created');
       }
 
       load();
@@ -78,7 +78,7 @@ const WorkReferenceModal = ({
     } catch (error: any) {
       toastify.error(
         error.response?.data?.message || 
-        (isEditing ? 'Error al actualizar' : 'Error al crear')
+        (isEditing ? 'Error updating' : 'Error creating')
       );
     }
   };
@@ -87,7 +87,7 @@ const WorkReferenceModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar referencia laboral' : 'Agregar referencia laboral'}
+      title={isEditing ? 'Edit work reference' : 'Add work reference'}
       size="lg"
     >
       <FormProviderWrapper
@@ -100,42 +100,42 @@ const WorkReferenceModal = ({
         <div className="grid grid-cols-1 gap-4">
           <InputField
             name="reference_name"
-            label="Nombre del referente"
-            placeholder="Ej: Ing. Juan Pérez, Arq. María Gómez"
+            label="Reference name"
+            placeholder="E.g.: Eng. John Smith, Arch. Mary Gomez"
           />
           
           <InputField
             name="company"
-            label="Empresa/Institución"
-            placeholder="Ej: GEOBOL, Consultoría Topográfica Andina, Municipalidad de La Paz"
+            label="Company/Institution"
+            placeholder="E.g.: GEOBOL, Andean Topographic Consulting, Municipality of La Paz"
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               name="position"
-              label="Cargo del referente"
-              placeholder="Ej: Jefe de Topografía, Supervisor de Catastro"
+              label="Reference position"
+              placeholder="E.g.: Head of Surveying, Cadastre Supervisor"
             />
 
             <InputField
               name="phone"
-              label="Teléfono de contacto"
-              placeholder="Ej: +591 71234567"
+              label="Contact phone"
+              placeholder="E.g.: +591 71234567"
               type="tel"
             />
           </div>
 
           <InputField
             name="email"
-            label="Correo electrónico"
-            placeholder="Ej: referencia@empresa.com"
+            label="Email address"
+            placeholder="E.g.: reference@company.com"
             type="email"
           />
 
           <TextAreaField
             name="additional_notes"
-            label="Observaciones adicionales"
-            placeholder="Ej: Descripcion de notas adicionales"
+            label="Additional notes"
+            placeholder="E.g.: Description of additional notes"
             rows={4}
           />
         </div>

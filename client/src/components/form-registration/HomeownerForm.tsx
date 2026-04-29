@@ -3,12 +3,31 @@ import type { FormData, FormValidationErrors } from "./types";
 import { fieldCls, labelCls, borderPrimary } from "./utils";
 import ErrorText from "./ErrorText";
 import PasswordInput from "./PasswordInput";
+import EmailVerification from "../registration-form/EmailVerification";
+import { Modal } from "../ui/modal/index";
 
 interface HomeownerFormProps {
   formData: Extract<FormData, { userType: "ownerHome" }>;
   errors: FormValidationErrors;
   submitted: boolean;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => void;
+
+  // Modal verification (✅ obligatorios)
+  showEmailVerification: boolean;
+  verificationCode: string;
+  setVerificationCode: (code: string) => void;
+  verificationError: string;
+
+  loading: boolean;
+  sendVerificationEmail: (email: string) => void;
+  onGoBackToForm: () => void;
+
+  // ✅ lo llama Create Account
+  onConfirmEmail: () => void;
 }
 
 const HomeownerForm: React.FC<HomeownerFormProps> = ({
@@ -16,12 +35,28 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
   errors,
   submitted,
   handleChange,
+
+  showEmailVerification,
+  verificationCode,
+  setVerificationCode,
+  verificationError,
+
+  loading,
+  sendVerificationEmail,
+  onGoBackToForm,
+  onConfirmEmail,
 }) => {
+  const handleResendEmail = () => sendVerificationEmail(formData.email);
+
   return (
     <>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="firstName">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
+            htmlFor="firstName"
+          >
             First Name *
           </label>
           <input
@@ -38,7 +73,11 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
         </div>
 
         <div>
-          <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="lastName">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
+            htmlFor="lastName"
+          >
             Last Name *
           </label>
           <input
@@ -55,7 +94,11 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
         </div>
 
         <div>
-          <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="email">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
+            htmlFor="email"
+          >
             Email *
           </label>
           <input
@@ -72,7 +115,11 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
         </div>
 
         <div>
-          <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="phone">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
+            htmlFor="phone"
+          >
             Phone Number *
           </label>
           <input
@@ -89,7 +136,11 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
         </div>
 
         <div>
-          <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="password">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
+            htmlFor="password"
+          >
             Password *
           </label>
           <PasswordInput
@@ -104,7 +155,11 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
         </div>
 
         <div>
-          <label className={labelCls} style={{ color: "var(--color-secondary)" }} htmlFor="confirmPassword">
+          <label
+            className={labelCls}
+            style={{ color: "var(--color-secondary)" }}
+            htmlFor="confirmPassword"
+          >
             Confirm Password *
           </label>
           <PasswordInput
@@ -118,6 +173,29 @@ const HomeownerForm: React.FC<HomeownerFormProps> = ({
           <ErrorText msg={submitted ? errors.confirmPassword : undefined} />
         </div>
       </div>
+
+      {/* ✅ MODAL */}
+      <Modal
+        isOpen={showEmailVerification}
+        onClose={onGoBackToForm}
+        className="max-w-xl mx-4 p-6 sm:p-8"
+        showCloseButton={false}
+      >
+        <EmailVerification
+          email={formData.email}
+          verificationCode={verificationCode}
+          setVerificationCode={setVerificationCode}
+          verificationError={verificationError}
+          loading={loading}
+          onResendEmail={handleResendEmail}
+          onGoBack={onGoBackToForm}
+          // onConfirm={onConfirmEmail}
+          onConfirm={() => {
+            console.log("🔥 HomeownerForm onConfirmEmail fired");
+            onConfirmEmail();
+          }}
+        />
+      </Modal>
     </>
   );
 };

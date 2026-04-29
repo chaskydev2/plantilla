@@ -24,7 +24,7 @@ const columns = [
   },
   {
     key: "title",
-    header: "Titulo",
+    header: "Title",
     render: (item: IItemResource) => (
       <div className="font-bold">{item.title}</div>
     ),
@@ -32,7 +32,7 @@ const columns = [
   },
   {
     key: "description",
-    header: "Descripcion",
+    header: "Description",
     render: (item: IItemResource) => (
       <div className="font-bold">{item.description}</div>
     ),
@@ -98,8 +98,8 @@ export default function MoralValueList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el valor moral ${item.title}?`,
+      "Confirm deletion",
+      `Are you sure you want to delete the moral value ${item.title}?`,
       () => handleDelete(item),
       "danger"
     );
@@ -108,10 +108,10 @@ export default function MoralValueList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || "Item deleted");
       fetchItems();
     } catch (error) {
-      console.error("Error al eliminar el valor moral:", error);
+      console.error("Error deleting moral value:", error);
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -120,7 +120,7 @@ export default function MoralValueList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: "Edit",
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -128,7 +128,7 @@ export default function MoralValueList() {
         item.id && hasPermission("valor_moral_editar"),
     },
     {
-      label: "Eliminar",
+      label: "Delete",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -149,7 +149,7 @@ export default function MoralValueList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            Add
           </button>
         </WithPermission>
       </div>
@@ -159,7 +159,7 @@ export default function MoralValueList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Search..."
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -170,7 +170,7 @@ export default function MoralValueList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Valores morales" />
+      <PageBreadcrumb pageTitle="Moral values" />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -205,7 +205,7 @@ export default function MoralValueList() {
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
           confirmText={
-            dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"
+            dialogConfig.variant === "danger" ? "Delete" : "Restore"
           }
         />
       )}

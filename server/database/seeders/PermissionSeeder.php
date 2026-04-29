@@ -47,6 +47,11 @@ class PermissionSeeder extends Seeder
             }
         }
 
+        Permission::firstOrCreate([
+            'name' => 'usuario_eliminar_permanente',
+            'guard_name' => 'api'
+        ]);
+
         $this->command->info('Permissions seeded successfully!');
     }
 }

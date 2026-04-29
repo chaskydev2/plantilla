@@ -18,7 +18,13 @@ const Caret: React.FC<{ open: boolean }> = ({ open }) => (
     animate={{ rotate: open ? 180 : 0 }}
     transition={{ duration: 0.2 }}
   >
-    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M6 9l6 6 6-6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </motion.svg>
 );
 
@@ -32,6 +38,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   className = "",
   style = {},
   ariaLabel,
+  disabled = false,
 }) => {
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -41,10 +48,28 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const liveMsgRef = useRef<HTMLDivElement | null>(null);
 
+  const announce = (message: string) => {
+    if (!liveMsgRef.current) return;
+    liveMsgRef.current.textContent = "";
+    setTimeout(() => {
+      if (liveMsgRef.current) liveMsgRef.current.textContent = message;
+    }, 50);
+  };
+
+  const selectedOptions = options.filter((o) => value.includes(o.id));
+  const reachedMax = value.length >= maxSelections;
+
+  const filteredOptions = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((o) => o.name.toLowerCase().includes(q));
+  }, [options, filter]);
+
   // keyboard navigation & close on esc
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (!isOpen) return;
+
       if (e.key === "Escape") {
         setIsOpen(false);
       } else if (e.key === "ArrowDown") {
@@ -71,13 +96,16 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
         }
       }
     };
+
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, activeIndex]); // eslint-disable-line
+  }, [isOpen, activeIndex, filteredOptions]); // ✅ incluye filteredOptions para evitar stale
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -100,7 +128,6 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       onChange(name, [...value, optionId]);
       announce(`${options.find((o) => o.id === optionId)?.name} añadido`);
     } else {
-      // announce max reached
       announce(`Máximo de ${maxSelections} seleccionados`);
     }
   };
@@ -109,39 +136,24 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
     if (value.includes(optionId)) onChange(name, value.filter((id) => id !== optionId));
   };
 
-  const selectedOptions = options.filter((o) => value.includes(o.id));
-  const reachedMax = value.length >= maxSelections;
-
-  const filteredOptions = useMemo(() => {
-    const q = filter.trim().toLowerCase();
-    if (!q) return options;
-    return options.filter((o) => o.name.toLowerCase().includes(q));
-  }, [options, filter]);
-
-  const announce = (message: string) => {
-    if (!liveMsgRef.current) return;
-    liveMsgRef.current.textContent = "";
-    setTimeout(() => {
-      if (liveMsgRef.current) liveMsgRef.current.textContent = message;
-    }, 50);
-  };
-
   return (
     <div className="relative" ref={dropdownRef}>
       <motion.button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        whileHover={{ scale: 1.005 }}
-        whileTap={{ scale: 0.995 }}
+        whileHover={disabled ? {} : { scale: 1.005 }}
+        whileTap={disabled ? {} : { scale: 0.995 }}
         className={cn(
-          "w-full min-h-[56px] cursor-pointer flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left shadow-sm focus:outline-none",
+          "w-full min-h-[56px] flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left shadow-sm focus:outline-none",
+          disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           className
         )}
         style={{ borderColor: "var(--color-primary)", background: "white", ...style }}
-        onClick={() => setIsOpen((o) => !o)}
+        onClick={() => !disabled && setIsOpen((o) => !o)}
         aria-controls={`ms-${id}-listbox`}
         aria-label={ariaLabel || placeholder}
+        aria-disabled={disabled}
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="flex-1 min-w-0">
@@ -160,18 +172,31 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                     title={option.name}
                   >
                     <span className="truncate max-w-[160px]">{option.name}</span>
-                    <button
-                      type="button"
+
+                    {/* ✅ FIX: No <button> dentro de <button> */}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         removeChip(option.id);
+                        announce(`${option.name} eliminado`);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeChip(option.id);
+                          announce(`${option.name} eliminado`);
+                        }
                       }}
                       aria-label={`Remove ${option.name}`}
-                      className="ml-1 text-[12px] leading-none p-1 rounded hover:bg-gray-100"
+                      className="ml-1 text-[12px] leading-none p-1 rounded hover:bg-gray-100 cursor-pointer select-none"
                       style={{ color: "var(--color-secondary)" }}
                     >
                       ×
-                    </button>
+                    </span>
                   </span>
                 ))}
                 <span className="text-xs text-gray-500 ml-1">({selectedOptions.length})</span>
@@ -181,6 +206,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
             )}
           </div>
         </div>
+
         <Caret open={isOpen} />
       </motion.button>
 
@@ -220,12 +246,15 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
 
           <div className="max-h-60 overflow-y-auto" role="presentation">
             {filteredOptions.length === 0 && (
-              <div className="px-4 py-6 text-center text-sm text-gray-500">No options available</div>
+              <div className="px-4 py-6 text-center text-sm text-gray-500">
+                No options available
+              </div>
             )}
 
             {filteredOptions.map((option, idx) => {
               const active = value.includes(option.id);
               const isFocused = activeIndex === idx;
+
               return (
                 <button
                   type="button"
@@ -244,7 +273,11 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                   style={{
                     color: "var(--color-secondary)",
                     borderLeftColor: active ? "var(--color-secondary)" : "transparent",
-                    background: isFocused ? "rgba(0,0,0,0.03)" : active ? "rgba(0,0,0,0.03)" : "transparent",
+                    background: isFocused
+                      ? "rgba(0,0,0,0.03)"
+                      : active
+                      ? "rgba(0,0,0,0.03)"
+                      : "transparent",
                   }}
                 >
                   <span className="truncate">{option.name}</span>
@@ -261,8 +294,15 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
             style={{ color: "var(--color-secondary)", borderColor: "var(--color-primary)" }}
           >
             <div>
-              {reachedMax ? <span>Máximo de {maxSelections} seleccionado{maxSelections > 1 ? "s" : ""}.</span> : <span>{options.length} opciones</span>}
+              {reachedMax ? (
+                <span>
+                  Máximo de {maxSelections} seleccionado{maxSelections > 1 ? "s" : ""}.
+                </span>
+              ) : (
+                <span>{options.length} opciones</span>
+              )}
             </div>
+
             <div>
               <button
                 type="button"

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { BeginningService as ItemService } from "@/core/services/beginning/beginning.service";
 import type { IBeginning as IItemResource } from "@/core/types/IBeginning";
@@ -10,44 +11,47 @@ import { toastify } from "@/core/utils/toastify";
 import useAuth from "@/core/hooks/useAuth";
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item.id}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "mission",
-    header: "Mision",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.mission}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "vision",
-    header: "Vision",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.vision}</div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "Our_father",
-    header: "Nuestro padre nuestro",
-    render: (item: IItemResource) => (
-      <div className="font-bold">{item.our_father}</div>
-    ),
-    sortable: true,
-  },
-];
+// columns moved into component to allow translations
 
 export default function ContactList() {
+  const { t } = useTranslation();
+
+  const columns = [
+    {
+      key: "id",
+      header: t("admin.common.id"),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item.id}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "mission",
+      header: t("admin.principles.mission"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.mission}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "vision",
+      header: t("admin.principles.vision"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.vision}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "our_father",
+      header: t("admin.principles.ourFather"),
+      render: (item: IItemResource) => (
+        <div className="font-bold">{item.our_father}</div>
+      ),
+      sortable: true,
+    },
+  ];
   const {
     items,
     loading,
@@ -105,8 +109,8 @@ export default function ContactList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar el principio? ${item.mission}?`,
+      t("admin.common.confirmDelete"),
+      t("admin.principles.confirmDeleteMessage", { mission: item.mission }),
       () => handleDelete(item),
       "danger"
     );
@@ -115,7 +119,7 @@ export default function ContactList() {
   const handleDelete = async (item: IItemResource) => {
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Item eliminado");
+      toastify.success(response?.message || t("admin.principles.deleteSuccess"));
       fetchItems();
     } catch (error) {
       console.error("Error al eliminar el principio:", error);
@@ -127,7 +131,7 @@ export default function ContactList() {
 
   const actions = [
     {
-      label: "Editar",
+  label: t("admin.common.edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
@@ -135,7 +139,7 @@ export default function ContactList() {
         item.id && hasPermission("principio_editar"),
     },
     {
-      label: "Eliminar",
+  label: t("admin.common.delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -157,7 +161,7 @@ export default function ContactList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar
+            {t("admin.common.add")}
           </button>
         }
       </div>
@@ -167,7 +171,7 @@ export default function ContactList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t("admin.common.search")}
           className=" input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -178,7 +182,7 @@ export default function ContactList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Principio" />
+  <PageBreadcrumb pageTitle={t("admin.sidebar.principles")} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -212,7 +216,7 @@ export default function ContactList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Restaurar"}
+          confirmText={dialogConfig.variant === "danger" ? t("admin.common.delete") : t("admin.common.restore")}
         />
       )}
     </div>

@@ -1,6 +1,7 @@
 import { SelectField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
+import { useTranslation } from 'react-i18next';
 import type { 
   IRolPermissionResponse as IItemResponse 
 } from '@/core/types/IRol';
@@ -28,6 +29,7 @@ const UserModal = ({
   load,
   permissions = []
 }: UserModalProps) => {
+  const { t } = useTranslation();
   const isEditing = !!initialData;
 
   const { id } = useParams();
@@ -53,7 +55,7 @@ const UserModal = ({
     await ItemService.createPermissions(id, request)
       .then(response => {
         load();
-        toastify.success(response.message || 'Item creado');
+        toastify.success(response.message || t('admin.messages.saveSuccess'));
       })
       .catch(error => toastify.error(error.message))
       .finally(() => onClose());
@@ -63,7 +65,7 @@ const UserModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Rol' : 'Nuevo Rol'}
+      title={isEditing ? t('admin.roles.editRole') : t('admin.roles.addRole')}
       size="lg"
     >
       <FormProviderWrapper

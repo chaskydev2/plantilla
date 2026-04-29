@@ -10,7 +10,6 @@ import {
   CalendarDays,
   Wrench,
   User,
-  Star,
   Plus,
   Minus,
   ArrowRight as ArrowRightIcon,
@@ -21,11 +20,23 @@ import {
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import SearchBar from "./HomePage/SearchBar";
+import { JobContractService } from '@/core/services/job-contracts/jobContract.service';
+import type { IJobContract } from '@/core/types/IJobContract';
+import { FaqService } from '@/core/services/faq/faq.service';
+import type { IFaq } from '@/core/types/IFaq';
+import { TextBlockService } from '@/core/services/textblock/textblock.service';
+import type { ITextBlock } from '@/core/types/ITextBlock';
+import { YouTubeVideoService } from '@/core/services/youtube/youtubeVideo.service';
+import type { IYouTubeVideo } from '@/core/types/IYouTubeVideo';
+import { BannerService } from '@/core/services/banner/banner.service';
+import type { IBanner } from '@/core/types/IBanner';
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [servicesModalOpen, setServicesModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsLoading(false);
@@ -34,35 +45,35 @@ const HomePage = () => {
   // Popular services data reused in carousel and modal
   const popularServices = [
     {
-      title: "Roofing",
+      title: t('services.roofing'),
       img: "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Gutters",
+      title: t('services.gutters'),
       img: "https://images.unsplash.com/photo-1560785496-3c9d27877182?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Siding",
+      title: t('services.siding'),
       img: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Windows",
+      title: t('services.windows'),
       img: "https://images.unsplash.com/photo-1584516025402-5ce32f67b86e?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Painting",
+      title: t('services.painting'),
       img: "https://images.unsplash.com/photo-1593282192539-9bdb07f6aa1f?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Drywall",
+      title: t('services.drywall'),
       img: "https://images.unsplash.com/photo-1617695271857-0cf6e8404a89?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Solar",
+      title: t('services.solar'),
       img: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=1400&auto=format&fit=crop",
     },
     {
-      title: "Insulation",
+      title: t('services.insulation'),
       img: "https://images.unsplash.com/photo-1600191729101-f54d9fba6032?q=80&w=1400&auto=format&fit=crop",
     },
   ];
@@ -79,18 +90,156 @@ const HomePage = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, [servicesModalOpen]);
 
+  // removed: getAnnouncements
+
+  // Extiende el tipo para los contratos recientes
+  interface IJobContractExtended extends IJobContract {
+    creator?: any;
+    contractor?: any;
+    image_url?: string;
+    title?: string;
+    location?: string;
+    created_at?: string;
+  }
+
+  const [latestContracts, setLatestContracts] = useState<IJobContractExtended[]>([]);
+  const [contractsLoading, setContractsLoading] = useState(true);
+  const [faqs, setFaqs] = useState<IFaq[]>([]);
+  const [faqsLoading, setFaqsLoading] = useState(true);
+  const [textBlock, setTextBlock] = useState<ITextBlock | null>(null);
+  const [youtubeVideos, setYouTubeVideos] = useState<IYouTubeVideo[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+  const [banner, setBanner] = useState<IBanner | null>(null);
+
   const bannerContent = {
-    topText: "Protecting families in the U.S. and Canada",
-    title: "Only vetted professionals. Backed by our $250,000 guarantee",
-    subtitle:
-      "All contractors are background-checked and financially screened—and if they mess up, your project is protected.",
+    topText: textBlock?.text_tertiary || t('hero.topText'),
+    title: textBlock?.text_primary || t('hero.title'),
+    subtitle: textBlock?.text_secondary || t('hero.subtitle'),
   };
 
-  // removed: getAnnouncements
+  useEffect(() => {
+    async function fetchLatestContracts() {
+      setContractsLoading(true);
+      try {
+        const res = await JobContractService.getAllPaginated({ limit: 3, sort_by: 'id', sort_dir: 'desc' });
+        console.log(res);
+        setLatestContracts(Array.isArray(res.data) ? res.data.slice(0, 3) : []);
+      } catch (err) {
+        console.log('Error fetching latest contracts:', err);
+        setLatestContracts([]);
+      } finally {
+        setContractsLoading(false);
+      }
+    }
+    fetchLatestContracts();
+  }, []);
+
+  useEffect(() => {
+    async function fetchFaqs() {
+      setFaqsLoading(true);
+      try {
+        const res = await FaqService.getAll();
+        setFaqs(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.log('Error fetching FAQs:', err);
+        setFaqs([]);
+      } finally {
+        setFaqsLoading(false);
+      }
+    }
+    fetchFaqs();
+  }, []);
+
+  useEffect(() => {
+    async function fetchTextBlock() {
+      try {
+        const res = await TextBlockService.getFirst();
+        if (res.data) {
+          setTextBlock(res.data);
+        }
+      } catch (err) {
+        console.log('Error fetching text block:', err);
+      }
+    }
+    fetchTextBlock();
+  }, []);
+
+  useEffect(() => {
+    async function fetchYouTubeVideos() {
+      setVideosLoading(true);
+      try {
+        const res = await YouTubeVideoService.getAllPaginated({ per_page: 10 });
+        const videoList = Array.isArray(res.data) ? res.data : [];
+        setYouTubeVideos(videoList);
+      } catch (err) {
+        console.log('Error fetching YouTube videos:', err);
+        setYouTubeVideos([]);
+      } finally {
+        setVideosLoading(false);
+      }
+    }
+    fetchYouTubeVideos();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBanner() {
+      try {
+        const res = await BannerService.getAll();
+        const bannerList = Array.isArray(res.data) ? res.data : [];
+        if (bannerList.length > 0) {
+          setBanner(bannerList[0]);
+        }
+      } catch (err) {
+        console.log('Error fetching banner:', err);
+        setBanner(null);
+      }
+    }
+    fetchBanner();
+  }, []);
+
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || '';
+  function getJobImageUrl(image?: string | null): string {
+    if (!image) return '/images/default-service.jpg';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    // Quitar cualquier /api o api al inicio
+    return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
+
+  function getBannerImageUrl(image?: string | null): string {
+    if (!image) return 'https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2000&auto=format&fit=crop';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    return `${API_BASE}/${image.replace(/^\/?api(\/|$)/, '')}`;
+  }
+
+  function getYouTubeEmbedUrl(url?: string): string {
+    if (!url) return '';
+    
+    // Si ya es una URL de embed, devolverla
+    if (url.includes('youtube.com/embed/')) return url;
+    
+    // Extraer video ID de diferentes formatos
+    let videoId = '';
+    
+    // Formato: https://www.youtube.com/watch?v=VIDEO_ID
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (watchMatch) videoId = watchMatch[1];
+    
+    // Formato: https://youtu.be/VIDEO_ID
+    const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+    if (shortMatch && !videoId) videoId = shortMatch[1];
+    
+    // Si se extrajo un video ID, retornar URL de embed
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // Si no se pudo extraer, retornar la URL original
+    return url;
+  }
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-screen overflow-hidden bg-primary text-[#1A1B16]">
+    <section className="relative min-h-screen overflow-hidden bg-primary text-[#1A1B16] pt-20 md:pt-24">
         <div className="relative h-full flex items-center justify-center text-center py-16">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <motion.div
@@ -144,7 +293,7 @@ const HomePage = () => {
       {/* Every contractor on GU - forced brand colors */}
       <section className=" py-16 !bg-[#1A1B16] text-white" id="gusection">
         <div className="container mx-auto px-6 md:px-12">
-          <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">What you'll find at GU</h2>
+          <h2 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-12">{t('whatYouFind.title')}</h2>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between md:divide-x md:divide-white/10 max-w-6xl mx-auto">
             {/* Item 1 */}
@@ -152,7 +301,7 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
                 <HardHat className="size-8 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Licensed and background-checked</h3>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">{t('whatYouFind.licensed')}</h3>
             </div>
 
             {/* Item 2 */}
@@ -160,7 +309,7 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
                 <LineChart className="size-8 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Financially verified</h3>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">{t('whatYouFind.verified')}</h3>
             </div>
 
             {/* Item 3 */}
@@ -168,8 +317,8 @@ const HomePage = () => {
               <div className="mb-6 inline-flex items-center justify-center size-16 rounded-full bg-white/5 ring-2 ring-primary ring-opacity-50">
                 <ShieldCheck className="size-8 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold leading-snug">Protected by a guarantee</h3>
-              <p className="mt-2 text-sm text-gray-300">Up to $250,000</p>
+              <h3 className="text-xl md:text-2xl font-semibold leading-snug">{t('whatYouFind.protected')}</h3>
+              <p className="mt-2 text-sm text-gray-300">{t('whatYouFind.upTo')}</p>
             </div>
           </div>
         </div>
@@ -180,46 +329,46 @@ const HomePage = () => {
           {/* What is GU.com - video section */}
           <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">Que es GU</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">{t('videos.title')}</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Video 1 */}
-                <div className="rounded-2xl overflow-hidden shadow-lg">
-                  <div className="relative w-full pt-[56.25%] bg-gray-100">
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src="https://www.youtube.com/embed/6yYl2ucx2Ng"
-                      title="Roofing Warranty : What Happens When Contractors Fail"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
+              {videosLoading ? (
+                <div className="text-center py-10 text-gray-400">Loading videos...</div>
+              ) : youtubeVideos.length === 0 ? (
+                <div className="text-center py-10 text-gray-400">No videos available.</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {youtubeVideos.slice(0, 2).map((video) => (
+                    <div key={video.id} className="rounded-2xl overflow-hidden shadow-lg">
+                      <div className="relative w-full pt-[56.25%] bg-gray-100">
+                        <iframe
+                          className="absolute inset-0 w-full h-full"
+                          src={getYouTubeEmbedUrl(video.youtube_url)}
+                          title={video.title || 'YouTube Video'}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                      {video.title && (
+                        <div className="p-4">
+                          <h3 className="text-lg font-semibold text-gray-900">{video.title}</h3>
+                          {video.description && (
+                            <p className="text-sm text-gray-600 mt-2 line-clamp-2">{video.description}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-
-                {/* Video 2 */}
-                <div className="rounded-2xl overflow-hidden shadow-lg">
-                  <div className="relative w-full pt-[56.25%] bg-gray-100">
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src="https://www.youtube.com/embed/n1G1kvt8R1g"
-                      title="How to Never Get Scammed By A Contractor again!"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </section>
 
           {/* How it works */}
           <section className="py-16 bg-[#EEF2F7]">
             <div className="container mx-auto px-6 md:px-12">
-              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">How it works</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-10">{t('howItWorks.title')}</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Step 1 */}
@@ -228,27 +377,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 1
+                        {t('howItWorks.step', { number: 1 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <Search className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Search</h3>
-                        <p className="text-gray-600">Enter your location and project type</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.search.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.search.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 1
+                        {t('howItWorks.step', { number: 1 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <Search className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Search</h3>
-                        <p className="text-gray-600">Enter your location and project type</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.search.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.search.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -260,27 +409,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 2
+                        {t('howItWorks.step', { number: 2 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <FileText className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Quotes</h3>
-                        <p className="text-gray-600">Receive quotes from pre-screened contractors</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.quotes.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.quotes.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 2
+                        {t('howItWorks.step', { number: 2 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <FileText className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Quotes</h3>
-                        <p className="text-gray-600">Receive quotes from pre-screened contractors</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.quotes.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.quotes.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -292,27 +441,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 3
+                        {t('howItWorks.step', { number: 3 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <HardHat className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Select</h3>
-                        <p className="text-gray-600">Choose the best contractor for your project</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.select.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.select.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 3
+                        {t('howItWorks.step', { number: 3 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <HardHat className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Select</h3>
-                        <p className="text-gray-600">Choose the best contractor for your project</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.select.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.select.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -324,27 +473,27 @@ const HomePage = () => {
                     {/* Front face */}
                     <div className="absolute inset-0 [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 4
+                        {t('howItWorks.step', { number: 4 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <ShieldCheck className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Guaranteed</h3>
-                        <p className="text-gray-600">Your project is protected up to $250,000</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.guarantee.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.guarantee.description')}</p>
                       </div>
                     </div>
                     {/* Back face (mirrored) */}
                     <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                       <span className="absolute -top-3 left-6 inline-flex items-center gap-2 text-xs font-semibold text-[#1A1B16] bg-primary rounded-full px-3 py-1 shadow">
-                        Step 4
+                        {t('howItWorks.step', { number: 4 })}
                       </span>
                       <div className="flex flex-col items-center text-center">
                         <div className="mb-6 inline-flex items-center justify-center size-24 rounded-full bg-gray-50 ring-2 ring-gray-200">
                           <ShieldCheck className="size-12 text-primary" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Guaranteed</h3>
-                        <p className="text-gray-600">Your project is protected up to $250,000</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('howItWorks.guarantee.title')}</h3>
+                        <p className="text-gray-600">{t('howItWorks.guarantee.description')}</p>
                       </div>
                     </div>
                   </div>
@@ -360,121 +509,72 @@ const HomePage = () => {
               <p className="text-center text-gray-600 mt-3 mb-10">
                 See actual claims we've paid to protect homeowners like you.
               </p>
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {/* Card 1 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
-                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400&auto=format&fit=crop"
-                      alt="Neighborhood"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
-                    "I was charged $4K after my contractor shut down. GU took care of it"
-                  </h3>
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-3 text-gray-400" />
-                    </div>
-                    <span className="font-semibold text-gray-700 text-sm md:text-base">Ben & Susan Smith</span>
-                  </div>
-                  <div className="mt-auto">
-                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
-                      <li className="flex items-center gap-2">
-                        <MapPin className="size-4 text-gray-400" /> Oklahoma, OK
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Wrench className="size-4 text-gray-400" /> Roofing
-                      </li>
-                    </ul>
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
-                        <CalendarDays className="size-4 text-gray-400" /> Jan 2023
-                      </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
-                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Card 2 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
-                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1400&auto=format&fit=crop"
-                      alt="Home exterior"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
-                    "A contractor destroyed my siding, but GU paid $15K to fix it"
-                  </h3>
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-3 text-gray-400" />
-                    </div>
-                    <span className="font-semibold text-gray-700 text-sm md:text-base">Brandy Oberg</span>
-                  </div>
-                  <div className="mt-auto">
-                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
-                      <li className="flex items-center gap-2">
-                        <MapPin className="size-4 text-gray-400" /> Minnesota, MN
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Wrench className="size-4 text-gray-400" /> Roofing
-                      </li>
-                    </ul>
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
-                        <CalendarDays className="size-4 text-gray-400" /> Apr 2022
-                      </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
-                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Card 3 */}
-                <article className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
-                  <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
-                    <img
-                      src="https://images.unsplash.com/photo-1585842378054-ee2e52f94ba3?q=80&w=1400&auto=format&fit=crop"
-                      alt="Roof repair"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
-                    "A contractor damaged my roof. GU paid $8K to replace it"
-                  </h3>
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
-                      <User className="size-3 text-gray-400" />
-                    </div>
-                    <span className="font-semibold text-gray-700 text-sm md:text-base">Lisa Brown</span>
-                  </div>
-                  <div className="mt-auto">
-                    <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
-                      <li className="flex items-center gap-2">
-                        <MapPin className="size-4 text-gray-400" /> New York, NY
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Wrench className="size-4 text-gray-400" /> Roofing
-                      </li>
-                    </ul>
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
-                        <CalendarDays className="size-4 text-gray-400" /> Jun 2024
-                      </div>
-                      <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
-                        <ArrowRightIcon className="size-4 text-[#1A1B16]" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
+                {contractsLoading ? (
+                  <div className="col-span-3 text-center py-10 text-gray-400">Loading...</div>
+                ) : (
+                  <div className="col-span-3 text-center py-10 text-gray-400"></div>
+                )}
+                {contractsLoading ? (
+                  <div className="col-span-3 text-center py-10 text-gray-400">Loading...</div>
+                ) : latestContracts.length === 0 ? (
+                  <div className="col-span-3 text-center py-10 text-gray-400">No recent payouts found.</div>
+                ) : (
+                  latestContracts.map((contract) => {
+                    // Adaptar a la nueva estructura de datos
+                    const contractor = contract.creator || contract.contractor || {};
+                    const professions = contractor.contractor?.professions || [];
+                    const mainProfession = professions.length > 0 ? professions[0].name : 'Profession';
+                    const imageUrl = getJobImageUrl(contract.image_url);
+                    return (
+                      <article key={contract.id} className="bg-white rounded-[14px] shadow-sm transition-all duration-300 p-2 flex flex-col border-[0.5px] border-primary max-w-[360px] w-full mx-auto hover:shadow-[0_0_24px_6px_rgba(245,210,56,0.55),0_0_120px_40px_rgba(245,210,56,0.25),inset_0_0_0_1px_rgba(245,210,56,0.85)]">
+                        <div className="relative w-full pt-[65%] rounded-[12px] overflow-hidden mb-2.5">
+                          <img
+                            src={imageUrl}
+                            alt={contract.title || 'Job'}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 leading-tight">
+                          {contract.title || 'Job payout'}
+                        </h3>
+                        <div className="flex items-center gap-2.5 mb-2.5">
+                          <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center">
+                            <User className="size-3 text-gray-400" />
+                          </div>
+                          <span className="font-semibold text-gray-700 text-sm md:text-base">
+                            {contractor.name || 'Contractor'}
+                          </span>
+                        </div>
+                        <div className="text-xs text-primary font-semibold mb-2">{mainProfession}</div>
+                        <div className="text-xs text-gray-500 mb-2">
+                          {contractor.email && <div>Email: {contractor.email}</div>}
+                          {contractor.mobile_number && <div>Phone: {contractor.mobile_number}</div>}
+                          {contractor.contractor?.company_name && <div>Company: {contractor.contractor.company_name}</div>}
+                        </div>
+                        <div className="mt-auto">
+                          <ul className="space-y-1.5 text-gray-600 text-sm md:text-base">
+                            <li className="flex items-center gap-2">
+                              <MapPin className="size-4 text-gray-400" /> {contract.location || 'Location'}
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Wrench className="size-4 text-gray-400" /> {mainProfession}
+                            </li>
+                          </ul>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-gray-600 text-sm md:text-base">
+                              <CalendarDays className="size-4 text-gray-400" />
+                              {contract.created_at ? new Date(contract.created_at).toLocaleDateString() : ''}
+                            </div>
+                            <button className="inline-flex items-center justify-center size-9 rounded-full bg-primary shadow hover:shadow-md transition">
+                              <ArrowRightIcon className="size-4 text-[#1A1B16]" />
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })
+                )}
               </div>
             </div>
           </section>
@@ -624,79 +724,6 @@ const HomePage = () => {
             </div>
           </section>
 
-          {/* Popular Services Near You */}
-          <section className="py-16 bg-[#F8FAFC]">
-            <div className="container mx-auto px-6 md:px-12">
-              <div className="text-center mb-1">
-                <h2 className="text-3xl md:text-5xl font-bold text-[#1A1B16]">Popular Services Near You</h2>
-              </div>
-              <p className="text-center text-gray-600 mt-1 mb-10">
-                We work in the US and Canada with 100% vetted contractors.
-              </p>
-
-              {/* Carousel */}
-              <div className="relative">
-                {/* edge fades */}
-                <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10 hidden md:block"></div>
-                <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10 hidden md:block"></div>
-
-                {/* viewport using CSS marquee */}
-                <div className="relative overflow-hidden group/services">
-                  <div className="flex gap-6 w-[200%] animate-[scroll-left_40s_linear_infinite] group-hover/services:[animation-play-state:paused]">
-                    {/* first strip */}
-                    <div className="flex gap-6">
-                      {popularServices.map((s) => (
-                        <article key={`a-${s.title}`} className="group shrink-0 w-[280px] sm:w-[320px]">
-                          <div className="relative w-full pt-[66%] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
-                            <img
-                              src={s.img}
-                              alt={s.title}
-                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          </div>
-                          <h3 className="mt-4 text-center text-xl md:text-2xl font-semibold text-[#1A1B16]">
-                            {s.title}
-                          </h3>
-                        </article>
-                      ))}
-                    </div>
-                    {/* second strip */}
-                    <div className="flex gap-6">
-                      {popularServices.map((s) => (
-                        <article key={`b-${s.title}`} className="group shrink-0 w-[280px] sm:w-[320px]">
-                          <div className="relative w-full pt-[66%] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
-                            <img
-                              src={s.img}
-                              alt={s.title}
-                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          </div>
-                          <h3 className="mt-4 text-center text-xl md:text-2xl font-semibold text-[#1A1B16]">
-                            {s.title}
-                          </h3>
-                        </article>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* controls removed to keep clean centered layout */}
-              </div>
-              {/* Show more button below carousel */}
-              <div className="mt-6 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setServicesModalOpen(true)}
-                  className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-[#1A1B16] hover:bg-gray-50 shadow-sm"
-                >
-                  Show more
-                </button>
-              </div>
-            </div>
-          </section>
-
           {/* Popular Services Modal */}
           <AnimatePresence>
             {servicesModalOpen && (
@@ -740,19 +767,16 @@ const HomePage = () => {
           </AnimatePresence>
 
           {/* What Our Customers Say - infinite scroll carousel */}
-          <section className="py-16 bg-white">
+          {/* <section className="py-16 bg-white">
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16] mb-10">
                 What Our Customers Say
               </h2>
 
-              {/* Carousel viewport */}
               <div className="relative overflow-hidden">
-                {/* edge fades */}
                 <div className="pointer-events-none absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-white to-transparent"></div>
                 <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-white to-transparent"></div>
 
-                {/* Track: duplicate items for seamless loop; pause on hover */}
                 <div className="group/carousel">
                   <div className="flex gap-6 w-[200%] animate-[scroll-left_40s_linear_infinite] group-hover/carousel:[animation-play-state:paused]">
                     {(() => {
@@ -811,7 +835,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-          </section>
+          </section> */}
           {/* $250K Guarantee Banner (placed after testimonials) */}
           <section className="py-8 bg-white">
             <div className="container mx-auto px-6 md:px-12">
@@ -820,8 +844,7 @@ const HomePage = () => {
                 <div
                   className="relative h-[360px] md:h-[440px] w-full bg-center bg-cover"
                   style={{
-                    backgroundImage:
-                      "url(https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2000&auto=format&fit=crop)",
+                    backgroundImage: `url(${getBannerImageUrl(banner?.image)})`,
                   }}
                 >
                   {/* Overlay */}
@@ -831,13 +854,21 @@ const HomePage = () => {
                   <div className="absolute inset-0 flex items-center justify-center text-center px-6">
                     <div className="max-w-5xl">
                       <h2 className="text-white font-extrabold leading-tight text-3xl md:text-5xl lg:text-6xl">
-                        Join homeowners who've chosen
-                        <br className="hidden md:block" />
-                        the security of our $250,000 guarantee
+                        {banner?.title || (
+                          <>
+                            Join homeowners who've chosen
+                            <br className="hidden md:block" />
+                            the security of our $250,000 guarantee
+                          </>
+                        )}
                       </h2>
                       <p className="text-white/90 mt-5 text-base md:text-lg max-w-3xl mx-auto">
-                        We understand the trust you place in contractors when you invite them into your space. That's
-                        why we've created the most comprehensive protection program in the industry.
+                        {banner?.subtitle || (
+                          <>
+                            We understand the trust you place in contractors when you invite them into your space. That's
+                            why we've created the most comprehensive protection program in the industry.
+                          </>
+                        )}
                       </p>
                       <div className="mt-7">
                         <Link
@@ -860,30 +891,15 @@ const HomePage = () => {
             <div className="container mx-auto px-6 md:px-12">
               <h2 className="text-3xl md:text-5xl font-bold text-center text-[#1A1B16] mb-6">Questions about GU</h2>
               <div className="max-w-4xl mx-auto divide-y divide-gray-200">
-                {[
-                  {
-                    q: "How do I use GU?",
-                    a: "Search for your project type and location, compare vetted contractors, and hire with confidence under our protection program.",
-                  },
-                  {
-                    q: "How are GU contractors different?",
-                    a: "All contractors on GU are verified, financially screened, and backed by our guarantee to protect homeowners.",
-                  },
-                  {
-                    q: "What if there are no contractors in my area?",
-                    a: "We are expanding rapidly. If none are listed, leave your info and we will notify you as soon as vetted contractors are available.",
-                  },
-                  {
-                    q: "How much does it cost?",
-                    a: "Using GU is free for homeowners. Contractors may have membership fees, but your protection is always included.",
-                  },
-                  {
-                    q: "What does the $250,000 Guarantee cover?",
-                    a: "It covers eligible losses such as contractor abandonment, shoddy workmanship, or damage caused during the project, up to the specified limit.",
-                  },
-                ].map((item, idx) => (
-                  <FaqItem key={idx} question={item.q} answer={item.a} />
-                ))}
+                {faqsLoading ? (
+                  <div className="text-center py-10 text-gray-400">Loading FAQs...</div>
+                ) : faqs.length === 0 ? (
+                  <div className="text-center py-10 text-gray-400">No FAQs available.</div>
+                ) : (
+                  faqs.map((item) => (
+                    <FaqItem key={item.id} question={item.question} answer={item.answer} />
+                  ))
+                )}
               </div>
             </div>
           </section>

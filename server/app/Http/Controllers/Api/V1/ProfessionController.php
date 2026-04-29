@@ -10,17 +10,58 @@ use App\Models\Profession;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\File;
+
 
 class ProfessionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    // public function index(Request $request): AnonymousResourceCollection
+    // {
+    //     $query = Profession::query();
+
+    //     // Apply search filter
+    //     if ($request->filled('search')) {
+    //         $query->search($request->search);
+    //     }
+
+    //     // Include counts if requested
+    //     if ($request->boolean('with_counts')) {
+    //         $query->withContractorsCount();
+    //     }
+
+    //     // Apply sorting
+    //     $sortBy = $request->get('sort_by', 'name');
+    //     $sortDir = $request->get('sort_dir', 'asc');
+    //     $query->sort($sortBy, $sortDir);
+
+    //     // Pagination
+    //     $perPage = $request->get('per_page', 15);
+    //     $professions = $query->paginate($perPage);
+
+    //     return ProfessionResource::collection($professions);
+    // }
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Profession::query();
 
-        // Apply search filter
+        // --- INICIO DE LO NUEVO ---
+        
+        // 1. Cargar la relación con el servicio (opcional, para optimizar)
+        $query->with('service');
+
+        // 2. Filtro por Service ID
+        // Esto captura lo que envía el buscador desde el frontend
+        if ($request->filled('service_id')) {
+            $query->where('service_id', $request->service_id);
+        }
+        
+        // --- FIN DE LO NUEVO ---
+
+        // Apply search filter (Búsqueda por texto existente)
         if ($request->filled('search')) {
             $query->search($request->search);
         }
@@ -41,6 +82,8 @@ class ProfessionController extends Controller
 
         return ProfessionResource::collection($professions);
     }
+
+
 
     /**
      * Get all professions without pagination.
@@ -74,11 +117,20 @@ class ProfessionController extends Controller
      */
     public function store(StoreProfessionRequest $request): JsonResponse
     {
-        $profession = Profession::create($request->validated());
+        $data = $request->validated();
+        $image = $this->persistImage($request, null);
+        if ($image !== '__keep') {
+            $data['image'] = $image;
+        } else {
+            unset($data['image']);
+        }
+
+        $profession = Profession::create($data);
 
         return response()->json([
             'message' => 'Profesión creada exitosamente',
-            'data' => new ProfessionResource($profession)
+            'data' => new ProfessionResource($profession), 
+            'datase' => $request->all()
         ], 201);
     }
 
@@ -121,16 +173,27 @@ class ProfessionController extends Controller
     public function update(UpdateProfessionRequest $request, $id): JsonResponse
     {
         try {
+            $data = $request->validated();
+
             // Buscar por ID o por slug
             $profession = is_numeric($id) 
                 ? Profession::findOrFail($id)
                 : Profession::where('slug', $id)->firstOrFail();
             
-            $profession->update($request->validated());
+            $image = $this->persistImage($request, $profession->image);
+            if ($image !== '__keep') {
+                $data['image'] = $image;
+            } else {
+                unset($data['image']);
+            }
+            $profession->update($data);
+
+            $profession->refresh()->load('service');
 
             return response()->json([
                 'message' => 'Profesión actualizada exitosamente',
-                'data' => new ProfessionResource($profession)
+                'data' => new ProfessionResource($profession),
+                'datasent' => $request->all()
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
@@ -162,7 +225,7 @@ class ProfessionController extends Controller
                     'message' => 'No se puede eliminar la profesión porque tiene contratistas asociados'
                 ], 422);
             }
-
+            $this->deleteImageIfExists($profession->image);
             $profession->delete();
 
             return response()->json([
@@ -267,6 +330,47 @@ class ProfessionController extends Controller
         $professions = $query->get();
 
         return ProfessionResource::collection($professions);
+    }
+
+    private function persistImage(Request $request, ?string $currentPath): ?string
+    {
+        if ($request->boolean('remove_image')) {
+            $this->deleteImageIfExists($currentPath);
+            return null;
+        }
+
+        if (!$request->hasFile('image')) {
+            return '__keep';
+        }
+
+        $file = $request->file('image');
+        if (!$file || !$file->isValid()) {
+            return '__keep';
+        }
+
+        $this->deleteImageIfExists($currentPath);
+
+        $directory = public_path('assets/professions');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        $filename = uniqid('profession_image_') . '.' . $file->getClientOriginalExtension();
+        $file->move($directory, $filename);
+
+        return 'assets/professions/' . $filename;
+    }
+
+    private function deleteImageIfExists(?string $path): void
+    {
+        if (!$path) {
+            return;
+        }
+
+        $fullPath = public_path($path);
+        if (File::exists($fullPath)) {
+            @File::delete($fullPath);
+        }
     }
 
     /**

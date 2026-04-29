@@ -11,19 +11,23 @@ Route::get('/refresh', function () {
         // Limpiar cache de configuración
         Artisan::call('config:clear');
         $output[] = 'Config cache cleared: ' . Artisan::output();
-        
+
         // Limpiar cache de rutas
         Artisan::call('route:clear');
         $output[] = 'Route cache cleared: ' . Artisan::output();
-        
+
         // Limpiar cache de vistas
         Artisan::call('view:clear');
         $output[] = 'View cache cleared: ' . Artisan::output();
-        
+
         // Limpiar cache de eventos
         Artisan::call('event:clear');
         $output[] = 'Event cache cleared: ' . Artisan::output();
-        
+
+        // Limpiar archivos optimizados (incluye rutas, servicios, paquetes, eventos)
+        Artisan::call('optimize:clear');
+        $output[] = 'Optimized files cleared: ' . Artisan::output();
+
         // Intentar limpiar cache de aplicación (puede fallar si hay problemas de DB)
         try {
             Artisan::call('cache:clear');
@@ -31,11 +35,11 @@ Route::get('/refresh', function () {
         } catch (\Exception $e) {
             $output[] = 'Application cache clear failed: ' . $e->getMessage();
         }
-        
+
         // Recrear cache de configuración
         Artisan::call('config:cache');
         $output[] = 'Config cache recreated: ' . Artisan::output();
-        
+
         // Optimizar autoload
         Artisan::call('optimize');
         $output[] = 'Application optimized: ' . Artisan::output();

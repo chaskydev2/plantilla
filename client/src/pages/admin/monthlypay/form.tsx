@@ -32,18 +32,18 @@ interface PaymentModalProps {
 }
 
 const paymentMethods = [
-  { id: "cash", name: "Pago en efectivo" },
-  { id: "qr", name: "Pago por QR" },
+  { id: "cash", name: "Cash payment" },
+  { id: "qr", name: "QR payment" },
 ];
 
 const paymentType = [
-  { id: "1", name: "Pago de Mensualidad" },
-  { id: "2", name: "Multar" },
-  { id: "3", name: "Pago de Curso" },
-  { id: "4", name: "Pago de Multa" },
-  { id: "5", name: "Pago De Certificacion" },
-  { id: "6", name: "Pago de Visacion de Planos" },
-  { id: "7", name: "Otros Pago" },
+  { id: "1", name: "Monthly payment" },
+  { id: "2", name: "Fine" },
+  { id: "3", name: "Course payment" },
+  { id: "4", name: "Penalty payment" },
+  { id: "5", name: "Certification payment" },
+  { id: "6", name: "Blueprint approval payment" },
+  { id: "7", name: "Other payment" },
 ];
 
 const PaymentModal = ({
@@ -97,18 +97,18 @@ const PaymentModal = ({
           cleanData as IUpdateRequest
         );
         load();
-        toastify.success(response.message || "Item actualizado");
+        toastify.success(response.message || "Item updated");
       } else {
         const response = await ItemService.create(cleanData as ICreateRequest);
         load();
-        toastify.success(response.message || "Item creado");
+        toastify.success(response.message || "Item created");
       }
 
       onClose();
     } catch (error: any) {
       toastify.error(
         error.response?.data?.message ||
-          (isEditing ? "Error al actualizar" : "Error al crear")
+          (isEditing ? "Error updating item" : "Error creating item")
       );
     }
   };
@@ -118,7 +118,7 @@ const PaymentModal = ({
     const selectedPaymentMethod = useWatch({ control, name: "payment_method" });
     const [copySuccess, setCopySuccess] = useState("");
 
-    const qrValue = "https://midominio.com/pago";
+    const qrValue = "https://mydomain.com/payment";
 
     if (selectedPaymentMethod !== "qr") return null;
 
@@ -126,23 +126,23 @@ const PaymentModal = ({
       if (navigator.share) {
         try {
           await navigator.share({
-            title: "Pago QR",
-            text: "Escanea o comparte este código QR para realizar el pago.",
+            title: "QR Payment",
+            text: "Scan or share this QR code to make the payment.",
             url: qrValue,
           });
-          setCopySuccess("¡Compartido correctamente!");
+          setCopySuccess("Shared successfully!");
         } catch (error) {
-          setCopySuccess("Error al compartir.");
+          setCopySuccess("Error sharing.");
         }
       } else if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(qrValue);
-          setCopySuccess("URL copiada al portapapeles");
+          setCopySuccess("URL copied to clipboard");
         } catch {
-          setCopySuccess("Error al copiar al portapapeles");
+          setCopySuccess("Error copying to clipboard");
         }
       } else {
-        setCopySuccess("Tu navegador no soporta compartir ni copiar.");
+        setCopySuccess("Your browser does not support sharing or copying.");
       }
 
       setTimeout(() => setCopySuccess(""), 3000);
@@ -151,7 +151,7 @@ const PaymentModal = ({
     return (
       <div className="mt-6 flex flex-col items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <p className="text-sm font-medium text-gray-700 dark:text-gray-200 text-center">
-          Escanee el siguiente código QR para realizar el pago
+          Scan the following QR code to make the payment
         </p>
 
         <div className="p-3 bg-white rounded-md border border-gray-200 dark:border-gray-700 shadow-inner">
@@ -178,7 +178,7 @@ const PaymentModal = ({
                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
               />
             </svg>
-            Compartir QR
+            Share QR
           </button>
 
           {copySuccess && (
@@ -211,14 +211,14 @@ const PaymentModal = ({
 
     if (selectedPaymentType !== "1") return null;
 
-    return <InputField name="date" label="Mes" type="month" />;
+    return <InputField name="date" label="Month" type="month" />;
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "Editar Pago" : "Nuevo Pago"}
+      title={isEditing ? "Edit Payment" : "New Payment"}
       size="lg"
     >
       <FormProviderWrapper
@@ -232,7 +232,7 @@ const PaymentModal = ({
           <div className="md:col-span-5">
             {isEditing ? (
               <SelectField
-                label="Afiliado"
+                label="Affiliate"
                 name="user_id"
                 options={users}
                 valueKey="id"
@@ -241,7 +241,7 @@ const PaymentModal = ({
               />
             ) : (
               <MultiSelectField
-                label="Seleccionar Afiliado(s)"
+                label="Select Affiliate(s)"
                 name="user_ids"
                 options={users}
                 valueKey="id"
@@ -253,7 +253,7 @@ const PaymentModal = ({
 
           <div className="md:col-span-2">
             <SelectField
-              label="Seleccione el Tipo de Movimiento"
+              label="Select Payment Type"
               name="payment_type"
               options={paymentType}
               valueKey="id"
@@ -263,7 +263,7 @@ const PaymentModal = ({
           <div className="md:col-span-1">
             <InputField
               name="amount"
-              label="Importe individual"
+              label="Individual amount"
               placeholder="0.00"
               type="number"
               step="any"
@@ -276,14 +276,14 @@ const PaymentModal = ({
           <div className="md:col-span-5">
             <TextAreaField
               name="observation"
-              label="Observacion"
-              placeholder="Ej: Observacion relevantes"
+              label="Observation"
+              placeholder="E.g.: relevant observations"
               rows={1}
             />
           </div>
           <div className="md:col-span-5">
             <SelectField
-              label="Seleccionar Método de Pago"
+              label="Select Payment Method"
               name="payment_method"
               options={paymentMethods}
               valueKey="id"

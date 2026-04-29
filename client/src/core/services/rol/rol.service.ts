@@ -19,6 +19,7 @@ export const update = async (id: any, request: Partial<IRolUpdateRequest>): Prom
 
 export const remove = async (id: any): Promise<IApiResponse> => {
   const res = await axios.delete(`/v1/roles/${id}`);
+  console.log('Respuesta al eliminar rol:', res.data);
   return res.data;
 }
 

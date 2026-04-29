@@ -9,6 +9,7 @@ interface ModalProps {
   footer?: ReactNode;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
   closeOnClickOutside?: boolean;
+  bodyMaxHeightClass?: string;
 }
 
 const Modal = ({
@@ -18,6 +19,7 @@ const Modal = ({
   children,
   footer,
   size = 'xl',
+  bodyMaxHeightClass = 'max-h-[60vh]',
 }: ModalProps) => {
   if (!isOpen) return null;
 
@@ -60,7 +62,7 @@ const Modal = ({
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto max-h-[60vh] pr-1">
+        <div className={`overflow-y-auto ${bodyMaxHeightClass} pr-1`}>
           {children}
         </div>
 

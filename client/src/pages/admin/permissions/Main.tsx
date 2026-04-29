@@ -4,8 +4,9 @@ import { PermissonService as ItemService } from "@/core/services/permission/perm
 import type { IPermissionResponse as IItemResource } from "@/core/types/IPermission";
 import { Search } from 'lucide-react';
 import { useResource } from "@/core/hooks/useResource";
+import { useTranslation } from 'react-i18next';
 
-const columns = [
+const columns = (t: any) => [
   {
     key: 'id',
     header: 'ID',
@@ -16,7 +17,7 @@ const columns = [
   },
   {
     key: 'name',
-    header: 'Nombre',
+    header: t('admin.roles.nameLabel'),
     render: (item: IItemResource) => (
       <div className="font-semibold text-gray-900 dark:text-gray-100">{item.name}</div>
     ),
@@ -25,6 +26,7 @@ const columns = [
 ];
 
 export default function PermissionList() {
+  const { t } = useTranslation();
   const {
     items,
     loading,
@@ -50,7 +52,7 @@ export default function PermissionList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={t('admin.permissions.searchPlaceholder')}
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -61,10 +63,10 @@ export default function PermissionList() {
 
   return (
     <>
-      <PageBreadcrumb pageTitle="Permisos" />
+      <PageBreadcrumb pageTitle={t('admin.permissions.title')} />
       <DataTable
           data={items as IItemResource[]}
-          columns={columns}
+          columns={columns(t)}
           sort={sort}
           onSortChange={handleSortChange}
           onFilterChange={handleFilterChange}

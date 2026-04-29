@@ -5,12 +5,15 @@ export type Contractor = {
   name: string;
   rating: number; // 0-5
   reviews: number;
+  tags?: string[];
   elite: boolean;
   projectsRegistered: number;
   services: string[];
   extraServicesCount?: number;
   distanceMiles: number;
   locationLabel: string; // e.g., "Oklahoma City, OK, 73131"
+  lat: number; // Latitud para Google Maps
+  lng: number; // Longitud para Google Maps
   logoUrl?: string;
   quote?: { author: string; text: string };
 };

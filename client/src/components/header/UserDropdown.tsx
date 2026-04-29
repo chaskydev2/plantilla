@@ -35,7 +35,7 @@ export default function UserDropdown() {
     if (logout.fulfilled.match(resultAction)) {
       navigate('/login');
     } else {
-      alert('Login fallido: ' + (resultAction.payload as string));
+      alert('Login failed: ' + (resultAction.payload as string));
     }
     setIsLoading(false);
   }
@@ -91,7 +91,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/admin/perfil"
+              to="/admin"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg
@@ -109,7 +109,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Editar perfil
+              Profile 
             </DropdownItem>
           </li>
         </ul>
@@ -133,7 +133,7 @@ export default function UserDropdown() {
               fill=""
             />
           </svg>
-          Cerrar Sesión
+          Sign Out
         </button>
       </Dropdown>
     </div>

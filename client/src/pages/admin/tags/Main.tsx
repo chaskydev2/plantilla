@@ -3,6 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { TagService as ItemService } from "@/core/services/tag/tag.service";
 import type { ITag as IItemResource } from "@/core/types/ITag";
 import { Search, Plus, Trash2, Edit, Tag } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import Form from "./form.tsx";
 import { useResource } from "@/core/hooks/useResource";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -10,55 +11,61 @@ import { toastify } from "@/core/utils/toastify";
 // import useAuth from "@/core/hooks/useAuth"; // TODO: Descomentar cuando se configuren los permisos
 import DataTable from "@/components/table/DataTable";
 
-const columns = [
-  {
-    key: "id",
-    header: "ID",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-3">
-        <div className="font-bold">{item?.id || '-'}</div>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "name",
-    header: "Nombre",
-    render: (item: IItemResource) => (
-      <div className="flex items-center gap-2">
-        <Tag className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className="font-bold">{item?.name || '-'}</span>
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "slug",
-    header: "Slug",
-    render: (item: IItemResource) => (
-      <div className="font-mono text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-        {item?.slug || '-'}
-      </div>
-    ),
-    sortable: true,
-  },
-  {
-    key: "created_at",
-    header: "Fecha de Creación",
-    render: (item: IItemResource) => (
-      <div className="text-sm text-gray-600 dark:text-gray-400">
-        {item?.created_at ? new Date(item.created_at).toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }) : '-'}
-      </div>
-    ),
-    sortable: true,
-  },
-];
+// Columns are created inside the component to allow translated labels
+// columns will be created inside component to allow translated labels
 
 export default function TagList() {
+  const { t } = useTranslation();
+
+  // Define columns with translated headers
+  const columns = [
+    {
+      key: "id",
+      header: t('admin.common.id'),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-3">
+          <div className="font-bold">{item?.id || '-'}</div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "name",
+      header: t('admin.common.name'),
+      render: (item: IItemResource) => (
+        <div className="flex items-center gap-2">
+          <Tag className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          <span className="font-bold">{item?.name || '-'}</span>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "slug",
+      header: t('admin.tags.slug'),
+      render: (item: IItemResource) => (
+        <div className="font-mono text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+          {item?.slug || '-'}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: "created_at",
+      header: t('admin.tags.createdDate'),
+      render: (item: IItemResource) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {item?.created_at ? new Date(item.created_at).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }) : '-'}
+        </div>
+      ),
+      sortable: true,
+    },
+  ];
+
   const {
     items,
     loading,
@@ -116,8 +123,8 @@ export default function TagList() {
 
   const confirmDelete = (item: IItemResource) => {
     openDialog(
-      "Confirmar eliminación",
-      `¿Estás seguro que deseas eliminar la etiqueta "${item.name}"?`,
+      t('admin.common.confirmDelete'),
+      t('admin.tags.confirmDeleteMessage', { name: item.name }),
       () => handleDelete(item),
       "danger"
     );
@@ -127,11 +134,11 @@ export default function TagList() {
     setIsProcessing(true);
     try {
       const response = await ItemService.remove(item.id);
-      toastify.success(response?.message || "Etiqueta eliminada");
+      toastify.success(response?.message || t('admin.tags.deleteSuccess'));
       fetchItems();
     } catch (error: any) {
       console.error("Error al eliminar la etiqueta:", error);
-      toastify.error(error.response?.data?.message || "Error al eliminar la etiqueta");
+      toastify.error(error.response?.data?.message || t('admin.tags.deleteError'));
     } finally {
       setIsProcessing(false);
       closeDialog();
@@ -140,14 +147,14 @@ export default function TagList() {
 
   const actions = [
     {
-      label: "Editar",
+      label: t('admin.common.edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (item: IItemResource) => handleEdit(item),
       variant: "primary" as const,
       show: () => true, // hasPermission("etiqueta_editar") - TODO: Agregar permisos
     },
     {
-      label: "Eliminar",
+      label: t('admin.common.delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: IItemResource) => confirmDelete(item),
       variant: "danger" as const,
@@ -167,7 +174,7 @@ export default function TagList() {
             }}
           >
             <Plus className="w-5 h-5" />
-            Agregar Etiqueta
+            {t('admin.tags.addTag')}
           </button>
         )}
       </div>
@@ -177,7 +184,7 @@ export default function TagList() {
         </div>
         <input
           type="text"
-          placeholder="Buscar etiquetas..."
+          placeholder={t('admin.tags.searchPlaceholder')}
           className="input w-full pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-500 focus:border-gray-600 focus:ring-1 focus:ring-gray-600"
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
@@ -188,7 +195,7 @@ export default function TagList() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Etiquetas" />
+      <PageBreadcrumb pageTitle={t('admin.sidebar.tags')} />
       <DataTable
         data={items as IItemResource[]}
         columns={columns}
@@ -222,7 +229,7 @@ export default function TagList() {
           onCancel={closeDialog}
           isProcessing={isProcessing}
           variant={dialogConfig.variant}
-          confirmText={dialogConfig.variant === "danger" ? "Eliminar" : "Confirmar"}
+          confirmText={dialogConfig.variant === "danger" ? t('admin.common.delete') : t('admin.common.confirmText')}
         />
       )}
     </div>

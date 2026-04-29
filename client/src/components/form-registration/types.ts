@@ -45,6 +45,7 @@ export interface MultiSelectFieldProps {
   className?: string;
   style?: React.CSSProperties;
   ariaLabel?: string;
+  disabled?: boolean;
 }
 
 export interface PasswordInputProps {

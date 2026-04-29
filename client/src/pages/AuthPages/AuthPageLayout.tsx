@@ -2,25 +2,22 @@ import React from "react";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import BrandLogoUrl from "@/assets/images/LOGO GUD.svg?url";
-import useGoBack from "@/core/hooks/useGoBack";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const goBack = useGoBack();
   return (
     <div className="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
       {/* Back button - global position in the login layout */}
-      <button
-        type="button"
-        onClick={goBack}
-        className="fixed top-4 left-4 z-[100] p-3 rounded-full text-[#1A1B16] hover:bg-[#F5D238]/20 focus:outline-none focus:ring-2 focus:ring-[#F5D238]/40 transition active:scale-95 cursor-pointer"
-        aria-label="Volver atrás"
+      <Link
+        to="/"
+        className="fixed top-4 left-4 z-[100] p-3 rounded-full text-[#1A1B16] hover:bg-[#F5D238]/20 focus:outline-none focus:ring-2 focus:ring-[#F5D238]/40 transition active:scale-95 cursor-pointer inline-flex items-center justify-center"
+        aria-label="Volver al login"
       >
         <ArrowLeft className="w-7 h-7" />
-      </button>
+      </Link>
       <div className="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0">
         {children}
         <div className="items-center hidden w-full h-full lg:w-1/2 bg-[#F5D238] lg:grid relative overflow-hidden">

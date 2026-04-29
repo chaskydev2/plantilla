@@ -1,6 +1,7 @@
 import { InputField } from '@/components/form-field';
 import Modal from '@/components/modal/Modal';
 import { FormProviderWrapper } from '@/composables/FormProviderWrapper';
+import { useTranslation } from 'react-i18next';
 import type { 
   IRolCreateRequest as ICreateRequest, 
   IRolUpdateRequest as IUpdateRequest, 
@@ -26,6 +27,7 @@ const RolModal = ({
   initialData = null,
   load,
 }: RolModalProps) => {
+  const { t } = useTranslation();
   const isEditing = !!initialData;
 
   type FormValues = ICreateRequest | IUpdateRequest;
@@ -49,20 +51,20 @@ const RolModal = ({
           cleanData as IUpdateRequest
         );
         load();
-        toastify.success(response.message || 'Item actualizado');
+  toastify.success(response.message || t('admin.messages.saveSuccess'));
       } else {
         const response = await ItemService.create(
           cleanData as ICreateRequest
         );
         load();
-        toastify.success(response.message || 'Item creado');
+  toastify.success(response.message || t('admin.messages.saveSuccess'));
       }
 
       onClose();
     } catch (error: any) {
       toastify.error(
-        error.response?.data?.message || 
-        (isEditing ? 'Error al actualizar' : 'Error al crear')
+        error.response?.data?.message ||
+        (isEditing ? t('admin.messages.errorOccurred') : t('admin.messages.errorOccurred'))
       );
     }
   }
@@ -71,7 +73,7 @@ const RolModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Editar Rol' : 'Nuevo Rol'}
+      title={isEditing ? t('admin.roles.editRole') : t('admin.roles.addRole')}
       size="lg"
     >
       <FormProviderWrapper
@@ -85,8 +87,8 @@ const RolModal = ({
           <div className="md:col-span-2">
             <InputField
               name="name"
-              label="Nombre rol"
-              placeholder="Ingrese el nombre del rol"
+              label={t('admin.roles.nameLabel')}
+              placeholder={t('admin.roles.namePlaceholder')}
             />
           </div>
         </div>
